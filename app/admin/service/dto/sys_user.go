@@ -117,8 +117,6 @@ func (s *SysUserInsertReq) Generate(model *models.SysUser) {
 	model.Avatar = s.Avatar
 	model.Sex = s.Sex
 	model.Email = s.Email
-	model.DeptId = s.DeptId
-	model.PostId = s.PostId
 	model.Remark = s.Remark
 	model.Status = s.Status
 	model.CreateBy = s.CreateBy
@@ -155,8 +153,6 @@ func (s *SysUserUpdateReq) Generate(model *models.SysUser) {
 	model.Avatar = s.Avatar
 	model.Sex = s.Sex
 	model.Email = s.Email
-	model.DeptId = s.DeptId
-	model.PostId = s.PostId
 	model.Remark = s.Remark
 	model.Status = s.Status
 }

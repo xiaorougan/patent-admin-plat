@@ -15,7 +15,7 @@ import (
 
 	"go-admin/common/middleware"
 	"go-admin/common/middleware/handler"
-	_ "go-admin/docs/admin"
+	_ "go-admin/docs"
 )
 
 func InitSysRouter(r *gin.Engine, authMiddleware *jwt.GinJWTMiddleware) *gin.RouterGroup {
@@ -56,7 +56,7 @@ func sysStaticFileRouter(r *gin.RouterGroup) {
 }
 
 func sysSwaggerRouter(r *gin.RouterGroup) {
-	r.GET("/swagger/admin/*any", ginSwagger.WrapHandler(swaggerfiles.NewHandler(), ginSwagger.InstanceName("admin")))
+	r.GET("/swagger/admin/*any", ginSwagger.WrapHandler(swaggerfiles.NewHandler()))
 }
 
 func sysCheckRoleRouterInit(r *gin.RouterGroup, authMiddleware *jwt.GinJWTMiddleware) {
@@ -71,18 +71,18 @@ func sysCheckRoleRouterInit(r *gin.RouterGroup, authMiddleware *jwt.GinJWTMiddle
 		v1.POST("/login", authMiddleware.LoginHandler)
 		// Refresh time can be longer than token timeout
 		v1.GET("/refresh_token", authMiddleware.RefreshHandler)
+		sys := apis.System{}
+		v1.GET("/captcha", sys.GenerateCaptchaHandler)
 	}
 	registerBaseRouter(v1, authMiddleware)
 }
 
 func registerBaseRouter(v1 *gin.RouterGroup, authMiddleware *jwt.GinJWTMiddleware) {
-	api := apis.SysMenu{}
-	api2 := apis.SysDept{}
-	v1auth := v1.Group("").Use(authMiddleware.MiddlewareFunc()).Use(middleware.AuthCheckRole())
+	//api2 := apis.SysDept{}
+	v1auth := v1.Group("/api/v1").Use(authMiddleware.MiddlewareFunc()).Use(middleware.AuthCheckRole())
 	{
-		v1auth.GET("/roleMenuTreeselect/:roleId", api.GetMenuTreeSelect)
 		//v1.GET("/menuTreeselect", api.GetMenuTreeSelect)
-		v1auth.GET("/roleDeptTreeselect/:roleId", api2.GetDeptTreeRoleSelect)
+		//v1auth.GET("/roleDeptTreeselect/:roleId", api2.GetDeptTreeRoleSelect)
 		v1auth.POST("/logout", handler.LogOut)
 	}
 }

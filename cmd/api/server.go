@@ -20,7 +20,6 @@ import (
 
 	"go-admin/app/admin/models"
 	"go-admin/app/admin/router"
-	"go-admin/app/jobs"
 	"go-admin/common/database"
 	"go-admin/common/global"
 	common "go-admin/common/middleware"
@@ -68,8 +67,6 @@ func setup() {
 	//注册监听函数
 	queue := sdk.Runtime.GetMemoryQueue("")
 	queue.Register(global.LoginLog, models.SaveLoginLog)
-	queue.Register(global.OperateLog, models.SaveOperaLog)
-	queue.Register(global.ApiCheck, models.SaveSysApi)
 	go queue.Run()
 
 	usageStr := `starting api server...`
@@ -90,12 +87,6 @@ func run() error {
 		Addr:    fmt.Sprintf("%s:%d", config.ApplicationConfig.Host, config.ApplicationConfig.Port),
 		Handler: sdk.Runtime.GetEngine(),
 	}
-
-	go func() {
-		jobs.InitJob()
-		jobs.Setup(sdk.Runtime.GetDb())
-
-	}()
 
 	if apiCheck {
 		var routers = sdk.Runtime.GetRouter()

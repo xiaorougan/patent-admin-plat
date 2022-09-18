@@ -2,10 +2,10 @@ package version
 
 import (
 	"github.com/go-admin-team/go-admin-core/sdk/config"
+	"go-admin/app/admin/models"
 	"runtime"
 
 	"go-admin/cmd/migrate/migration"
-	"go-admin/cmd/migrate/migration/models"
 	common "go-admin/common/models"
 
 	"gorm.io/gorm"
@@ -22,23 +22,9 @@ func _1599190683659Tables(db *gorm.DB, version string) error {
 			tx = tx.Set("gorm:table_options", "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4")
 		}
 		err := tx.Migrator().AutoMigrate(
-			new(models.SysDept),
-			new(models.SysConfig),
-			new(models.SysTables),
-			new(models.SysColumns),
-			new(models.SysMenu),
 			new(models.SysLoginLog),
-			new(models.SysOperaLog),
-			new(models.SysRoleDept),
 			new(models.SysUser),
 			new(models.SysRole),
-			new(models.SysPost),
-			new(models.DictData),
-			new(models.DictType),
-			new(models.SysJob),
-			new(models.SysConfig),
-			new(models.SysApi),
-			new(models.TbDemo),
 		)
 		if err != nil {
 			return err

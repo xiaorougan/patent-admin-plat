@@ -31,7 +31,6 @@ type SysRole struct {
 // @Param roleKey query string false "roleKey"
 // @Param pageSize query int false "页条数"
 // @Param pageIndex query int false "页码"
-// @Success 200 {object} response.Response "{"code": 200, "data": [...]}"
 // @Router /api/v1/role [get]
 // @Security Bearer
 func (e SysRole) GetPage(c *gin.Context) {
@@ -65,7 +64,6 @@ func (e SysRole) GetPage(c *gin.Context) {
 // @Description 获取JSON
 // @Tags 角色/Role
 // @Param roleId path string false "roleId"
-// @Success 200 {object} response.Response "{"code": 200, "data": [...]}"
 // @Router /api/v1/role/{id} [get]
 // @Security Bearer
 func (e SysRole) Get(c *gin.Context) {
@@ -100,7 +98,6 @@ func (e SysRole) Get(c *gin.Context) {
 // @Accept  application/json
 // @Product application/json
 // @Param data body dto.SysRoleInsertReq true "data"
-// @Success 200 {object} response.Response "{"code": 200, "data": [...]}"
 // @Router /api/v1/role [post]
 // @Security Bearer
 func (e SysRole) Insert(c *gin.Context) {
@@ -138,55 +135,11 @@ func (e SysRole) Insert(c *gin.Context) {
 	e.OK(req.GetId(), "创建成功")
 }
 
-// Update 修改用户角色
-// @Summary 修改用户角色
-// @Description 获取JSON
-// @Tags 角色/Role
-// @Accept  application/json
-// @Product application/json
-// @Param data body dto.SysRoleUpdateReq true "body"
-// @Success 200 {object} response.Response "{"code": 200, "data": [...]}"
-// @Router /api/v1/role/{id} [put]
-// @Security Bearer
-func (e SysRole) Update(c *gin.Context) {
-	s := service.SysRole{}
-	req := dto.SysRoleUpdateReq{}
-	err := e.MakeContext(c).
-		MakeOrm().
-		Bind(&req, nil, binding.JSON).
-		MakeService(&s.Service).
-		Errors
-	if err != nil {
-		e.Logger.Error(err)
-		e.Error(500, err, err.Error())
-		return
-	}
-	cb := sdk.Runtime.GetCasbinKey(c.Request.Host)
-
-	req.SetUpdateBy(user.GetUserId(c))
-
-	err = s.Update(&req, cb)
-	if err != nil {
-		e.Logger.Error(err)
-		return
-	}
-
-	_, err = global.LoadPolicy(c)
-	if err != nil {
-		e.Logger.Error(err)
-		e.Error(500, err, "更新失败,"+err.Error())
-		return
-	}
-
-	e.OK(req.GetId(), "更新成功")
-}
-
 // Delete
 // @Summary 删除用户角色
 // @Description 删除数据
 // @Tags 角色/Role
 // @Param data body dto.SysRoleDeleteReq true "body"
-// @Success 200 {object} response.Response "{"code": 200, "data": [...]}"
 // @Router /api/v1/role [delete]
 // @Security Bearer
 func (e SysRole) Delete(c *gin.Context) {
@@ -221,7 +174,6 @@ func (e SysRole) Delete(c *gin.Context) {
 // @Accept  application/json
 // @Product application/json
 // @Param data body dto.UpdateStatusReq true "body"
-// @Success 200 {object} response.Response "{"code": 200, "data": [...]}"
 // @Router /api/v1/role-status/{id} [put]
 // @Security Bearer
 func (e SysRole) Update2Status(c *gin.Context) {
@@ -256,29 +208,29 @@ func (e SysRole) Update2Status(c *gin.Context) {
 // @Success 200 {object} response.Response "{"code": 200, "data": [...]}"
 // @Router /api/v1/role-status/{id} [put]
 // @Security Bearer
-func (e SysRole) Update2DataScope(c *gin.Context) {
-	s := service.SysRole{}
-	req := dto.RoleDataScopeReq{}
-	err := e.MakeContext(c).
-		MakeOrm().
-		Bind(&req, binding.JSON, nil).
-		MakeService(&s.Service).
-		Errors
-	if err != nil {
-		e.Logger.Error(err)
-		e.Error(500, err, err.Error())
-		return
-	}
-	data := &models.SysRole{
-		RoleId:    req.RoleId,
-		DataScope: req.DataScope,
-		DeptIds:   req.DeptIds,
-	}
-	data.UpdateBy = user.GetUserId(c)
-	err = s.UpdateDataScope(&req).Error
-	if err != nil {
-		e.Error(500, err, fmt.Sprintf("更新角色数据权限失败！错误详情：%s", err.Error()))
-		return
-	}
-	e.OK(nil, "操作成功")
-}
+//func (e SysRole) Update2DataScope(c *gin.Context) {
+//	s := service.SysRole{}
+//	req := dto.RoleDataScopeReq{}
+//	err := e.MakeContext(c).
+//		MakeOrm().
+//		Bind(&req, binding.JSON, nil).
+//		MakeService(&s.Service).
+//		Errors
+//	if err != nil {
+//		e.Logger.Error(err)
+//		e.Error(500, err, err.Error())
+//		return
+//	}
+//	data := &models.SysRole{
+//		RoleId:    req.RoleId,
+//		DataScope: req.DataScope,
+//		DeptIds:   req.DeptIds,
+//	}
+//	data.UpdateBy = user.GetUserId(c)
+//	err = s.UpdateDataScope(&req).Error
+//	if err != nil {
+//		e.Error(500, err, fmt.Sprintf("更新角色数据权限失败！错误详情：%s", err.Error()))
+//		return
+//	}
+//	e.OK(nil, "操作成功")
+//}

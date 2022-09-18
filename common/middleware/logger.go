@@ -5,7 +5,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"go-admin/app/admin/service/dto"
 	"go-admin/common"
 	gaConfig "go-admin/config"
 	"io"
@@ -121,11 +120,6 @@ func SetDBOperLog(c *gin.Context, clientIP string, statusCode int, reqUri string
 	l["userAgent"] = c.Request.UserAgent()
 	l["createBy"] = user.GetUserId(c)
 	l["updateBy"] = user.GetUserId(c)
-	if status == http.StatusOK {
-		l["status"] = dto.OperaStatusEnabel
-	} else {
-		l["status"] = dto.OperaStatusDisable
-	}
 	q := sdk.Runtime.GetMemoryQueue(c.Request.Host)
 	message, err := sdk.Runtime.GetStreamMessage("", global.OperateLog, l)
 	if err != nil {

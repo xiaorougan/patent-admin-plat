@@ -18,7 +18,8 @@ config/settings.dev.yml.log
 config/settings.b.dev.yml
 cmd/migrate/migration/version-local/*
 !cmd/migrate/migration/version-local/doc.go
-*/.DS_Store
+
+.DS_Store
 
 # go sum
 go.sum

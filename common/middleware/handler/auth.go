@@ -120,7 +120,7 @@ func LoginLogToDB(c *gin.Context, status string, msg string, username string) {
 	ua := user_agent.New(c.Request.UserAgent())
 	l["ipaddr"] = common.GetClientIP(c)
 	fmt.Println("gaConfig.ExtConfig.AMap.Key", gaConfig.ExtConfig.AMap.Key)
-	l["loginLocation"] = pkg.GetLocation(common.GetClientIP(c),gaConfig.ExtConfig.AMap.Key)
+	l["loginLocation"] = pkg.GetLocation(common.GetClientIP(c), gaConfig.ExtConfig.AMap.Key)
 	l["loginTime"] = pkg.GetCurrentTime()
 	l["status"] = status
 	l["remark"] = c.Request.UserAgent()
@@ -151,8 +151,9 @@ func LoginLogToDB(c *gin.Context, status string, msg string, username string) {
 // Reply will be of the form {"token": "TOKEN"}.
 // @Accept  application/json
 // @Product application/json
+// @Tags 登陆
 // @Success 200 {string} string "{"code": 200, "msg": "成功退出系统" }"
-// @Router /logout [post]
+// @Router /api/v1/logout [post]
 // @Security Bearer
 func LogOut(c *gin.Context) {
 	LoginLogToDB(c, "2", "退出成功", user.GetUserName(c))
