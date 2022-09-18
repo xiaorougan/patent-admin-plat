@@ -2,7 +2,7 @@ package version
 
 import (
 	"github.com/go-admin-team/go-admin-core/sdk/config"
-	"go-admin/app/admin/models"
+	"go-admin/cmd/migrate/migration/models"
 	"runtime"
 
 	"go-admin/cmd/migrate/migration"
