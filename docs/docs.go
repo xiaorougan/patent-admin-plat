@@ -11,10 +11,6 @@ const docTemplate = `{
         "description": "{{escape .Description}}",
         "title": "{{.Title}}",
         "contact": {},
-        "license": {
-            "name": "MIT",
-            "url": "https://github.com/go-admin-team/go-admin/blob/master/LICENSE.md"
-        },
         "version": "{{.Version}}"
     },
     "host": "{{.Host}}",
@@ -76,6 +72,31 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/v1/logout": {
+            "post": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "获取token",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "登陆"
+                ],
+                "summary": "退出登录",
+                "responses": {
+                    "200": {
+                        "description": "{\"code\": 200, \"msg\": \"成功退出系统\" }",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/public/uploadFile": {
             "post": {
                 "security": [
@@ -115,6 +136,30 @@ const docTemplate = `{
                         }
                     }
                 }
+            }
+        },
+        "/api/v1/register": {
+            "post": {
+                "description": "获取JSON",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "登陆"
+                ],
+                "summary": "注册用户",
+                "parameters": [
+                    {
+                        "description": "用户数据",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.SysUserInsertReq"
+                        }
+                    }
+                ],
+                "responses": {}
             }
         },
         "/api/v1/role": {
@@ -633,31 +678,6 @@ const docTemplate = `{
                 ],
                 "responses": {}
             }
-        },
-        "/logout": {
-            "post": {
-                "security": [
-                    {
-                        "Bearer": []
-                    }
-                ],
-                "description": "获取token",
-                "consumes": [
-                    "application/json"
-                ],
-                "tags": [
-                    "登陆"
-                ],
-                "summary": "退出登录",
-                "responses": {
-                    "200": {
-                        "description": "{\"code\": 200, \"msg\": \"成功退出系统\" }",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                }
-            }
         }
     },
     "definitions": {
@@ -763,13 +783,19 @@ const docTemplate = `{
                 "avatar": {
                     "type": "string"
                 },
+                "bio": {
+                    "type": "string"
+                },
                 "createBy": {
                     "type": "integer"
                 },
                 "deptId": {
-                    "type": "integer"
+                    "type": "string"
                 },
                 "email": {
+                    "type": "string"
+                },
+                "interest": {
                     "type": "string"
                 },
                 "nickName": {
@@ -780,9 +806,6 @@ const docTemplate = `{
                 },
                 "phone": {
                     "type": "string"
-                },
-                "postId": {
-                    "type": "integer"
                 },
                 "remark": {
                     "type": "string"
@@ -930,11 +953,11 @@ const docTemplate = `{
 
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
-	Version:          "2.0.0",
+	Version:          "0.1.0",
 	Host:             "",
 	BasePath:         "",
 	Schemes:          []string{},
-	Title:            "go-admin API",
+	Title:            "PatentAdminPlat API",
 	Description:      "专利检测平台v0.1",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,

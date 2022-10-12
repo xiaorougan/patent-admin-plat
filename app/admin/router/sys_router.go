@@ -29,6 +29,8 @@ func InitSysRouter(r *gin.Engine, authMiddleware *jwt.GinJWTMiddleware) *gin.Rou
 	}
 	// 需要认证
 	sysCheckRoleRouterInit(g, authMiddleware)
+	// 无需认证
+	sysNoCheckRoleRouterInit(g)
 	return g
 }
 
@@ -71,10 +73,20 @@ func sysCheckRoleRouterInit(r *gin.RouterGroup, authMiddleware *jwt.GinJWTMiddle
 		v1.POST("/login", authMiddleware.LoginHandler)
 		// Refresh time can be longer than token timeout
 		v1.GET("/refresh_token", authMiddleware.RefreshHandler)
-		sys := apis.System{}
-		v1.GET("/captcha", sys.GenerateCaptchaHandler)
 	}
 	registerBaseRouter(v1, authMiddleware)
+}
+
+func sysNoCheckRoleRouterInit(r *gin.RouterGroup) {
+	sys := apis.System{}
+	user := apis.SysUser{}
+	v1 := r.Group("/api/v1")
+	{
+		// 验证码
+		v1.GET("/captcha", sys.GenerateCaptchaHandler)
+		// 注册
+		v1.POST("/register", user.Register)
+	}
 }
 
 func registerBaseRouter(v1 *gin.RouterGroup, authMiddleware *jwt.GinJWTMiddleware) {

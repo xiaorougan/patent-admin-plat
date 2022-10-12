@@ -123,6 +123,38 @@ func (e SysUser) Insert(c *gin.Context) {
 	e.OK(req.GetId(), "创建成功")
 }
 
+// Register
+// @Summary 注册用户
+// @Description 获取JSON
+// @Tags 登陆
+// @Accept  application/json
+// @Product application/json
+// @Param data body dto.SysUserInsertReq true "用户数据"
+// @Router /api/v1/register [post]
+func (e SysUser) Register(c *gin.Context) {
+	s := service.SysUser{}
+	req := dto.SysUserInsertReq{}
+	err := e.MakeContext(c).
+		MakeOrm().
+		Bind(&req, binding.JSON).
+		MakeService(&s.Service).
+		Errors
+	if err != nil {
+		e.Logger.Error(err)
+		e.Error(500, err, err.Error())
+		return
+	}
+
+	err = s.Insert(&req)
+	if err != nil {
+		e.Logger.Error(err)
+		e.Error(500, err, err.Error())
+		return
+	}
+
+	e.OK(req.GetId(), "创建成功")
+}
+
 // Update
 // @Summary 修改用户数据
 // @Description 获取JSON

@@ -2,13 +2,9 @@
     "swagger": "2.0",
     "info": {
         "description": "专利检测平台v0.1",
-        "title": "go-admin API",
+        "title": "PatentAdminPlat API",
         "contact": {},
-        "license": {
-            "name": "MIT",
-            "url": "https://github.com/go-admin-team/go-admin/blob/master/LICENSE.md"
-        },
-        "version": "2.0.0"
+        "version": "0.1.0"
     },
     "paths": {
         "/api/v1/captcha": {
@@ -67,6 +63,31 @@
                 }
             }
         },
+        "/api/v1/logout": {
+            "post": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "获取token",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "登陆"
+                ],
+                "summary": "退出登录",
+                "responses": {
+                    "200": {
+                        "description": "{\"code\": 200, \"msg\": \"成功退出系统\" }",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/public/uploadFile": {
             "post": {
                 "security": [
@@ -106,6 +127,30 @@
                         }
                     }
                 }
+            }
+        },
+        "/api/v1/register": {
+            "post": {
+                "description": "获取JSON",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "登陆"
+                ],
+                "summary": "注册用户",
+                "parameters": [
+                    {
+                        "description": "用户数据",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.SysUserInsertReq"
+                        }
+                    }
+                ],
+                "responses": {}
             }
         },
         "/api/v1/role": {
@@ -624,31 +669,6 @@
                 ],
                 "responses": {}
             }
-        },
-        "/logout": {
-            "post": {
-                "security": [
-                    {
-                        "Bearer": []
-                    }
-                ],
-                "description": "获取token",
-                "consumes": [
-                    "application/json"
-                ],
-                "tags": [
-                    "登陆"
-                ],
-                "summary": "退出登录",
-                "responses": {
-                    "200": {
-                        "description": "{\"code\": 200, \"msg\": \"成功退出系统\" }",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                }
-            }
         }
     },
     "definitions": {
@@ -754,13 +774,19 @@
                 "avatar": {
                     "type": "string"
                 },
+                "bio": {
+                    "type": "string"
+                },
                 "createBy": {
                     "type": "integer"
                 },
                 "deptId": {
-                    "type": "integer"
+                    "type": "string"
                 },
                 "email": {
+                    "type": "string"
+                },
+                "interest": {
                     "type": "string"
                 },
                 "nickName": {
@@ -771,9 +797,6 @@
                 },
                 "phone": {
                     "type": "string"
-                },
-                "postId": {
-                    "type": "integer"
                 },
                 "remark": {
                     "type": "string"
