@@ -48,7 +48,7 @@ func newDataPermission(tx *gorm.DB, userId interface{}) (*DataPermission, error)
 	p := &DataPermission{}
 
 	err = tx.Table("sys_user").
-		Select("sys_user.user_id", "sys_role.role_id", "sys_user.dept_id", "sys_role.data_scope").
+		Select("sys_user.user_id", "sys_role.role_id").
 		Joins("left join sys_role on sys_role.role_id = sys_user.role_id").
 		Where("sys_user.user_id = ?", userId).
 		Scan(p).Error
