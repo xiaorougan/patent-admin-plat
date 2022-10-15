@@ -37,6 +37,9 @@ $ bin/PatentAdminPlat-linux-amd64 migrate -c config/settings_dev.yml
 
 ## ✨ Swagger
 
+#### VERSION:
+v1.8.6
+
 #### 生成swagger代码
 
 ```bash
