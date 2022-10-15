@@ -77,3 +77,74 @@ $ swag init
 | Remark    | 备注       | string |
 | Admin     | 是否是超管 | bool   |
 | DataScope | 无         | string |
+
+### 专利表（patent）
+
+| 字段名   | 描述     | 类型   |
+| -------- | -------- | ------ |
+| PatentId | 专利ID   | int    |
+| TI       | 专利名   | string |
+| PNM      | 申请号   | string |
+| AD       | 申请日   | string |
+| PD       | 公开日   | string |
+| CL       | 简介     | string |
+| PA       | 申请单位 | string |
+| AR       | 地址     | string |
+| INN      | 申请人   | string |
+
+### 用户-专利关系表（user_patent）
+
+| 字段名   | 描述                  | 类型   |
+| -------- | --------------------- | ------ |
+| ID       | ID                    | int    |
+| UserId   | 用户ID                | int    |
+| PatentId | 专利ID                | int    |
+| Type     | 关系类型（关注/认领） | string |
+
+### 标签表（tag）
+
+| 字段名  | 描述   | 类型   |
+| ------- | ------ | ------ |
+| TagId   |        | int    |
+| TagName | 标签名 | string |
+| Desc    | 描述   | string |
+
+### 用户-标签关系表（user-tag）
+
+| 字段名 | 描述 | 类型 |
+| ------ | ---- | ---- |
+| ID     |      | int  |
+| UserId |      | int  |
+| TagId  |      | int  |
+
+### 专利-标签关系表（patent-tag）
+
+| 字段名   | 描述 | 类型 |
+| -------- | ---- | ---- |
+| ID       |      | int  |
+| PatentId |      | int  |
+| TagId    |      | int  |
+
+### 专利包表（package）
+
+| 字段名      | 描述   | 类型   |
+| ----------- | ------ | ------ |
+| PackageId   |        | int    |
+| PackageName | 专利包 | string |
+| Desc        | 描述   | string |
+
+### 用户-专利包关系表（user-package）
+
+| 字段名    | 描述 | 类型 |
+| --------- | ---- | ---- |
+| ID        |      | int  |
+| UserId    |      | int  |
+| PackageId |      | int  |
+
+### 专利-专利包关系表（patent-package）
+
+| 字段名    | 描述 | 类型 |
+| --------- | ---- | ---- |
+| ID        |      | int  |
+| PatentId  |      | int  |
+| PackageId |      | int  |
