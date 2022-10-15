@@ -22,8 +22,8 @@ type SysUser struct {
 func (e *SysUser) GetPage(c *dto.SysUserGetPageReq, p *actions.DataPermission, list *[]models.SysUser, count *int64) error {
 	var err error
 	var data models.SysUser
-
-	err = e.Orm.Debug().Preload("Dept").
+	// todo: check
+	err = e.Orm.Debug().
 		Scopes(
 			cDto.MakeCondition(c.GetNeedSearch()),
 			cDto.Paginate(c.GetPageSize(), c.GetPageIndex()),
@@ -97,6 +97,29 @@ func (e *SysUser) Update(c *dto.SysUserUpdateReq, p *actions.DataPermission) err
 	if db.RowsAffected == 0 {
 		return errors.New("无权更新该数据")
 
+	}
+	c.Generate(&model)
+	update := e.Orm.Model(&model).Where("user_id = ?", &model.UserId).Omit("password", "salt").Updates(&model)
+	if err = update.Error; err != nil {
+		e.Log.Errorf("db error: %s", err)
+		return err
+	}
+	if update.RowsAffected == 0 {
+		err = errors.New("update userinfo error")
+		log.Warnf("db update error")
+		return err
+	}
+	return nil
+}
+
+// InternalUpdate internal修改SysUser对象
+func (e *SysUser) InternalUpdate(c *dto.SysUserUpdateReq) error {
+	var err error
+	var model models.SysUser
+	db := e.Orm.First(&model, c.GetId())
+	if err = db.Error; err != nil {
+		e.Log.Errorf("Service UpdateSysUser error: %s", err)
+		return err
 	}
 	c.Generate(&model)
 	update := e.Orm.Model(&model).Where("user_id = ?", &model.UserId).Omit("password", "salt").Updates(&model)

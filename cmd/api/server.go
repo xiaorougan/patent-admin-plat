@@ -172,6 +172,9 @@ func initRouter() {
 		Use(common.RequestId(pkg.TrafficKey)).
 		Use(api.SetRequestLogger)
 
+	// 跨域
+	r.Use(common.Cors())
+
 	common.InitMiddleware(r)
 
 }

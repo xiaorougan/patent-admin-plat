@@ -144,7 +144,8 @@ func (e SysUser) Register(c *gin.Context) {
 		e.Error(500, err, err.Error())
 		return
 	}
-
+	// set status for register
+	req.Status = "2"
 	err = s.Insert(&req)
 	if err != nil {
 		e.Logger.Error(err)
@@ -457,21 +458,10 @@ func (e SysUser) GetInfo(c *gin.Context) {
 	p := actions.GetPermissionFromContext(c)
 	var roles = make([]string, 1)
 	roles[0] = user.GetRoleName(c)
-	var permissions = make([]string, 1)
-	permissions[0] = "*:*:*"
-	var buttons = make([]string, 1)
-	buttons[0] = "*:*:*"
 
 	var mp = make(map[string]interface{})
 	mp["roles"] = roles
-	if user.GetRoleName(c) == "admin" || user.GetRoleName(c) == "系统管理员" {
-		mp["permissions"] = permissions
-		mp["buttons"] = buttons
-	} else {
-		list, _ := r.GetById(user.GetRoleId(c))
-		mp["permissions"] = list
-		mp["buttons"] = list
-	}
+
 	sysUser := models.SysUser{}
 	req.Id = user.GetUserId(c)
 	err = s.Get(&req, p, &sysUser)
@@ -479,14 +469,47 @@ func (e SysUser) GetInfo(c *gin.Context) {
 		e.Error(http.StatusUnauthorized, err, "登录失败")
 		return
 	}
-	mp["introduction"] = " am a super administrator"
 	mp["avatar"] = "https://wpimg.wallstcn.com/f778738c-e4f8-4870-b634-56703b4acafe.gif"
 	if sysUser.Avatar != "" {
 		mp["avatar"] = sysUser.Avatar
 	}
-	mp["userName"] = sysUser.NickName
+	mp["userName"] = sysUser.Username
 	mp["userId"] = sysUser.UserId
 	mp["name"] = sysUser.NickName
-	mp["code"] = 200
+	mp["email"] = sysUser.Email
+	mp["phone"] = sysUser.Phone
+	mp["bio"] = sysUser.Bio
+	mp["departure"] = sysUser.Departure
 	e.OK(mp, "")
+}
+
+// UpdateInfo
+// @Summary 修改个人信息
+// @Description 获取JSON
+// @Tags 个人中心
+// @Router /api/v1/updateinfo [post]
+// @Security Bearer
+func (e SysUser) UpdateInfo(c *gin.Context) {
+	req := dto.SysUserUpdateReq{}
+	s := service.SysUser{}
+	err := e.MakeContext(c).
+		MakeOrm().
+		Bind(&req).
+		MakeService(&s.Service).
+		Errors
+	if err != nil {
+		e.Logger.Error(err)
+		e.Error(500, err, err.Error())
+		return
+	}
+	p := actions.GetPermissionFromContext(c)
+	req.UserId = p.UserId
+	req.RoleId = p.RoleId
+
+	err = s.InternalUpdate(&req)
+	if err != nil {
+		e.Logger.Error(err)
+		return
+	}
+	e.OK(req.GetId(), "更新成功")
 }

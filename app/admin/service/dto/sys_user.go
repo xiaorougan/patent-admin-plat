@@ -102,7 +102,7 @@ type SysUserInsertReq struct {
 	Remark    string `json:"remark" comment:"备注"`
 	Bio       string `json:"bio" comment:"个人简介"`
 	Interest  string `json:"interest" comment:"科研兴趣"`
-	Status    string `json:"status" comment:"状态" vd:"len($)>0" default:"1"`
+	Status    string `json:"status" comment:"状态" default:"1"`
 	common.ControlBy
 }
 
