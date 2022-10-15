@@ -488,7 +488,10 @@ func (e SysUser) GetInfo(c *gin.Context) {
 // @Summary 修改个人信息
 // @Description 获取JSON
 // @Tags 个人中心
+// @Accept  application/json
+// @Product application/json
 // @Router /api/v1/updateinfo [post]
+// @Param data body dto.UpdateSysUserStatusReq true "body"
 // @Security Bearer
 func (e SysUser) UpdateInfo(c *gin.Context) {
 	req := dto.SysUserUpdateReq{}
