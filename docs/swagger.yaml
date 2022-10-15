@@ -72,7 +72,7 @@ definitions:
         type: string
       createBy:
         type: integer
-      deptId:
+      departure:
         type: string
       email:
         type: string
@@ -525,6 +525,15 @@ paths:
       summary: 修改用户数据
       tags:
       - 用户
+  /api/v1/updateinfo:
+    post:
+      description: 获取JSON
+      responses: {}
+      security:
+      - Bearer: []
+      summary: 修改个人信息
+      tags:
+      - 个人中心
   /api/v1/user/avatar:
     post:
       consumes:

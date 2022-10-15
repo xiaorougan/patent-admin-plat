@@ -550,6 +550,21 @@ const docTemplate = `{
                 "responses": {}
             }
         },
+        "/api/v1/updateinfo": {
+            "post": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "获取JSON",
+                "tags": [
+                    "个人中心"
+                ],
+                "summary": "修改个人信息",
+                "responses": {}
+            }
+        },
         "/api/v1/user/avatar": {
             "post": {
                 "security": [
@@ -789,7 +804,7 @@ const docTemplate = `{
                 "createBy": {
                     "type": "integer"
                 },
-                "deptId": {
+                "departure": {
                     "type": "string"
                 },
                 "email": {
