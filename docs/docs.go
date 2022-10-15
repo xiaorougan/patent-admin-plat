@@ -449,6 +449,33 @@ const docTemplate = `{
                 ],
                 "responses": {}
             },
+            "put": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "获取JSON",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "用户"
+                ],
+                "summary": "修改用户数据",
+                "parameters": [
+                    {
+                        "description": "body",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.SysUserUpdateReq"
+                        }
+                    }
+                ],
+                "responses": {}
+            },
             "post": {
                 "security": [
                     {
@@ -471,6 +498,37 @@ const docTemplate = `{
                         "required": true,
                         "schema": {
                             "$ref": "#/definitions/dto.SysUserInsertReq"
+                        }
+                    }
+                ],
+                "responses": {}
+            },
+            "delete": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "删除数据",
+                "tags": [
+                    "用户"
+                ],
+                "summary": "删除用户数据",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "userId",
+                        "name": "userId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "body",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.ObjectById"
                         }
                     }
                 ],
@@ -499,7 +557,9 @@ const docTemplate = `{
                     }
                 ],
                 "responses": {}
-            },
+            }
+        },
+        "/api/v1/updateinfo": {
             "put": {
                 "security": [
                     {
@@ -511,9 +571,9 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "用户"
+                    "个人中心"
                 ],
-                "summary": "修改用户数据",
+                "summary": "修改个人信息",
                 "parameters": [
                     {
                         "description": "body",
@@ -525,43 +585,6 @@ const docTemplate = `{
                         }
                     }
                 ],
-                "responses": {}
-            },
-            "delete": {
-                "security": [
-                    {
-                        "Bearer": []
-                    }
-                ],
-                "description": "删除数据",
-                "tags": [
-                    "用户"
-                ],
-                "summary": "删除用户数据",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "userId",
-                        "name": "userId",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {}
-            }
-        },
-        "/api/v1/updateinfo": {
-            "post": {
-                "security": [
-                    {
-                        "Bearer": []
-                    }
-                ],
-                "description": "获取JSON",
-                "tags": [
-                    "个人中心"
-                ],
-                "summary": "修改个人信息",
                 "responses": {}
             }
         },
@@ -696,6 +719,20 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "dto.ObjectById": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "ids": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                }
+            }
+        },
         "dto.PassWord": {
             "type": "object",
             "properties": {
@@ -853,13 +890,19 @@ const docTemplate = `{
                 "avatar": {
                     "type": "string"
                 },
+                "bio": {
+                    "type": "string"
+                },
                 "createBy": {
                     "type": "integer"
                 },
-                "deptId": {
-                    "type": "integer"
+                "departure": {
+                    "type": "string"
                 },
                 "email": {
+                    "type": "string"
+                },
+                "interest": {
                     "type": "string"
                 },
                 "nickName": {
@@ -867,9 +910,6 @@ const docTemplate = `{
                 },
                 "phone": {
                     "type": "string"
-                },
-                "postId": {
-                    "type": "integer"
                 },
                 "remark": {
                     "type": "string"
@@ -890,9 +930,6 @@ const docTemplate = `{
                 "userId": {
                     "description": "用户ID",
                     "type": "integer"
-                },
-                "username": {
-                    "type": "string"
                 }
             }
         },

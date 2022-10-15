@@ -10,7 +10,6 @@ import (
 	"github.com/go-admin-team/go-admin-core/sdk/service"
 	"gorm.io/gorm"
 
-	"go-admin/common/actions"
 	cDto "go-admin/common/dto"
 )
 
@@ -19,15 +18,15 @@ type SysUser struct {
 }
 
 // GetPage 获取SysUser列表
-func (e *SysUser) GetPage(c *dto.SysUserGetPageReq, p *actions.DataPermission, list *[]models.SysUser, count *int64) error {
+func (e *SysUser) GetPage(c *dto.SysUserGetPageReq, list *[]models.SysUser, count *int64) error {
 	var err error
-	var data models.SysUser
+	//var data models.SysUser
 	// todo: check
 	err = e.Orm.Debug().
 		Scopes(
 			cDto.MakeCondition(c.GetNeedSearch()),
 			cDto.Paginate(c.GetPageSize(), c.GetPageIndex()),
-			actions.Permission(data.TableName(), p),
+			//actions.Permission(data.TableName(), p),
 		).
 		Find(list).Limit(-1).Offset(-1).
 		Count(count).Error
@@ -39,13 +38,13 @@ func (e *SysUser) GetPage(c *dto.SysUserGetPageReq, p *actions.DataPermission, l
 }
 
 // Get 获取SysUser对象
-func (e *SysUser) Get(d *dto.SysUserById, p *actions.DataPermission, model *models.SysUser) error {
+func (e *SysUser) Get(d *dto.SysUserById, model *models.SysUser) error {
 	var data models.SysUser
 
 	err := e.Orm.Model(&data).Debug().
-		Scopes(
-			actions.Permission(data.TableName(), p),
-		).
+		//Scopes(
+		//	actions.Permission(data.TableName(), p),
+		//).
 		First(model, d.GetId()).Error
 	if err != nil && errors.Is(err, gorm.ErrRecordNotFound) {
 		err = errors.New("查看对象不存在或无权查看")
@@ -84,12 +83,10 @@ func (e *SysUser) Insert(c *dto.SysUserInsertReq) error {
 }
 
 // Update 修改SysUser对象
-func (e *SysUser) Update(c *dto.SysUserUpdateReq, p *actions.DataPermission) error {
+func (e *SysUser) Update(c *dto.SysUserUpdateReq) error {
 	var err error
 	var model models.SysUser
-	db := e.Orm.Scopes(
-		actions.Permission(model.TableName(), p),
-	).First(&model, c.GetId())
+	db := e.Orm.First(&model, c.GetId())
 	if err = db.Error; err != nil {
 		e.Log.Errorf("Service UpdateSysUser error: %s", err)
 		return err
@@ -136,12 +133,10 @@ func (e *SysUser) InternalUpdate(c *dto.SysUserUpdateReq) error {
 }
 
 // UpdateAvatar 更新用户头像
-func (e *SysUser) UpdateAvatar(c *dto.UpdateSysUserAvatarReq, p *actions.DataPermission) error {
+func (e *SysUser) UpdateAvatar(c *dto.UpdateSysUserAvatarReq) error {
 	var err error
 	var model models.SysUser
-	db := e.Orm.Scopes(
-		actions.Permission(model.TableName(), p),
-	).First(&model, c.GetId())
+	db := e.Orm.First(&model, c.GetId())
 	if err = db.Error; err != nil {
 		e.Log.Errorf("Service UpdateSysUser error: %s", err)
 		return err
@@ -159,12 +154,10 @@ func (e *SysUser) UpdateAvatar(c *dto.UpdateSysUserAvatarReq, p *actions.DataPer
 }
 
 // UpdateStatus 更新用户状态
-func (e *SysUser) UpdateStatus(c *dto.UpdateSysUserStatusReq, p *actions.DataPermission) error {
+func (e *SysUser) UpdateStatus(c *dto.UpdateSysUserStatusReq) error {
 	var err error
 	var model models.SysUser
-	db := e.Orm.Scopes(
-		actions.Permission(model.TableName(), p),
-	).First(&model, c.GetId())
+	db := e.Orm.First(&model, c.GetId())
 	if err = db.Error; err != nil {
 		e.Log.Errorf("Service UpdateSysUser error: %s", err)
 		return err
@@ -182,12 +175,10 @@ func (e *SysUser) UpdateStatus(c *dto.UpdateSysUserStatusReq, p *actions.DataPer
 }
 
 // ResetPwd 重置用户密码
-func (e *SysUser) ResetPwd(c *dto.ResetSysUserPwdReq, p *actions.DataPermission) error {
+func (e *SysUser) ResetPwd(c *dto.ResetSysUserPwdReq) error {
 	var err error
 	var model models.SysUser
-	db := e.Orm.Scopes(
-		actions.Permission(model.TableName(), p),
-	).First(&model, c.GetId())
+	db := e.Orm.First(&model, c.GetId())
 	if err = db.Error; err != nil {
 		e.Log.Errorf("At Service ResetSysUserPwd error: %s", err)
 		return err
@@ -205,26 +196,24 @@ func (e *SysUser) ResetPwd(c *dto.ResetSysUserPwdReq, p *actions.DataPermission)
 }
 
 // Remove 删除SysUser
-func (e *SysUser) Remove(c *dto.SysUserById, p *actions.DataPermission) error {
+func (e *SysUser) Remove(c *dto.SysUserById) error {
 	var err error
 	var data models.SysUser
 
 	db := e.Orm.Model(&data).
-		Scopes(
-			actions.Permission(data.TableName(), p),
-		).Delete(&data, c.GetId())
+		Delete(&data, c.GetId())
 	if err = db.Error; err != nil {
 		e.Log.Errorf("Error found in  RemoveSysUser : %s", err)
 		return err
 	}
-	if db.RowsAffected == 0 {
-		return errors.New("无权删除该数据")
-	}
+	//if db.RowsAffected == 0 {
+	//	return errors.New("无权删除该数据")
+	//}
 	return nil
 }
 
 // UpdatePwd 修改SysUser对象密码
-func (e *SysUser) UpdatePwd(id int, oldPassword, newPassword string, p *actions.DataPermission) error {
+func (e *SysUser) UpdatePwd(id int, oldPassword, newPassword string) error {
 	var err error
 
 	if newPassword == "" {
@@ -233,9 +222,7 @@ func (e *SysUser) UpdatePwd(id int, oldPassword, newPassword string, p *actions.
 	c := &models.SysUser{}
 
 	err = e.Orm.Model(c).
-		Scopes(
-			actions.Permission(c.TableName(), p),
-		).Select("UserId", "Password", "Salt").
+		Select("UserId", "Password", "Salt").
 		First(c, id).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {

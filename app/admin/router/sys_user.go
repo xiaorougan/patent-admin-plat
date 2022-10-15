@@ -20,8 +20,8 @@ func registerSysUserRouter(v1 *gin.RouterGroup, authMiddleware *jwt.GinJWTMiddle
 		r.GET("", api.GetPage)
 		r.GET("/:id", api.Get)
 		r.POST("", api.Insert)
-		r.PUT("", api.Update)
-		r.DELETE("", api.Delete)
+		r.PUT("/", api.Update)
+		r.DELETE("/", api.Delete)
 	}
 
 	user := v1.Group("/user").Use(authMiddleware.MiddlewareFunc()).Use(middleware.AuthCheckRole()).Use(actions.PermissionAction())
@@ -35,5 +35,6 @@ func registerSysUserRouter(v1 *gin.RouterGroup, authMiddleware *jwt.GinJWTMiddle
 	v1auth := v1.Group("").Use(authMiddleware.MiddlewareFunc())
 	{
 		v1auth.GET("/getinfo", api.GetInfo)
+		v1auth.PUT("/updateinfo", api.UpdateInfo)
 	}
 }
