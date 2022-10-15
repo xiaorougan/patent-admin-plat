@@ -473,13 +473,14 @@ func (e SysUser) GetInfo(c *gin.Context) {
 	if sysUser.Avatar != "" {
 		mp["avatar"] = sysUser.Avatar
 	}
-	mp["userName"] = sysUser.Username
+	mp["username"] = sysUser.Username
 	mp["userId"] = sysUser.UserId
-	mp["name"] = sysUser.NickName
+	mp["nickname"] = sysUser.NickName
 	mp["email"] = sysUser.Email
 	mp["phone"] = sysUser.Phone
 	mp["bio"] = sysUser.Bio
 	mp["departure"] = sysUser.Departure
+	mp["interest"] = sysUser.Interest
 	e.OK(mp, "")
 }
 

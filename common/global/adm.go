@@ -1,8 +1,8 @@
 package global
 
 const (
-	// Version go-admin version info
-	Version = "2.1.0"
+	// Version patent-admin-plat version info
+	Version = "0.1.0"
 )
 
 var (
