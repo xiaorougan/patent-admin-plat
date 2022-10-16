@@ -3,6 +3,8 @@ package api
 import (
 	"context"
 	"fmt"
+	"github.com/spf13/viper"
+	"go-admin/app/patent/my_config"
 	"log"
 	"net/http"
 	"os"
@@ -64,6 +66,13 @@ func setup() {
 		database.Setup,
 		storage.Setup,
 	)
+
+	if err := initViper(configYml); err != nil {
+		panic(err)
+	}
+
+	loadConfig()
+
 	//注册监听函数
 	queue := sdk.Runtime.GetMemoryQueue("")
 	queue.Register(global.LoginLog, models.SaveLoginLog)
@@ -71,6 +80,8 @@ func setup() {
 
 	usageStr := `starting api server...`
 	log.Println(usageStr)
+
+	fmt.Println(config.ExtendConfig)
 }
 
 func run() error {
@@ -177,4 +188,19 @@ func initRouter() {
 
 	common.InitMiddleware(r)
 
+}
+
+func initViper(configPath string) error {
+	viper.SetConfigFile(configPath)
+	viper.SetConfigType("yaml")
+
+	if err := viper.ReadInConfig(); err != nil {
+		return err
+	}
+	return nil
+}
+
+func loadConfig() {
+	// load your config
+	my_config.LoadPatentConfig()
 }

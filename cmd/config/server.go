@@ -3,6 +3,7 @@ package config
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/spf13/viper"
 
 	"github.com/go-admin-team/go-admin-core/config/source/file"
 	"github.com/spf13/cobra"
@@ -60,4 +61,19 @@ func run() {
 	}
 	fmt.Println("logger:", string(loggerConfig))
 
+	fmt.Println(config.ExtendConfig)
+}
+
+func initViper(configPath string) error {
+	viper.SetConfigFile(configPath)
+	viper.SetConfigType("yaml")
+
+	if err := viper.ReadInConfig(); err != nil {
+		return err
+	}
+	return nil
+}
+
+func loadConfig() {
+	// load your config
 }
