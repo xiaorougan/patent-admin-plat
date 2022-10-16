@@ -327,6 +327,155 @@ const docTemplate = `{
                 "responses": {}
             }
         },
+        "/api/v1/sys-list": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "获取JSON",
+                "tags": [
+                    "专利表"
+                ],
+                "summary": "获取",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "专利ID",
+                        "name": "PatentId",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "专利名",
+                        "name": "TI",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "申请号",
+                        "name": "PNM",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "申请日",
+                        "name": "AD",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "公开日",
+                        "name": "PD",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "简介",
+                        "name": "CL",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "申请单位",
+                        "name": "PA",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "地址",
+                        "name": "AR",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "申请人",
+                        "name": "INN",
+                        "in": "query"
+                    }
+                ],
+                "responses": {}
+            },
+            "put": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "修改JSON",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "专利表"
+                ],
+                "summary": "修改专利表数据",
+                "parameters": [
+                    {
+                        "description": "body",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.SysListUpdateReq"
+                        }
+                    }
+                ],
+                "responses": {}
+            },
+            "post": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "获取JSON",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "专利表"
+                ],
+                "summary": "根据专利id创建专利",
+                "parameters": [
+                    {
+                        "description": "专利表数据",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.SysListInsertReq"
+                        }
+                    }
+                ],
+                "responses": {}
+            },
+            "delete": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "专利删除",
+                "tags": [
+                    "专利表"
+                ],
+                "summary": "专利表删除",
+                "parameters": [
+                    {
+                        "description": "body",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.SysListDeleteReq"
+                        }
+                    }
+                ],
+                "responses": {}
+            }
+        },
         "/api/v1/sys-login-log": {
             "get": {
                 "security": [
@@ -758,6 +907,93 @@ const docTemplate = `{
                 },
                 "userId": {
                     "description": "用户ID",
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.SysListDeleteReq": {
+            "type": "object",
+            "properties": {
+                "patent_ids": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                }
+            }
+        },
+        "dto.SysListInsertReq": {
+            "type": "object",
+            "properties": {
+                "AD": {
+                    "type": "string"
+                },
+                "AR": {
+                    "type": "string"
+                },
+                "CL": {
+                    "type": "string"
+                },
+                "INN": {
+                    "type": "string"
+                },
+                "PA": {
+                    "type": "string"
+                },
+                "PD": {
+                    "type": "string"
+                },
+                "PNM": {
+                    "type": "string"
+                },
+                "PatentId": {
+                    "type": "integer"
+                },
+                "TI": {
+                    "type": "string"
+                },
+                "createBy": {
+                    "type": "integer"
+                },
+                "updateBy": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.SysListUpdateReq": {
+            "type": "object",
+            "properties": {
+                "AD": {
+                    "type": "string"
+                },
+                "AR": {
+                    "type": "string"
+                },
+                "CL": {
+                    "type": "string"
+                },
+                "INN": {
+                    "type": "string"
+                },
+                "PA": {
+                    "type": "string"
+                },
+                "PD": {
+                    "type": "string"
+                },
+                "PNM": {
+                    "type": "string"
+                },
+                "PatentId": {
+                    "type": "integer"
+                },
+                "TI": {
+                    "type": "string"
+                },
+                "createBy": {
+                    "type": "integer"
+                },
+                "updateBy": {
                     "type": "integer"
                 }
             }
