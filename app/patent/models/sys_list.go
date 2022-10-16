@@ -6,7 +6,8 @@ import (
 
 type SysList struct {
 	models.Model
-	PatentId int    `json:"PatentId" gorm:"size:128;comment:专利ID"`
+	Id       int    `json:"Id" gorm:"comment:编码" `
+	PatentId int    `json:"PatentId" gorm:"size:128;primaryKey;autoIncrement;comment:专利ID(主键)"`
 	TI       string `json:"TI" gorm:"size:128;comment:专利名"`
 	PNM      string `json:"PNM" gorm:"size:128;comment:申请号"`
 	AD       string `json:"AD" gorm:"size:128;comment:申请日"`

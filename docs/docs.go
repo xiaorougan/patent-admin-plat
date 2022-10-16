@@ -338,7 +338,102 @@ const docTemplate = `{
                 "tags": [
                     "专利表"
                 ],
-                "summary": "获取",
+                "summary": "列表专利信息数据",
+                "responses": {}
+            },
+            "post": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "获取JSON",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "专利表"
+                ],
+                "summary": "创建专利",
+                "parameters": [
+                    {
+                        "description": "专利表数据",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.SysListInsertReq"
+                        }
+                    }
+                ],
+                "responses": {}
+            },
+            "delete": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "专利删除",
+                "tags": [
+                    "专利表"
+                ],
+                "summary": "输入id删除专利表",
+                "parameters": [
+                    {
+                        "description": "body",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.SysListDeleteReq"
+                        }
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/api/v1/sys-list/": {
+            "put": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "修改JSON",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "专利表"
+                ],
+                "summary": "修改专利表数据",
+                "parameters": [
+                    {
+                        "description": "body",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.SysListUpdateReq"
+                        }
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/api/v1/sys-list/patentid/{patent_id}": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "获取JSON",
+                "tags": [
+                    "专利表"
+                ],
+                "summary": "通过专利id获取单个对象",
                 "parameters": [
                     {
                         "type": "string",
@@ -393,84 +488,6 @@ const docTemplate = `{
                         "description": "申请人",
                         "name": "INN",
                         "in": "query"
-                    }
-                ],
-                "responses": {}
-            },
-            "put": {
-                "security": [
-                    {
-                        "Bearer": []
-                    }
-                ],
-                "description": "修改JSON",
-                "consumes": [
-                    "application/json"
-                ],
-                "tags": [
-                    "专利表"
-                ],
-                "summary": "修改专利表数据",
-                "parameters": [
-                    {
-                        "description": "body",
-                        "name": "data",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/dto.SysListUpdateReq"
-                        }
-                    }
-                ],
-                "responses": {}
-            },
-            "post": {
-                "security": [
-                    {
-                        "Bearer": []
-                    }
-                ],
-                "description": "获取JSON",
-                "consumes": [
-                    "application/json"
-                ],
-                "tags": [
-                    "专利表"
-                ],
-                "summary": "根据专利id创建专利",
-                "parameters": [
-                    {
-                        "description": "专利表数据",
-                        "name": "data",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/dto.SysListInsertReq"
-                        }
-                    }
-                ],
-                "responses": {}
-            },
-            "delete": {
-                "security": [
-                    {
-                        "Bearer": []
-                    }
-                ],
-                "description": "专利删除",
-                "tags": [
-                    "专利表"
-                ],
-                "summary": "专利表删除",
-                "parameters": [
-                    {
-                        "description": "body",
-                        "name": "data",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/dto.SysListDeleteReq"
-                        }
                     }
                 ],
                 "responses": {}

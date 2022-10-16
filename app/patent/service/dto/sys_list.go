@@ -125,3 +125,29 @@ func (s *SysListInsertReq) GenerateList(model *models.SysList) {
 func (s *SysListInsertReq) GetPatentId() interface{} {
 	return s.PatentId
 }
+
+type SysListById struct {
+	dto.ObjectByPatentId
+	common.ControlBy
+}
+
+func (s *SysListById) GetPatentId() interface{} {
+	return s.PAId
+}
+
+func (s *SysListById) GenerateM() (common.ActiveRecord, error) {
+	return &models.SysList{}, nil
+}
+
+//type SysListByName struct {
+//	dto.ObjectByPatentName
+//	common.ControlBy
+//}
+//
+//func (s *SysListByName) GetPatentTI() interface{} {
+//	return s.TI
+//}
+//
+//func (s *SysListByName) GenerateM() (common.ActiveRecord, error) {
+//	return &models.SysList{}, nil
+//}

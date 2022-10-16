@@ -464,9 +464,53 @@ paths:
       responses: {}
       security:
       - Bearer: []
-      summary: 专利表删除
+      summary: 输入id删除专利表
       tags:
       - 专利表
+    get:
+      description: 获取JSON
+      responses: {}
+      security:
+      - Bearer: []
+      summary: 列表专利信息数据
+      tags:
+      - 专利表
+    post:
+      consumes:
+      - application/json
+      description: 获取JSON
+      parameters:
+      - description: 专利表数据
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/dto.SysListInsertReq'
+      responses: {}
+      security:
+      - Bearer: []
+      summary: 创建专利
+      tags:
+      - 专利表
+  /api/v1/sys-list/:
+    put:
+      consumes:
+      - application/json
+      description: 修改JSON
+      parameters:
+      - description: body
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/dto.SysListUpdateReq'
+      responses: {}
+      security:
+      - Bearer: []
+      summary: 修改专利表数据
+      tags:
+      - 专利表
+  /api/v1/sys-list/patentid/{patent_id}:
     get:
       description: 获取JSON
       parameters:
@@ -509,41 +553,7 @@ paths:
       responses: {}
       security:
       - Bearer: []
-      summary: 获取
-      tags:
-      - 专利表
-    post:
-      consumes:
-      - application/json
-      description: 获取JSON
-      parameters:
-      - description: 专利表数据
-        in: body
-        name: data
-        required: true
-        schema:
-          $ref: '#/definitions/dto.SysListInsertReq'
-      responses: {}
-      security:
-      - Bearer: []
-      summary: 根据专利id创建专利
-      tags:
-      - 专利表
-    put:
-      consumes:
-      - application/json
-      description: 修改JSON
-      parameters:
-      - description: body
-        in: body
-        name: data
-        required: true
-        schema:
-          $ref: '#/definitions/dto.SysListUpdateReq'
-      responses: {}
-      security:
-      - Bearer: []
-      summary: 修改专利表数据
+      summary: 通过专利id获取单个对象
       tags:
       - 专利表
   /api/v1/sys-login-log:

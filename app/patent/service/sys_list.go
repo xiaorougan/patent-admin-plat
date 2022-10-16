@@ -37,7 +37,7 @@ func (e *SysList) GetPage(c *dto.SysListGetPageReq, list *[]models.SysList, coun
 }
 
 // Get 获取SysList对象
-func (e *SysList) Get(d *dto.SysListGetReq, model *models.SysList) error {
+func (e *SysList) Get(d *dto.SysListById, model *models.SysList) error {
 	var err error
 	db := e.Orm.First(model, d.GetPatentId())
 	err = db.Error
@@ -52,6 +52,23 @@ func (e *SysList) Get(d *dto.SysListGetReq, model *models.SysList) error {
 	}
 	return nil
 }
+
+//// Get 获取SysList对象
+//func (e *SysList) GetByName(d *dto.SysListByName, model *models.SysList) error {
+//	var err error
+//	db := e.Orm.First(model, d.GetPatentTI())
+//	err = db.Error
+//	if err != nil && errors.Is(err, gorm.ErrRecordNotFound) {
+//		err = errors.New("查看专利不存在或无权查看")
+//		e.Log.Errorf("db error:%s", err)
+//		return err
+//	}
+//	if db.Error != nil {
+//		e.Log.Errorf("db error:%s", err)
+//		return err
+//	}
+//	return nil
+//}
 
 // Remove 删除SysList
 func (e *SysList) Remove(c *dto.SysListDeleteReq) error {

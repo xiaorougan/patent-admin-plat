@@ -18,8 +18,10 @@ func registerSysListRouter(v1 *gin.RouterGroup, authMiddleware *jwt.GinJWTMiddle
 
 	r := v1.Group("/sys-list").Use(authMiddleware.MiddlewareFunc()).Use(middleware.AuthCheckRole())
 	{
-		r.GET("", api.GetLists) //测试成功
-		//r.GET("/:patent_id", api.GetLists) 错误无法使用id
+		r.GET("", api.GetLists)                          //测试成功
+		r.GET("/:id", api.GetPatentById)                 //根据id查询
+		r.GET("/patentid/:patent_id", api.GetPatentById) //根据patent_id查询
+		//r.GET("/patentname/:ti", api.GetPatentByName)
 		r.POST("", api.InsertListsByPatentId) //测试成功
 		//r.POST("/:id", api.InsertListsByPatentId)
 		//r.POST("/:ti", api.InsertListsByPatentName)
