@@ -3,12 +3,13 @@ package router
 import (
 	"github.com/gin-gonic/gin"
 	jwt "github.com/go-admin-team/go-admin-core/sdk/pkg/jwtauth"
-	"go-admin/app/admin/apis"
+	"go-admin/app/admin/router"
+	"go-admin/app/patent/apis"
 	"go-admin/common/middleware"
 )
 
 func init() {
-	routerCheckRole = append(routerCheckRole, registerSysListRouter)
+	router.RouterCheckRole = append(router.RouterCheckRole, registerSysListRouter)
 }
 
 // 需认证的路由代码

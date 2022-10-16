@@ -1,23 +1,25 @@
 package dto
 
 import (
-	"go-admin/app/admin/models"
+	"go-admin/app/patent/models"
 	"go-admin/common/dto"
 	common "go-admin/common/models"
 	"time"
 )
 
+//查询必须写form字段
+
 type SysListGetPageReq struct {
 	dto.Pagination `search:"-"`
-	PatentId       int    `from:"PatentId" search:"type:exact;column:PatentId;table:sys_list" comment:"专利ID"`
-	TI             string `from:"TI" search:"type:exact;column:TI;table:sys_list" comment:"专利名"`
-	PNM            string `from:"PNM" search:"type:exact;column:PNN;table:sys_list" comment:"申请号"`
-	AD             string `from:"AD" search:"type:exact;column:AD;table:sys_list" comment:"申请日"`
-	PD             string `from:"PD" search:"type:exact;column:PD;table:sys_list" comment:"公开日"`
-	CL             string `from:"CL" search:"type:exact;column:CL;table:sys_list" comment:"简介"`
-	PA             string `from:"PA" search:"type:exact;column:PA;table:sys_list" comment:"申请单位"`
-	AR             string `from:"AR" search:"type:exact;column:AR;table:sys_list" comment:"地址"`
-	INN            string `from:"INN" search:"type:exact;column:INN;table:sys_list" comment:"申请人"`
+	PatentId       int    `form:"PatentId" search:"type:exact;column:PatentId;table:sys_list" comment:"专利ID"`
+	TI             string `form:"TI" search:"type:exact;column:TI;table:sys_list" comment:"专利名"`
+	PNM            string `form:"PNM" search:"type:exact;column:PNN;table:sys_list" comment:"申请号"`
+	AD             string `form:"AD" search:"type:exact;column:AD;table:sys_list" comment:"申请日"`
+	PD             string `form:"PD" search:"type:exact;column:PD;table:sys_list" comment:"公开日"`
+	CL             string `form:"CL" search:"type:exact;column:CL;table:sys_list" comment:"简介"`
+	PA             string `form:"PA" search:"type:exact;column:PA;table:sys_list" comment:"申请单位"`
+	AR             string `form:"AR" search:"type:exact;column:AR;table:sys_list" comment:"地址"`
+	INN            string `form:"INN" search:"type:exact;column:INN;table:sys_list" comment:"申请人"`
 	SysListOrder
 }
 

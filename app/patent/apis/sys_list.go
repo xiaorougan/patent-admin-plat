@@ -4,13 +4,12 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
 	"github.com/go-admin-team/go-admin-core/sdk/pkg/jwtauth/user"
+	"go-admin/app/patent/models"
+	"go-admin/app/patent/service"
+	"go-admin/app/patent/service/dto"
 
 	"github.com/go-admin-team/go-admin-core/sdk/api"
 	_ "github.com/go-admin-team/go-admin-core/sdk/pkg/jwtauth/user"
-	"go-admin/app/admin/models"
-
-	"go-admin/app/admin/service"
-	"go-admin/app/admin/service/dto"
 )
 
 type SysList struct {
