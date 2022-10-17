@@ -121,6 +121,7 @@ func (ic *InnojoyClient) search(sr *SearchReq, cb callback) (result []*dto.Paten
 			sr.Token = ic.token
 			retried = true
 		} else {
+			handleTitle(searchRes.Option.PatentList)
 			return searchRes.Option.PatentList, nil
 		}
 	}
@@ -155,4 +156,11 @@ type loginResp struct {
 	ReturnValue int    `json:"ReturnValue"`
 	Option      string `json:"Option"`
 	ErrorInfo   string `json:"ErrorInfo"`
+}
+
+// refine patent title
+func handleTitle(pds []*dto.PatentDetail) {
+	for _, pd := range pds {
+		pd.Ti = strings.Split(pd.Ti, "[ZH]")[0]
+	}
 }

@@ -17,7 +17,7 @@ type Search struct {
 // @Tags 专利检索
 // @Param data body dto.SimpleSearchReq true "用户数据"
 // @Success 200 {object} dto.SwagSimpleSearchResp
-// @Router /api/v1/search/simple [get]
+// @Router /api/v1/search/simple [post]
 // @Security Bearer
 func (e Search) SimpleSearch(c *gin.Context) {
 	ic := service.GetCurrentInnojoy()

@@ -14,7 +14,7 @@ func registerSearchRouter(v1 *gin.RouterGroup) {
 	api := apis.Search{}
 	r := v1.Group("/search")
 	{
-		r.GET("/simple", api.SimpleSearch)
+		r.POST("/simple", api.SimpleSearch)
 		//r.GET("table", api.Get)
 		//r.GET("advance", api.Insert)
 	}
