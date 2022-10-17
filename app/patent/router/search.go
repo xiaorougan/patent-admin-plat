@@ -2,7 +2,7 @@ package router
 
 import (
 	"github.com/gin-gonic/gin"
-	"go-admin/app/admin/apis"
+	"go-admin/app/patent/apis"
 )
 
 func init() {
@@ -11,10 +11,10 @@ func init() {
 
 // 需认证的路由代码
 func registerSearchRouter(v1 *gin.RouterGroup) {
-	api := apis.SysUser{}
+	api := apis.Search{}
 	r := v1.Group("/search")
 	{
-		r.GET("simple", api.GetPage)
+		r.GET("/simple", api.SimpleSearch)
 		//r.GET("table", api.Get)
 		//r.GET("advance", api.Insert)
 	}

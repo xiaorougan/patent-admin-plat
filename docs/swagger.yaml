@@ -27,6 +27,62 @@ definitions:
         description: 用户ID
         type: integer
     type: object
+  dto.SimpleSearchReq:
+    properties:
+      DB:
+        type: string
+      Query:
+        type: string
+    type: object
+  dto.SwagSimpleSearchResp:
+    properties:
+      code:
+        type: integer
+      data:
+        properties:
+          count:
+            type: integer
+          list:
+            items:
+              properties:
+                AD:
+                  type: string
+                AN:
+                  type: string
+                DB:
+                  type: string
+                ExamAN:
+                  type: string
+                ISNEWDATA:
+                  type: boolean
+                "NO":
+                  type: integer
+                PA:
+                  type: string
+                PD:
+                  type: string
+                PINN:
+                  type: string
+                PNM:
+                  type: string
+                PNM2:
+                  type: string
+                RNO:
+                  type: integer
+                TI:
+                  type: string
+              type: object
+            type: array
+          pageIndex:
+            type: integer
+          pageSize:
+            type: integer
+        type: object
+      msg:
+        type: string
+      requestId:
+        type: string
+    type: object
   dto.SysLoginLogDeleteReq:
     properties:
       ids:
@@ -385,6 +441,26 @@ paths:
       summary: 获取Role数据
       tags:
       - 角色/Role
+  /api/v1/search/simple:
+    get:
+      description: 根据查询字符串进行模糊搜索
+      parameters:
+      - description: 用户数据
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/dto.SimpleSearchReq'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.SwagSimpleSearchResp'
+      security:
+      - Bearer: []
+      summary: 简单查询
+      tags:
+      - 专利检索
   /api/v1/server-monitor:
     get:
       description: 获取JSON

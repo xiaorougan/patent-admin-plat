@@ -1,0 +1,45 @@
+package apis
+
+import (
+	"github.com/gin-gonic/gin"
+	"github.com/go-admin-team/go-admin-core/sdk/api"
+	"go-admin/app/patent/service"
+	"go-admin/app/patent/service/dto"
+)
+
+type Search struct {
+	api.Api
+}
+
+// SimpleSearch
+// @Summary 简单查询
+// @Description 根据查询字符串进行模糊搜索
+// @Tags 专利检索
+// @Param data body dto.SimpleSearchReq true "用户数据"
+// @Success 200 {object} dto.SwagSimpleSearchResp
+// @Router /api/v1/search/simple [get]
+// @Security Bearer
+func (e Search) SimpleSearch(c *gin.Context) {
+	ic := service.GetCurrentInnojoy()
+	s := service.Search{}
+	req := dto.SimpleSearchReq{}
+
+	err := e.MakeContext(c).
+		Bind(&req).
+		MakeService(&s.Service).
+		Errors
+	if err != nil {
+		e.Logger.Error(err)
+		e.Error(500, err, err.Error())
+		return
+	}
+
+	ps, err := ic.SimpleSearch(req.Query, req.DB)
+	if err != nil {
+		e.Logger.Error(err)
+		e.Error(500, err, err.Error())
+		return
+	}
+
+	e.PageOK(ps, 100, 1, 100, "查询成功")
+}

@@ -312,6 +312,39 @@ const docTemplate = `{
                 "responses": {}
             }
         },
+        "/api/v1/search/simple": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "根据查询字符串进行模糊搜索",
+                "tags": [
+                    "专利检索"
+                ],
+                "summary": "简单查询",
+                "parameters": [
+                    {
+                        "description": "用户数据",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.SimpleSearchReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.SwagSimpleSearchResp"
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/server-monitor": {
             "get": {
                 "security": [
@@ -759,6 +792,92 @@ const docTemplate = `{
                 "userId": {
                     "description": "用户ID",
                     "type": "integer"
+                }
+            }
+        },
+        "dto.SimpleSearchReq": {
+            "type": "object",
+            "properties": {
+                "DB": {
+                    "type": "string"
+                },
+                "Query": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.SwagSimpleSearchResp": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "integer"
+                },
+                "data": {
+                    "type": "object",
+                    "properties": {
+                        "count": {
+                            "type": "integer"
+                        },
+                        "list": {
+                            "type": "array",
+                            "items": {
+                                "type": "object",
+                                "properties": {
+                                    "AD": {
+                                        "type": "string"
+                                    },
+                                    "AN": {
+                                        "type": "string"
+                                    },
+                                    "DB": {
+                                        "type": "string"
+                                    },
+                                    "ExamAN": {
+                                        "type": "string"
+                                    },
+                                    "ISNEWDATA": {
+                                        "type": "boolean"
+                                    },
+                                    "NO": {
+                                        "type": "integer"
+                                    },
+                                    "PA": {
+                                        "type": "string"
+                                    },
+                                    "PD": {
+                                        "type": "string"
+                                    },
+                                    "PINN": {
+                                        "type": "string"
+                                    },
+                                    "PNM": {
+                                        "type": "string"
+                                    },
+                                    "PNM2": {
+                                        "type": "string"
+                                    },
+                                    "RNO": {
+                                        "type": "integer"
+                                    },
+                                    "TI": {
+                                        "type": "string"
+                                    }
+                                }
+                            }
+                        },
+                        "pageIndex": {
+                            "type": "integer"
+                        },
+                        "pageSize": {
+                            "type": "integer"
+                        }
+                    }
+                },
+                "msg": {
+                    "type": "string"
+                },
+                "requestId": {
+                    "type": "string"
                 }
             }
         },
