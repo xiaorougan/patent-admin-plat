@@ -39,12 +39,12 @@ func (e Search) SimpleSearch(c *gin.Context) {
 		req.DB = "wgzl,syxx,fmzl"
 	}
 
-	ps, err := ic.SimpleSearch(req.Query, req.DB)
+	ps, err := ic.SimpleSearch(&req)
 	if err != nil {
 		e.Logger.Error(err)
 		e.Error(500, err, err.Error())
 		return
 	}
 
-	e.PageOK(ps, 100, 1, 100, "查询成功")
+	e.PageOK(ps, 100, req.PageIndex, len(ps), "查询成功")
 }

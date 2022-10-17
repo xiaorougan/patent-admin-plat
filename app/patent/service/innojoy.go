@@ -3,16 +3,23 @@ package service
 import (
 	"encoding/json"
 	"fmt"
+	s_cache "github.com/Gleiphir2769/s-cache"
 	"go-admin/app/patent/my_config"
 	"go-admin/app/patent/service/dto"
 	"io/ioutil"
+	"strconv"
 	"strings"
 	"sync"
+	"time"
 )
 
 const (
 	authUrl   = "http://www.innojoy.com/accountAuth.aspx"
 	searchUrl = "http://www.innojoy.com/service/patentSearch.aspx"
+
+	defaultCacheExpire     = time.Hour * 24
+	defaultCleanupInterval = time.Minute
+	defaultCacheCapacity   = 100000
 )
 
 var CurrentInnojoy *InnojoyClient
@@ -33,6 +40,8 @@ type InnojoyClient struct {
 
 	hc    *httpClient
 	token string
+
+	pc *pageCache
 }
 
 func newInnojoyClient() *InnojoyClient {
@@ -40,6 +49,7 @@ func newInnojoyClient() *InnojoyClient {
 		email:    my_config.CurrentPatentConfig.InnojoyUser,
 		password: my_config.CurrentPatentConfig.InnojoyPassword,
 		hc:       newHttpClient(),
+		pc:       newPageCache(),
 	}
 }
 
@@ -71,22 +81,26 @@ func (ic *InnojoyClient) autoLogin() error {
 	return nil
 }
 
-func (ic *InnojoyClient) SimpleSearch(query string, db string) (result []*dto.PatentDetail, err error) {
-	req := ic.parseSimpleSearchQuery(query, db)
-	return ic.search(req, ic.autoLogin)
+func (ic *InnojoyClient) SimpleSearch(req *dto.SimpleSearchReq) (result []*dto.PatentDetail, err error) {
+	sr := ic.parseSimpleSearchQuery(req.Query, req.DB, req.PageIndex, req.PageSize)
+	return ic.search(sr, ic.autoLogin)
 }
 
-func (ic *InnojoyClient) parseSimpleSearchQuery(query string, db string) *SearchReq {
+func (ic *InnojoyClient) parseSimpleSearchQuery(query string, db string, pageIndex int, pageSize int) *SearchReq {
 	queryFormat := fmt.Sprintf("TI='%s'", query)
+	var guid string
+	if pageIndex > 0 {
+		guid = ic.pc.Get(queryFormat)
+	}
 	return &SearchReq{
 		Token: ic.token,
 		PatentSearchConfig: &PatentSearchConfig{
-			GUID:      "",
+			GUID:      guid,
 			Action:    "Search",
 			Query:     queryFormat,
 			Database:  db,
-			Page:      "1",
-			PageSize:  "100",
+			Page:      strconv.Itoa(pageIndex),
+			PageSize:  strconv.Itoa(pageSize),
 			Sortby:    "-公开（公告）日,公开（公告）号",
 			FieldList: "TI,AN,AD,PNM,PD,PA,PINN,CL",
 		},
@@ -118,10 +132,14 @@ func (ic *InnojoyClient) search(sr *SearchReq, cb callback) (result []*dto.Paten
 			if err = cb(); err != nil {
 				return nil, fmt.Errorf("seatch call callback error: %w", err)
 			}
+			// reset token
 			sr.Token = ic.token
 			retried = true
 		} else {
-			handleTitle(searchRes.Option.PatentList)
+			// refresh page GUID cache
+			ic.pc.Put(sr.PatentSearchConfig.Query, searchRes.Option.GUID)
+			// remove useless data
+			refinePatentDetails(searchRes.Option.PatentList)
 			return searchRes.Option.PatentList, nil
 		}
 	}
@@ -159,8 +177,35 @@ type loginResp struct {
 }
 
 // refine patent title
-func handleTitle(pds []*dto.PatentDetail) {
+func refinePatentDetails(pds []*dto.PatentDetail) {
 	for _, pd := range pds {
 		pd.Ti = strings.Split(pd.Ti, "[ZH]")[0]
+		pd.Pa = strings.Split(pd.Pa, ";")[0]
 	}
+}
+
+type pageCache struct {
+	cache *s_cache.Cache
+}
+
+func newPageCache() *pageCache {
+	c := s_cache.NewCache(defaultCacheExpire, defaultCleanupInterval, s_cache.NewLRU(defaultCacheCapacity))
+	return &pageCache{cache: c}
+}
+
+func (c *pageCache) Put(key string, guid string) {
+	c.cache.Delete(key, nil)
+	h := c.cache.Get(key, func() (size int, value s_cache.Value, d time.Duration) {
+		return 1, guid, s_cache.DefaultExpiration
+	})
+	h.Release()
+}
+
+func (c *pageCache) Get(key string) string {
+	h := c.cache.Get(key, nil)
+	if h == nil {
+		return ""
+	}
+	defer h.Release()
+	return h.Value().(string)
 }

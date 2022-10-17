@@ -3,6 +3,8 @@ package service
 import (
 	"fmt"
 	"github.com/stretchr/testify/assert"
+	"go-admin/app/patent/service/dto"
+	cDto "go-admin/common/dto"
 	"testing"
 )
 
@@ -23,7 +25,13 @@ func TestInnojoyAutoLogin(t *testing.T) {
 
 func TestInnojoySimpleSearch(t *testing.T) {
 	ic := newMockInnojoyClient()
-	res, err := ic.SimpleSearch("请求处理方法", "wgzl,syxx,fmzl")
+	res, err := ic.SimpleSearch(&dto.SimpleSearchReq{
+		Pagination: cDto.Pagination{
+			PageIndex: 1,
+			PageSize:  100,
+		},
+		Query: "请求处理方法",
+	})
 	assert.NoError(t, err)
 	for _, r := range res {
 		fmt.Println(r)
