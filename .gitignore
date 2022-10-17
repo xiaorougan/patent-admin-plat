@@ -10,6 +10,7 @@ temp/
 !temp
 vendor
 config/settings.dev.yml
+config/settings_migrate.yml
 common/middleware/demo.go
 config/settings.dev.*.yml
 config/settings.dev.*.yml.log
@@ -23,3 +24,5 @@ cmd/migrate/migration/version-local/*
 
 # go sum
 go.sum
+
+bin/
