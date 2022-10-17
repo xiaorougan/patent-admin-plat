@@ -304,7 +304,7 @@
             }
         },
         "/api/v1/search/simple": {
-            "get": {
+            "post": {
                 "security": [
                     {
                         "Bearer": []
@@ -794,6 +794,12 @@
                 },
                 "Query": {
                     "type": "string"
+                },
+                "pageIndex": {
+                    "type": "integer"
+                },
+                "pageSize": {
+                    "type": "integer"
                 }
             }
         },

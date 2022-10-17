@@ -33,6 +33,10 @@ definitions:
         type: string
       Query:
         type: string
+      pageIndex:
+        type: integer
+      pageSize:
+        type: integer
     type: object
   dto.SwagSimpleSearchResp:
     properties:
@@ -442,7 +446,7 @@ paths:
       tags:
       - 角色/Role
   /api/v1/search/simple:
-    get:
+    post:
       description: 根据查询字符串进行模糊搜索
       parameters:
       - description: 用户数据

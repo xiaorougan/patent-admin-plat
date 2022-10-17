@@ -313,7 +313,7 @@ const docTemplate = `{
             }
         },
         "/api/v1/search/simple": {
-            "get": {
+            "post": {
                 "security": [
                     {
                         "Bearer": []
@@ -803,6 +803,12 @@ const docTemplate = `{
                 },
                 "Query": {
                     "type": "string"
+                },
+                "pageIndex": {
+                    "type": "integer"
+                },
+                "pageSize": {
+                    "type": "integer"
                 }
             }
         },
