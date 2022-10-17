@@ -34,6 +34,11 @@ func (e Search) SimpleSearch(c *gin.Context) {
 		return
 	}
 
+	if len(req.DB) == 0 {
+		// todo: 设置默认数据库配置文件
+		req.DB = "wgzl,syxx,fmzl"
+	}
+
 	ps, err := ic.SimpleSearch(req.Query, req.DB)
 	if err != nil {
 		e.Logger.Error(err)
