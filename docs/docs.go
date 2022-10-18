@@ -97,6 +97,107 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/v1/package": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "获取JSON",
+                "tags": [
+                    "专利包"
+                ],
+                "summary": "列表专利包信息数据",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "packageName",
+                        "name": "packageName",
+                        "in": "query"
+                    }
+                ],
+                "responses": {}
+            },
+            "put": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "获取JSON",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "专利包"
+                ],
+                "summary": "修改专利包数据",
+                "parameters": [
+                    {
+                        "description": "body",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.PackageInsertReq"
+                        }
+                    }
+                ],
+                "responses": {}
+            },
+            "post": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "获取JSON",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "专利包"
+                ],
+                "summary": "创建专利包",
+                "parameters": [
+                    {
+                        "description": "专利包数据",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.PackageInsertReq"
+                        }
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/api/v1/package/{packageId}": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "获取JSON",
+                "tags": [
+                    "专利包"
+                ],
+                "summary": "获取专利包",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "专利包编码",
+                        "name": "packageId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {}
+            }
+        },
         "/api/v1/public/uploadFile": {
             "post": {
                 "security": [
@@ -313,7 +414,7 @@ const docTemplate = `{
             }
         },
         "/api/v1/search/simple": {
-            "get": {
+            "post": {
                 "security": [
                     {
                         "Bearer": []
@@ -544,14 +645,14 @@ const docTemplate = `{
                 ],
                 "description": "删除数据",
                 "tags": [
-                    "用户"
+                    "专利包"
                 ],
-                "summary": "删除用户数据",
+                "summary": "删除专利包数据",
                 "parameters": [
                     {
                         "type": "integer",
-                        "description": "userId",
-                        "name": "userId",
+                        "description": "packageId",
+                        "name": "packageId",
                         "in": "path",
                         "required": true
                     },
@@ -766,6 +867,27 @@ const docTemplate = `{
                 }
             }
         },
+        "dto.PackageInsertReq": {
+            "type": "object",
+            "properties": {
+                "createBy": {
+                    "type": "integer"
+                },
+                "desc": {
+                    "type": "string"
+                },
+                "packageId": {
+                    "description": "专利包ID",
+                    "type": "integer"
+                },
+                "packageName": {
+                    "type": "string"
+                },
+                "updateBy": {
+                    "type": "integer"
+                }
+            }
+        },
         "dto.PassWord": {
             "type": "object",
             "properties": {
@@ -803,6 +925,12 @@ const docTemplate = `{
                 },
                 "Query": {
                     "type": "string"
+                },
+                "pageIndex": {
+                    "type": "integer"
+                },
+                "pageSize": {
+                    "type": "integer"
                 }
             }
         },
