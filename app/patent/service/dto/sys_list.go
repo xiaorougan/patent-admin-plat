@@ -87,11 +87,11 @@ func (s *SysListGetReq) GetPatentId() interface{} {
 // SysLoginLogDeleteReq 功能删除请求参数
 
 type SysListDeleteReq struct {
-	PatentIds []int `json:"patent_ids"`
+	PatentId int `json:"patent_ids"`
 }
 
 func (s *SysListDeleteReq) GetPatentId() interface{} {
-	return s.PatentIds
+	return s.PatentId
 }
 
 type SysListInsertReq struct {
@@ -132,7 +132,7 @@ type SysListById struct {
 }
 
 func (s *SysListById) GetPatentId() interface{} {
-	return s.PAId
+	return s.PatentId
 }
 
 func (s *SysListById) GenerateM() (common.ActiveRecord, error) {

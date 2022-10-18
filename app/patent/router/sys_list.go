@@ -16,17 +16,22 @@ func init() {
 func registerSysListRouter(v1 *gin.RouterGroup, authMiddleware *jwt.GinJWTMiddleware) {
 	api := apis.SysList{}
 
-	r := v1.Group("/sys-list").Use(authMiddleware.MiddlewareFunc()).Use(middleware.AuthCheckRole())
+	r := v1.Group("/patent-list").Use(authMiddleware.MiddlewareFunc()).Use(middleware.AuthCheckRole())
 	{
-		r.GET("", api.GetLists) //测试成功
-
-		r.GET("/patentid/:patent_id", api.GetPatentById) //根据patent_id查询
-		//r.GET("/patentname/:ti", api.GetPatentByName)
-		r.POST("", api.InsertListsByPatentId) //测试成功
-		//r.POST("/:id", api.InsertListsByPatentId)
-		//r.POST("/:ti", api.InsertListsByPatentName)
-		r.PUT("", api.UpdateLists)        //测试成功
-		r.DELETE("/:id", api.DeleteLists) //测试成功
-
+		r.GET("/get_patent_lists", api.GetLists)
+		r.GET("/get_by_patent_id/:patent_id", api.GetPatentById)
+		//r.GET("/patent-name/:ti", api.GetPatentByName)
+		r.POST("/post_a_patent/", api.InsertLists)
+		r.PUT("/change_a_patent/", api.UpdateLists)
+		r.DELETE("/delete_a_patent_by_id/:patent_id", api.DeletePatentByPatentId)
 	}
+
+	r1 := v1.Group("/patent-relationship").Use(authMiddleware.MiddlewareFunc()).Use(middleware.AuthCheckRole())
+	{
+		r1.GET("", api.GetLists)
+		r1.GET("/get-patent-lists-by-userid/:user_id", api.GetPatentById)
+	}
+
 }
+
+//一般来说,Controller是Handler,但Handler不一定是Controller。
