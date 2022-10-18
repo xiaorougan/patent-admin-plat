@@ -14,7 +14,7 @@ import (
 	"go-admin/app/patent/service/dto"
 )
 
-type SysTag struct {
+type PatentTag struct {
 	api.Api
 }
 
@@ -25,9 +25,9 @@ type SysTag struct {
 // @Param tagId path string false "tagId"
 // @Router /api/v1/tag/{id} [get]
 // @Security Bearer
-func (e SysTag) Get(c *gin.Context) {
-	s := service.SysTag{}
-	req := dto.SysTagGetReq{}
+func (e PatentTag) Get(c *gin.Context) {
+	s := service.PatentTag{}
+	req := dto.PatentTagGetReq{}
 	err := e.MakeContext(c).
 		MakeOrm().
 		Bind(&req, nil).
@@ -38,7 +38,7 @@ func (e SysTag) Get(c *gin.Context) {
 		e.Error(500, err, fmt.Sprintf(" %s ", err.Error()))
 		return
 	}
-	var object models.SysTag
+	var object models.PatentTag
 
 	err = s.Get(&req, &object)
 	if err != nil {
@@ -52,12 +52,12 @@ func (e SysTag) Get(c *gin.Context) {
 // @Summary 增加标签
 // @Description 获取JSON
 // @Tags 标签/Tag
-// @Param data body dto.SysTagInsertReq true "标签数据"
+// @Param data body dto.PatentTagInsertReq true "标签数据"
 // @Router /api/v1/tag [post]
 // @Security Bearer
-func (e SysTag) Insert(c *gin.Context) {
-	s := service.SysTag{}
-	req := dto.SysTagInsertReq{}
+func (e PatentTag) Insert(c *gin.Context) {
+	s := service.PatentTag{}
+	req := dto.PatentTagInsertReq{}
 	err := e.MakeContext(c).
 		MakeOrm().
 		Bind(&req, binding.JSON).
@@ -87,9 +87,9 @@ func (e SysTag) Insert(c *gin.Context) {
 // @Param data body dto.ObjectById true "标签数据"
 // @Router /api/v1/tag [delete]
 // @Security Bearer
-func (e SysTag) Delete(c *gin.Context) {
-	s := service.SysTag{}
-	req := dto.SysTagById{}
+func (e PatentTag) Delete(c *gin.Context) {
+	s := service.PatentTag{}
+	req := dto.PatentTagById{}
 	err := e.MakeContext(c).
 		MakeOrm().
 		Bind(&req, binding.JSON).
@@ -119,12 +119,12 @@ func (e SysTag) Delete(c *gin.Context) {
 // @Summary 更新标签
 // @Description 获取JSON
 // @Tags 标签/Tag
-// @Param data body dto.SysTagUpdateReq true "标签数据"
+// @Param data body dto.PatentTagUpdateReq true "标签数据"
 // @Router /api/v1/tag [put]
 // @Security Bearer
-func (e SysTag) Update(c *gin.Context) {
-	s := service.SysTag{}
-	req := dto.SysTagUpdateReq{}
+func (e PatentTag) Update(c *gin.Context) {
+	s := service.PatentTag{}
+	req := dto.PatentTagUpdateReq{}
 	err := e.MakeContext(c).
 		MakeOrm().
 		Bind(&req).

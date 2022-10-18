@@ -9,12 +9,12 @@ import (
 	"gorm.io/gorm"
 )
 
-type SysTag struct {
+type PatentTag struct {
 	service.Service
 }
 
 // Get 获取SysRole对象
-func (e *SysTag) Get(d *dto.SysTagGetReq, model *models.SysTag) error {
+func (e *PatentTag) Get(d *dto.PatentTagGetReq, model *models.PatentTag) error {
 	var err error
 	db := e.Orm.First(model, d.GetId())
 	err = db.Error
@@ -30,9 +30,9 @@ func (e *SysTag) Get(d *dto.SysTagGetReq, model *models.SysTag) error {
 	return nil
 }
 
-func (e *SysTag) Insert(d *dto.SysTagInsertReq) error {
+func (e *PatentTag) Insert(d *dto.PatentTagInsertReq) error {
 	var err error
-	var data models.SysTag
+	var data models.PatentTag
 	var i int64
 	err = e.Orm.Model(&data).Where("tag_name = ?", d.TagName).Count(&i).Error
 	if err != nil {
@@ -53,9 +53,9 @@ func (e *SysTag) Insert(d *dto.SysTagInsertReq) error {
 	return nil
 }
 
-func (e *SysTag) Remove(c *dto.SysTagById) error {
+func (e *PatentTag) Remove(c *dto.PatentTagById) error {
 	var err error
-	var data models.SysTag
+	var data models.PatentTag
 
 	db := e.Orm.Model(&data).
 		Delete(&data, c.GetId())
@@ -69,9 +69,9 @@ func (e *SysTag) Remove(c *dto.SysTagById) error {
 	return nil
 }
 
-func (e *SysTag) Update(c *dto.SysTagUpdateReq) error {
+func (e *PatentTag) Update(c *dto.PatentTagUpdateReq) error {
 	var err error
-	var model models.SysTag
+	var model models.PatentTag
 	db := e.Orm.First(&model, c.GetId())
 	if err = db.Error; err != nil {
 		e.Log.Errorf("Service UpdateSysUser error: %s", err)

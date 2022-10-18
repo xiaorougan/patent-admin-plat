@@ -6,26 +6,26 @@ import (
 	common "go-admin/common/models"
 )
 
-type SysTagInsertReq struct {
+type PatentTagInsertReq struct {
 	TagId   int    `json:"tagId" comment:"标签ID"`   //标签ID
 	TagName string `json:"tagName" comment:"标签名;"` //标签名称
 	Desc    string `json:"desc"    comment:"标签描述"` //标签描述
 	common.ControlBy
 }
 
-type SysTagUpdateReq struct {
+type PatentTagUpdateReq struct {
 	TagId   int    `json:"tagId" comment:"标签ID"`   //标签ID
 	TagName string `json:"tagName" comment:"标签名;"` //标签名称
 	Desc    string `json:"desc"    comment:"标签描述"` //标签描述
 	common.ControlBy
 }
 
-type SysTagById struct {
+type PatentTagById struct {
 	dto.ObjectById
 	common.ControlBy
 }
 
-func (s *SysTagInsertReq) Generate(model *models.SysTag) {
+func (s *PatentTagInsertReq) Generate(model *models.PatentTag) {
 	if s.TagId != 0 {
 		model.TagId = s.TagId
 	}
@@ -33,7 +33,7 @@ func (s *SysTagInsertReq) Generate(model *models.SysTag) {
 	model.Desc = s.TagName
 }
 
-func (s *SysTagUpdateReq) Generate(model *models.SysTag) {
+func (s *PatentTagUpdateReq) Generate(model *models.PatentTag) {
 	if s.TagId != 0 {
 		model.TagId = s.TagId
 	}
@@ -41,18 +41,18 @@ func (s *SysTagUpdateReq) Generate(model *models.SysTag) {
 	model.Desc = s.TagName
 }
 
-func (s *SysTagInsertReq) GetId() interface{} {
+func (s *PatentTagInsertReq) GetId() interface{} {
 	return s.TagId
 }
 
-func (s *SysTagUpdateReq) GetId() interface{} {
+func (s *PatentTagUpdateReq) GetId() interface{} {
 	return s.TagId
 }
 
-type SysTagGetReq struct {
+type PatentTagGetReq struct {
 	Id int `uri:"id"`
 }
 
-func (s *SysTagGetReq) GetId() interface{} {
+func (s *PatentTagGetReq) GetId() interface{} {
 	return s.Id
 }

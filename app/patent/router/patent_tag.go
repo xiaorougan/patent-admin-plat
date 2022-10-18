@@ -9,12 +9,12 @@ import (
 )
 
 func init() {
-	routerCheckRole = append(routerCheckRole, registerSysTagRouter)
+	routerCheckRole = append(routerCheckRole, registerPatentTagRouter)
 }
 
 // 需认证的路由代码
-func registerSysTagRouter(v1 *gin.RouterGroup, authMiddleware *jwt.GinJWTMiddleware) {
-	api := apis.SysTag{}
+func registerPatentTagRouter(v1 *gin.RouterGroup, authMiddleware *jwt.GinJWTMiddleware) {
+	api := apis.PatentTag{}
 	r := v1.Group("/tag").Use(authMiddleware.MiddlewareFunc()).Use(middleware.AuthCheckRole())
 	{
 		r.PUT("", api.Update)
