@@ -312,18 +312,18 @@ const docTemplate = `{
                 "responses": {}
             }
         },
-        "/api/v1/search/simple": {
+        "/api/v1/search": {
             "post": {
                 "security": [
                     {
                         "Bearer": []
                     }
                 ],
-                "description": "根据查询字符串进行模糊搜索",
+                "description": "根据查询字符串进行搜索（可传入逻辑表达式或简单字符串）",
                 "tags": [
                     "专利检索"
                 ],
-                "summary": "简单查询",
+                "summary": "专利搜索",
                 "parameters": [
                     {
                         "description": "用户数据",
@@ -339,7 +339,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/dto.SwagSimpleSearchResp"
+                            "$ref": "#/definitions/dto.SwagSearchListResp"
                         }
                     }
                 }
@@ -812,7 +812,7 @@ const docTemplate = `{
                 }
             }
         },
-        "dto.SwagSimpleSearchResp": {
+        "dto.SwagSearchListResp": {
             "type": "object",
             "properties": {
                 "code": {

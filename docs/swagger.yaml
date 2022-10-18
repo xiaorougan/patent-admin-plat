@@ -38,7 +38,7 @@ definitions:
       pageSize:
         type: integer
     type: object
-  dto.SwagSimpleSearchResp:
+  dto.SwagSearchListResp:
     properties:
       code:
         type: integer
@@ -445,9 +445,9 @@ paths:
       summary: 获取Role数据
       tags:
       - 角色/Role
-  /api/v1/search/simple:
+  /api/v1/search:
     post:
-      description: 根据查询字符串进行模糊搜索
+      description: 根据查询字符串进行搜索（可传入逻辑表达式或简单字符串）
       parameters:
       - description: 用户数据
         in: body
@@ -459,10 +459,10 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/dto.SwagSimpleSearchResp'
+            $ref: '#/definitions/dto.SwagSearchListResp'
       security:
       - Bearer: []
-      summary: 简单查询
+      summary: 专利搜索
       tags:
       - 专利检索
   /api/v1/server-monitor:
