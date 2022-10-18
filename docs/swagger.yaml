@@ -83,6 +83,63 @@ definitions:
       requestId:
         type: string
     type: object
+  dto.SysListDeleteReq:
+    properties:
+      patent_ids:
+        items:
+          type: integer
+        type: array
+    type: object
+  dto.SysListInsertReq:
+    properties:
+      AD:
+        type: string
+      AR:
+        type: string
+      CL:
+        type: string
+      INN:
+        type: string
+      PA:
+        type: string
+      PD:
+        type: string
+      PNM:
+        type: string
+      PatentId:
+        type: integer
+      TI:
+        type: string
+      createBy:
+        type: integer
+      updateBy:
+        type: integer
+    type: object
+  dto.SysListUpdateReq:
+    properties:
+      AD:
+        type: string
+      AR:
+        type: string
+      CL:
+        type: string
+      INN:
+        type: string
+      PA:
+        type: string
+      PD:
+        type: string
+      PNM:
+        type: string
+      PatentId:
+        type: integer
+      TI:
+        type: string
+      createBy:
+        type: integer
+      updateBy:
+        type: integer
+    type: object
   dto.SysLoginLogDeleteReq:
     properties:
       ids:
@@ -470,6 +527,111 @@ paths:
       summary: 系统信息
       tags:
       - 系统信息
+  /api/v1/sys-list:
+    delete:
+      description: 专利删除
+      parameters:
+      - description: body
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/dto.SysListDeleteReq'
+      responses: {}
+      security:
+      - Bearer: []
+      summary: 输入id删除专利表
+      tags:
+      - 专利表
+    get:
+      description: 获取JSON
+      responses: {}
+      security:
+      - Bearer: []
+      summary: 列表专利信息数据
+      tags:
+      - 专利表
+    post:
+      consumes:
+      - application/json
+      description: 获取JSON
+      parameters:
+      - description: 专利表数据
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/dto.SysListInsertReq'
+      responses: {}
+      security:
+      - Bearer: []
+      summary: 创建专利
+      tags:
+      - 专利表
+  /api/v1/sys-list/:
+    put:
+      consumes:
+      - application/json
+      description: 修改JSON
+      parameters:
+      - description: body
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/dto.SysListUpdateReq'
+      responses: {}
+      security:
+      - Bearer: []
+      summary: 修改专利表数据
+      tags:
+      - 专利表
+  /api/v1/sys-list/patentid/{patent_id}:
+    get:
+      description: 获取JSON
+      parameters:
+      - description: 专利ID
+        in: query
+        name: PatentId
+        type: string
+      - description: 专利名
+        in: query
+        name: TI
+        type: string
+      - description: 申请号
+        in: query
+        name: PNM
+        type: string
+      - description: 申请日
+        in: query
+        name: AD
+        type: string
+      - description: 公开日
+        in: query
+        name: PD
+        type: string
+      - description: 简介
+        in: query
+        name: CL
+        type: string
+      - description: 申请单位
+        in: query
+        name: PA
+        type: string
+      - description: 地址
+        in: query
+        name: AR
+        type: string
+      - description: 申请人
+        in: query
+        name: INN
+        type: string
+      responses: {}
+      security:
+      - Bearer: []
+      summary: 通过专利id获取单个对象
+      tags:
+      - 专利表
   /api/v1/sys-login-log:
     delete:
       description: 登录日志删除
