@@ -3,7 +3,7 @@ package apis
 import (
 	"fmt"
 	"github.com/gin-gonic/gin/binding"
-	"go-admin/app/admin/models"
+	"go-admin/app/patent/models"
 	"net/http"
 
 	"github.com/gin-gonic/gin"

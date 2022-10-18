@@ -4,7 +4,7 @@ import (
 	"errors"
 	log "github.com/go-admin-team/go-admin-core/logger"
 	"github.com/go-admin-team/go-admin-core/sdk/service"
-	"go-admin/app/admin/models"
+	"go-admin/app/patent/models"
 	"go-admin/app/patent/service/dto"
 	"gorm.io/gorm"
 )
