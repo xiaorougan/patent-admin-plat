@@ -13,7 +13,7 @@ import (
 	_ "github.com/go-admin-team/go-admin-core/sdk/pkg/jwtauth/user"
 )
 
-type SysList struct {
+type Patent struct {
 	api.Api
 }
 
@@ -24,9 +24,9 @@ type SysList struct {
 // @Param PatentId query string false "专利ID"
 // @Router /api/v1/patent-list/get_by_patent_id/{patent_id} [get]
 // @Security Bearer
-func (e SysList) GetPatentById(c *gin.Context) {
-	s := service.SysList{}
-	req := dto.SysListById{}
+func (e Patent) GetPatentById(c *gin.Context) {
+	s := service.Patent{}
+	req := dto.PatentById{}
 	err := e.MakeContext(c).
 		MakeOrm().
 		Bind(&req, nil).
@@ -37,7 +37,7 @@ func (e SysList) GetPatentById(c *gin.Context) {
 		e.Error(500, err, err.Error())
 		return
 	}
-	var object models.SysList
+	var object models.Patent
 	//数据权限检查
 	//p := actions.GetPermissionFromContext(c)
 	err = s.Get(&req, &object)
@@ -48,15 +48,15 @@ func (e SysList) GetPatentById(c *gin.Context) {
 	e.OK(object, "查询成功")
 }
 
-// GetLists
+// GetPatentLists
 // @Summary 列表专利信息数据
 // @Description 获取JSON
 // @Tags 专利表
 // @Router /api/v1/patent-list/get_patent_lists [get]
 // @Security Bearer
-func (e SysList) GetLists(c *gin.Context) { //gin框架里的上下文
-	s := service.SysList{}         //service中查询或者返回的结果赋值给s变量
-	req := dto.SysListGetPageReq{} //被绑定的数据
+func (e Patent) GetPatentLists(c *gin.Context) { //gin框架里的上下文
+	s := service.Patent{}         //service中查询或者返回的结果赋值给s变量
+	req := dto.PatentGetPageReq{} //被绑定的数据
 	err := e.MakeContext(c).
 		MakeOrm().
 		Bind(&req).
@@ -71,7 +71,7 @@ func (e SysList) GetLists(c *gin.Context) { //gin框架里的上下文
 	//数据权限检查
 	//p := actions.GetPermissionFromContext(c)
 
-	list := make([]models.SysList, 0)
+	list := make([]models.Patent, 0)
 	var count int64
 
 	err = s.GetPage(&req, &list, &count)
@@ -83,18 +83,18 @@ func (e SysList) GetLists(c *gin.Context) { //gin框架里的上下文
 	e.PageOK(list, int(count), req.GetPageIndex(), req.GetPageSize(), "查询成功")
 }
 
-// InsertLists
+// InsertPatent
 // @Summary 创建专利
 // @Description 不是必须要有主键PatentId值（自增），其他需要修改什么输入什么
 // @Tags 专利表
 // @Accept  application/json
 // @Product application/json
-// @Param data body dto.SysListInsertReq true "专利表数据"
+// @Param data body dto.PatentInsertReq true "专利表数据"
 // @Router /api/v1/patent-list/post_a_patent/ [post]
 // @Security Bearer
-func (e SysList) InsertLists(c *gin.Context) {
-	s := service.SysList{}
-	req := dto.SysListInsertReq{}
+func (e Patent) InsertPatent(c *gin.Context) {
+	s := service.Patent{}
+	req := dto.PatentInsertReq{}
 	err := e.MakeContext(c).
 		MakeOrm().
 		Bind(&req, binding.JSON).
@@ -117,18 +117,18 @@ func (e SysList) InsertLists(c *gin.Context) {
 	e.OK(req.GetPatentId(), "创建成功")
 }
 
-// UpdateLists
+// UpdatePatent
 // @Summary 修改专利表数据
 // @Description 在post的json数组必须要有主键PatentId值（默认0不可重复），其他需要修改什么输入什么
 // @Tags 专利表
 // @Accept  application/json
 // @Product application/json
-// @Param data body dto.SysListUpdateReq true "body"
+// @Param data body dto.PatentUpdateReq true "body"
 // @Router /api/v1/patent-list/change_a_patent/ [put]
 // @Security Bearer
-func (e SysList) UpdateLists(c *gin.Context) {
-	s := service.SysList{}
-	req := dto.SysListUpdateReq{}
+func (e Patent) UpdatePatent(c *gin.Context) {
+	s := service.Patent{}
+	req := dto.PatentUpdateReq{}
 	err := e.MakeContext(c).
 		MakeOrm().
 		Bind(&req).
@@ -159,9 +159,9 @@ func (e SysList) UpdateLists(c *gin.Context) {
 // @Param PatentId query string false "专利ID"
 // @Router /api/v1/patent-list/delete_a_patent_by_id/{patent_id} [delete]
 // @Security Bearer
-func (e SysList) DeletePatentByPatentId(c *gin.Context) {
-	s := service.SysList{}
-	req := dto.SysListById{}
+func (e Patent) DeletePatentByPatentId(c *gin.Context) {
+	s := service.Patent{}
+	req := dto.PatentById{}
 	err := e.MakeContext(c).
 		MakeOrm().
 		Bind(&req, nil).

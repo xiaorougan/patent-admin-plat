@@ -4,7 +4,7 @@ import (
 	"go-admin/common/models"
 )
 
-type SysList struct {
+type Patent struct {
 	//models.Model        //就是自增id
 	PatentId int    `json:"PatentId" gorm:"size:128;primaryKey;autoIncrement;comment:专利ID(主键)"`
 	TI       string `json:"TI" gorm:"size:128;comment:专利名"`
@@ -19,15 +19,15 @@ type SysList struct {
 	//嵌入结构体：先写好models然后嵌入，等效于models本体
 }
 
-func (SysList) TableName() string {
-	return "sys_list"
+func (Patent) TableName() string {
+	return "patent"
 }
 
-func (e *SysList) Generate() models.ActiveRecord {
+func (e *Patent) Generate() models.ActiveRecord {
 	o := *e
 	return &o
 }
 
-func (e *SysList) GetId() interface{} {
+func (e *Patent) GetId() interface{} {
 	return e.PatentId
 }
