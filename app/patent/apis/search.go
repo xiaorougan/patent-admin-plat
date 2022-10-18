@@ -46,5 +46,5 @@ func (e Search) SimpleSearch(c *gin.Context) {
 		return
 	}
 
-	e.PageOK(ps, 100, req.PageIndex, len(ps), "查询成功")
+	e.PageOK(ps, req.PageSize, req.PageIndex, len(ps), "查询成功")
 }
