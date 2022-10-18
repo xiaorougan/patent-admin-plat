@@ -313,7 +313,7 @@ const docTemplate = `{
             }
         },
         "/api/v1/search/simple": {
-            "get": {
+            "post": {
                 "security": [
                     {
                         "Bearer": []
@@ -592,6 +592,103 @@ const docTemplate = `{
                 "responses": {}
             }
         },
+        "/api/v1/tag": {
+            "put": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "获取JSON",
+                "tags": [
+                    "标签/Tag"
+                ],
+                "summary": "更新标签",
+                "parameters": [
+                    {
+                        "description": "标签数据",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.SysTagUpdateReq"
+                        }
+                    }
+                ],
+                "responses": {}
+            },
+            "post": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "获取JSON",
+                "tags": [
+                    "标签/Tag"
+                ],
+                "summary": "增加标签",
+                "parameters": [
+                    {
+                        "description": "标签数据",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.SysTagInsertReq"
+                        }
+                    }
+                ],
+                "responses": {}
+            },
+            "delete": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "获取JSON",
+                "tags": [
+                    "标签/Tag"
+                ],
+                "summary": "删除标签",
+                "parameters": [
+                    {
+                        "description": "标签数据",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.ObjectById"
+                        }
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/api/v1/tag/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "获取JSON",
+                "tags": [
+                    "标签/Tag"
+                ],
+                "summary": "获取Tag数据",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "tagId",
+                        "name": "tagId",
+                        "in": "path"
+                    }
+                ],
+                "responses": {}
+            }
+        },
         "/api/v1/updateinfo": {
             "put": {
                 "security": [
@@ -803,6 +900,12 @@ const docTemplate = `{
                 },
                 "Query": {
                     "type": "string"
+                },
+                "pageIndex": {
+                    "type": "integer"
+                },
+                "pageSize": {
+                    "type": "integer"
                 }
             }
         },
@@ -941,6 +1044,52 @@ const docTemplate = `{
                 },
                 "status": {
                     "description": "状态",
+                    "type": "string"
+                },
+                "updateBy": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.SysTagInsertReq": {
+            "type": "object",
+            "properties": {
+                "createBy": {
+                    "type": "integer"
+                },
+                "desc": {
+                    "description": "标签描述",
+                    "type": "string"
+                },
+                "tagId": {
+                    "description": "标签ID",
+                    "type": "integer"
+                },
+                "tagName": {
+                    "description": "标签名称",
+                    "type": "string"
+                },
+                "updateBy": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.SysTagUpdateReq": {
+            "type": "object",
+            "properties": {
+                "createBy": {
+                    "type": "integer"
+                },
+                "desc": {
+                    "description": "标签描述",
+                    "type": "string"
+                },
+                "tagId": {
+                    "description": "标签ID",
+                    "type": "integer"
+                },
+                "tagName": {
+                    "description": "标签名称",
                     "type": "string"
                 },
                 "updateBy": {

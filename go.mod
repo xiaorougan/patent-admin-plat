@@ -3,6 +3,7 @@ module go-admin
 go 1.17
 
 require (
+	github.com/Gleiphir2769/s-cache v0.1.1
 	github.com/alibaba/sentinel-golang v1.0.4
 	github.com/alibaba/sentinel-golang/pkg/adapters/gin v0.0.0-20220808015021-c5f1f1d055c5
 	github.com/aliyun/aliyun-oss-go-sdk v0.0.0-20190307165228-86c17b95fcd5
@@ -33,7 +34,6 @@ require (
 )
 
 require (
-	github.com/Gleiphir2769/s-cache v0.1.1 // indirect
 	github.com/Knetic/govaluate v3.0.1-0.20171022003610-9aa49832a739+incompatible // indirect
 	github.com/KyleBanks/depth v1.2.1 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
