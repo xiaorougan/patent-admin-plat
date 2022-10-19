@@ -1,0 +1,61 @@
+package dto
+
+import (
+	"go-admin/app/patent/models"
+
+	"go-admin/common/dto"
+	common "go-admin/common/models"
+)
+
+type UserPatentGetPageReq struct {
+	dto.Pagination `search:"-"`
+	UserId         int    `form:"UserId" search:"type:exact;column:UserId;table:user_patent" comment:"用户ID"`
+	PatentId       int    `form:"PatentId" search:"type:exact;column:TagId;table:user_patent" comment:"专利ID"`
+	Type           string `json:"Type" gorm:"size:64;comment:关系类型（关注/认领）"`
+	PatentTagOrder
+}
+
+type UserPatentOrder struct {
+	CreatedAtOrder string `search:"type:order;column:created_at;table:user_patent" form:"createdAtOrder"`
+}
+
+func (m *UserPatentGetPageReq) GetNeedSearch() interface{} {
+	return *m
+}
+
+func (d *UserPatentGetPageReq) GetUserId() interface{} {
+	return d.UserId
+}
+
+func (d *UserPatentGetPageReq) GetPatentId() interface{} {
+	return d.PatentId
+}
+
+type UserPatentInsertReq struct {
+	UserId   int    `form:"UserId" search:"type:exact;column:UserId;table:user_patent" comment:"用户ID"`
+	PatentId int    `form:"PatentId" search:"type:exact;column:TagId;table:user_patent" comment:"专利ID"`
+	Type     string `json:"Type" gorm:"size:64;comment:关系类型（关注/认领）"`
+	common.ControlBy
+}
+
+func (s *UserPatentInsertReq) GenerateUserPatent(g *models.UserPatent) {
+	g.PatentId = s.PatentId
+	g.UserId = s.UserId
+	g.Type = s.Type
+
+}
+
+type UserPatentObject struct {
+	UserId   int    `form:"UserId" search:"type:exact;column:UserId;table:user_patent" comment:"用户ID"`
+	PatentId int    `uri:"patent_id"`
+	Type     string `uri:"type"`
+	common.ControlBy
+}
+
+func (d *UserPatentObject) GetPatentId() interface{} {
+	return d.PatentId
+}
+
+func (d *UserPatentObject) GetType() interface{} {
+	return d.Type
+}

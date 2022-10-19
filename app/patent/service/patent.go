@@ -101,8 +101,8 @@ func (e *Patent) UpdateLists(c *dto.PatentUpdateReq) error {
 	return nil
 }
 
-// InsertListsByPatentId 根据PatentId 创建Patent对象
-func (e *Patent) InsertListsByPatentId(c *dto.PatentInsertReq) error {
+// InsertLists 根据PatentId 创建Patent对象
+func (e *Patent) InsertLists(c *dto.PatentInsertReq) error {
 	var err error
 	var data models.Patent
 	var i int64

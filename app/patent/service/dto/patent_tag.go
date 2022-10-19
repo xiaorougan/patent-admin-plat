@@ -5,7 +5,7 @@ import "go-admin/common/dto"
 type PatentTagGetPageReq struct {
 	dto.Pagination `search:"-"`
 	PatentId       int `form:"PatentId" search:"type:exact;column:PatentId;table:patent_tag" comment:"专利ID"`
-	TagId          int `form:"PatentId" search:"type:exact;column:TagId;table:patent_tag" comment:"标签ID"`
+	TagId          int `form:"TagId" search:"type:exact;column:TagId;table:patent_tag" comment:"标签ID"`
 	PatentTagOrder
 }
 

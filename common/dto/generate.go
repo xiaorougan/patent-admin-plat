@@ -17,10 +17,10 @@ type ObjectByPatentId struct {
 	PatentId int `uri:"patent_id"`
 }
 
-//type ObjectByPatentName struct {
-//	TI  int   `uri:"ti"`
-//	TIS []int `json:"tis"`
-//}
+type ObjectOfPatentId struct {
+	PatentId  int   `uri:"patent_id"`
+	PatentIds []int `json:"Patent_ids"`
+}
 
 func (s *ObjectById) Bind(ctx *gin.Context) error {
 	var err error

@@ -107,7 +107,7 @@ func (e Patent) InsertPatent(c *gin.Context) {
 	}
 	// 设置创建人
 	req.SetCreateBy(user.GetUserId(c))
-	err = s.InsertListsByPatentId(&req)
+	err = s.InsertLists(&req)
 	if err != nil {
 		e.Logger.Error(err)
 		e.Error(500, err, err.Error())
@@ -162,6 +162,7 @@ func (e Patent) UpdatePatent(c *gin.Context) {
 func (e Patent) DeletePatentByPatentId(c *gin.Context) {
 	s := service.Patent{}
 	req := dto.PatentById{}
+
 	err := e.MakeContext(c).
 		MakeOrm().
 		Bind(&req, nil).
@@ -174,7 +175,7 @@ func (e Patent) DeletePatentByPatentId(c *gin.Context) {
 	}
 
 	// 设置编辑人
-	//req.SetUpdateBy(user.GetUserId(c))
+	req.SetUpdateBy(user.GetUserId(c))
 
 	// 数据权限检查
 	//p := actions.GetPermissionFromContext(c)

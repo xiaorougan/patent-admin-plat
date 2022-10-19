@@ -18,8 +18,12 @@ func registerPatentTagRouter(v1 *gin.RouterGroup, authMiddleware *jwt.GinJWTMidd
 
 	r1 := v1.Group("/patent_tag").Use(authMiddleware.MiddlewareFunc()).Use(middleware.AuthCheckRole())
 	{
-		r1.GET("", api.GetPatentListsByUserId)
-		r1.GET("/get-patent-lists-by-userid/:user_id", api.GetPatentListsByUserId)
+		r1.GET("", api.GetPatentTagRelationship)
+		r1.GET("/get-patent-lists-by-tag-id/:tag_id", api.GetPatentTagRelationship)
+		r1.GET("/get-tag-lists-by-patent-id/:patent_id", api.GetPatentTagRelationship)
+		r1.PUT("/change_relationship_by_relationship_id/:id", api.GetPatentTagRelationship)
+		r1.POST("/add_relationship/", api.GetPatentTagRelationship)
+		r1.DELETE("/delete_relationship_by_relationship_id/:id", api.GetPatentTagRelationship)
 	}
 
 }

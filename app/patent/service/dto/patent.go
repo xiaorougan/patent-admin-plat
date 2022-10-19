@@ -24,15 +24,16 @@ type PatentGetPageReq struct {
 }
 
 type PatentUpdateReq struct {
-	PatentId int    `json:"PatentId" gorm:"size:128;comment:专利ID"`
-	TI       string `json:"TI" gorm:"size:128;comment:专利名"`
-	PNM      string `json:"PNM" gorm:"size:128;comment:申请号"`
-	AD       string `json:"AD" gorm:"size:128;comment:申请日"`
-	PD       string `json:"PD" gorm:"size:128;comment:公开日"`
-	CL       string `json:"CL" gorm:"size:128;comment:简介"`
-	PA       string `json:"PA" gorm:"size:128;comment:申请单位"`
-	AR       string `json:"AR" gorm:"size:128;comment:地址"`
-	INN      string `json:"INN" gorm:"size:128;comment:申请人"`
+	PatentId int `json:"PatentId" gorm:"size:128;comment:专利ID"`
+
+	TI  string `json:"TI" gorm:"size:128;comment:专利名"`
+	PNM string `json:"PNM" gorm:"size:128;comment:申请号"`
+	AD  string `json:"AD" gorm:"size:128;comment:申请日"`
+	PD  string `json:"PD" gorm:"size:128;comment:公开日"`
+	CL  string `json:"CL" gorm:"size:128;comment:简介"`
+	PA  string `json:"PA" gorm:"size:128;comment:申请单位"`
+	AR  string `json:"AR" gorm:"size:128;comment:地址"`
+	INN string `json:"INN" gorm:"size:128;comment:申请人"`
 	common.ControlBy
 }
 
@@ -46,6 +47,10 @@ type PatentOrder struct {
 
 func (m *PatentGetPageReq) GetNeedSearch() interface{} {
 	return *m
+}
+func (s *PatentGetPageReq) GetPatentId() interface{} {
+
+	return s.PatentId
 }
 
 func (s *PatentUpdateReq) GenerateList(model *models.Patent) {
@@ -137,4 +142,19 @@ func (s *PatentById) GetPatentId() interface{} {
 
 func (s *PatentById) GenerateM() (common.ActiveRecord, error) {
 	return &models.Patent{}, nil
+}
+
+type PatentsByIdsForRelationshipUsers struct {
+	dto.ObjectOfPatentId
+}
+
+func (s *PatentsByIdsForRelationshipUsers) GetPatentId() []int {
+
+	s.PatentIds = append(s.PatentIds, s.PatentId)
+	return s.PatentIds
+
+}
+
+func (s *PatentsByIdsForRelationshipUsers) GetNeedSearch() interface{} {
+	return *s
 }

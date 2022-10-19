@@ -12,13 +12,13 @@ type PatentTag struct {
 	api.Api
 }
 
-// GetPatentListsByUserId
-// @Summary 列表专利信息数据
+// GetPatentTagRelationship
+// @Summary 获取PatentId和TagId的对应关系
 // @Description 获取JSON
-// @Tags 专利表
-// @Router /api/v1/patent-list/get_patent_lists [get]
+// @Tags 专利标签关系表
+// @Router /api/v1/patent_tag [get]
 // @Security Bearer
-func (e PatentTag) GetPatentListsByUserId(c *gin.Context) { //gin框架里的上下文
+func (e PatentTag) GetPatentTagRelationship(c *gin.Context) { //gin框架里的上下文
 	s := service.PatentTag{}         //service中查询或者返回的结果赋值给s变量
 	req := dto.PatentTagGetPageReq{} //被绑定的数据
 	err := e.MakeContext(c).
