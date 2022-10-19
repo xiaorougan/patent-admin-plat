@@ -22,7 +22,7 @@ type Patent struct {
 // @Description 获取JSON,希望可以通过以下参数高级搜索，暂时只支持patentId
 // @Tags 专利表
 // @Param PatentId query string false "专利ID"
-// @Router /api/v1/patent-list/get_by_patent_id/{patent_id} [get]
+// @Router /api/v1/patent/{patent_id} [get]
 // @Security Bearer
 func (e Patent) GetPatentById(c *gin.Context) {
 	s := service.Patent{}
@@ -52,7 +52,7 @@ func (e Patent) GetPatentById(c *gin.Context) {
 // @Summary 列表专利信息数据
 // @Description 获取JSON
 // @Tags 专利表
-// @Router /api/v1/patent-list/get_patent_lists [get]
+// @Router /api/v1/patent [get]
 // @Security Bearer
 func (e Patent) GetPatentLists(c *gin.Context) { //gin框架里的上下文
 	s := service.Patent{}         //service中查询或者返回的结果赋值给s变量
@@ -90,7 +90,7 @@ func (e Patent) GetPatentLists(c *gin.Context) { //gin框架里的上下文
 // @Accept  application/json
 // @Product application/json
 // @Param data body dto.PatentInsertReq true "专利表数据"
-// @Router /api/v1/patent-list/post_a_patent/ [post]
+// @Router /api/v1/patent [post]
 // @Security Bearer
 func (e Patent) InsertPatent(c *gin.Context) {
 	s := service.Patent{}
@@ -124,7 +124,7 @@ func (e Patent) InsertPatent(c *gin.Context) {
 // @Accept  application/json
 // @Product application/json
 // @Param data body dto.PatentUpdateReq true "body"
-// @Router /api/v1/patent-list/change_a_patent/ [put]
+// @Router /api/v1/patent [put]
 // @Security Bearer
 func (e Patent) UpdatePatent(c *gin.Context) {
 	s := service.Patent{}
@@ -157,7 +157,7 @@ func (e Patent) UpdatePatent(c *gin.Context) {
 // @Description  输入专利id删除专利表
 // @Tags 专利表
 // @Param PatentId query string false "专利ID"
-// @Router /api/v1/patent-list/delete_a_patent_by_id/{patent_id} [delete]
+// @Router /api/v1/patent/{patent_id} [delete]
 // @Security Bearer
 func (e Patent) DeletePatentByPatentId(c *gin.Context) {
 	s := service.Patent{}

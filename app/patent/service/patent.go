@@ -53,13 +53,13 @@ func (e *Patent) Get(d *dto.PatentById, model *models.Patent) error {
 	return nil
 }
 
-// Remove 根据专利id删除Patent（可以自定义根据专利id删除数据的个数，因为post的内容是一个json里面是PatentID的数组）
+// Remove 根据专利id删除Patent
 func (e *Patent) Remove(c *dto.PatentById) error {
 	var err error
 	var data models.Patent
 
 	db := e.Orm.Delete(&data, c.GetPatentId())
-	//.Where("patent_id = ?", c.GetPatentId())
+
 	if db.Error != nil {
 		err = db.Error
 		e.Log.Errorf("Delete error: %s", err)

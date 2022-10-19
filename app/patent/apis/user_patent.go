@@ -19,7 +19,7 @@ type UserPatent struct {
 // @Summary 获得该UserId的认领专利IDs
 // @Description 获取认领关系
 // @Tags 用户专利关系表
-// @Router /api/v1/user-patent/get-claim-lists [get]
+// @Router /api/v1/user-patent/claim [get]
 // @Security Bearer
 func (e UserPatent) GetClaimPatentByUserId(c *gin.Context) { //gin框架里的上下文
 
@@ -71,7 +71,7 @@ func (e UserPatent) GetClaimPatentByUserId(c *gin.Context) { //gin框架里的�
 // @Summary 获得该UserId的关注专利IDs
 // @Description 获取关注关系
 // @Tags 用户专利关系表
-// @Router /api/v1/user-patent/get-collection-lists [get]
+// @Router /api/v1/user-patent/collection [get]
 // @Security Bearer
 func (e UserPatent) GetCollectionPatentByUserId(c *gin.Context) { //gin框架里的上下文
 
@@ -124,7 +124,7 @@ func (e UserPatent) GetCollectionPatentByUserId(c *gin.Context) { //gin框架里
 // @Accept  application/json
 // @Product application/json
 // @Param data body dto.UserPatentInsertReq true "Type和PatentId为必要输入"
-// @Router /api/v1/user-patent/add_claim_or_collection_relationship/ [post]
+// @Router /api/v1/user-patent/ [post]
 // @Security Bearer
 func (e UserPatent) InsertUserPatentRelationship(c *gin.Context) {
 	s := service.UserPatent{}
@@ -174,7 +174,7 @@ func (e UserPatent) InsertUserPatentRelationship(c *gin.Context) {
 // @Tags 用户专利关系表
 // @Param PatentId query string false "专利ID"
 // @Param Type query string false "关系类型"
-// @Router /api/v1/user-patent/delete_user_patent_relationship/{patent_id}/{type} [delete]
+// @Router /api/v1/user-patent/{patent_id}/{type} [delete]
 // @Security Bearer
 func (e UserPatent) DeleteUserPatentRelationship(c *gin.Context) {
 	s := service.UserPatent{}

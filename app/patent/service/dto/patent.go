@@ -4,7 +4,6 @@ import (
 	"go-admin/app/patent/models"
 	"go-admin/common/dto"
 	common "go-admin/common/models"
-	"time"
 )
 
 //查询必须写form字段
@@ -67,20 +66,6 @@ func (s *PatentUpdateReq) GenerateList(model *models.Patent) {
 	model.PA = s.PA
 }
 
-type PatentControl struct {
-	PatentId      int       `uri:"Id" comment:"主键"` // 主键
-	Username      string    `json:"username" comment:"用户名"`
-	Status        string    `json:"status" comment:"状态"`
-	Ipaddr        string    `json:"ipaddr" comment:"ip地址"`
-	LoginLocation string    `json:"loginLocation" comment:"归属地"`
-	Browser       string    `json:"browser" comment:"浏览器"`
-	Os            string    `json:"os" comment:"系统"`
-	Platform      string    `json:"platform" comment:"固件"`
-	LoginTime     time.Time `json:"loginTime" comment:"登录时间"`
-	Remark        string    `json:"remark" comment:"备注"`
-	Msg           string    `json:"msg" comment:"信息"`
-}
-
 type PatentGetReq struct {
 	PatentId int `uri:"patent_id"`
 }
@@ -92,7 +77,7 @@ func (s *PatentGetReq) GetPatentId() interface{} {
 // PatentDeleteReq 功能删除请求参数
 
 type PatentDeleteReq struct {
-	PatentId int `json:"patent_ids"`
+	PatentId int `json:"PatentIds"`
 }
 
 func (s *PatentDeleteReq) GetPatentId() interface{} {

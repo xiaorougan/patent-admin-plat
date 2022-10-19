@@ -16,16 +16,14 @@ func init() {
 func registerPatentRouter(v1 *gin.RouterGroup, authMiddleware *jwt.GinJWTMiddleware) {
 	api := apis.Patent{}
 
-	r := v1.Group("/patent-list").Use(authMiddleware.MiddlewareFunc()).Use(middleware.AuthCheckRole())
+	r := v1.Group("/patent").Use(authMiddleware.MiddlewareFunc()).Use(middleware.AuthCheckRole())
 	{
-		r.GET("/get_patent_lists", api.GetPatentLists)
-		r.GET("/get_by_patent_id/:patent_id", api.GetPatentById)
+		r.GET("", api.GetPatentLists)
+		r.GET("/:patent_id", api.GetPatentById)
 		//r.GET("/patent-name/:ti", api.GetPatentByName)
-		r.POST("/post_a_patent/", api.InsertPatent)
-		r.PUT("/change_a_patent/", api.UpdatePatent)
-		r.DELETE("/delete_a_patent_by_id/:patent_id", api.DeletePatentByPatentId)
+		r.POST("", api.InsertPatent)
+		r.PUT("", api.UpdatePatent)
+		r.DELETE("/:patent_id", api.DeletePatentByPatentId)
 	}
 
 }
-
-//一般来说,Controller是Handler,但Handler不一定是Controller。

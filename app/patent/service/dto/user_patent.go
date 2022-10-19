@@ -9,8 +9,8 @@ import (
 
 type UserPatentGetPageReq struct {
 	dto.Pagination `search:"-"`
-	UserId         int    `form:"UserId" search:"type:exact;column:UserId;table:user_patent" comment:"用户ID"`
-	PatentId       int    `form:"PatentId" search:"type:exact;column:TagId;table:user_patent" comment:"专利ID"`
+	UserId         int    `form:"UserId" search:"type:exact;column:UserId;table:user_patent" comment:"用户ID" `
+	PatentId       int    `form:"PatentId" search:"type:exact;column:TagId;table:user_patent" comment:"专利ID" `
 	Type           string `json:"Type" gorm:"size:64;comment:关系类型（关注/认领）"`
 	PatentTagOrder
 }
