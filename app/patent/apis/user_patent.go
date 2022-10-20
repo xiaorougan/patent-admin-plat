@@ -1,7 +1,6 @@
 package apis
 
 import (
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
 	"github.com/go-admin-team/go-admin-core/sdk/api"
@@ -130,56 +129,56 @@ func (e UserPatent) GetCollections(c *gin.Context) { //gin框架里的上下文
 	e.OK(list1, "查询成功")
 }
 
-// InsertUserPatentRelationship
-// @Summary 创建用户专利关系
-// @Description Type和PatentId为必要输入，Type只能是 认领 或者 关注 关系
-// @Tags 用户专利关系表
-// @Accept  application/json
-// @Product application/json
-// @Param data body dto.UserPatentInsertReq true "Type和PatentId为必要输入"
-// @Router /api/v1/user-patent/ [post]
-// @Security Bearer
-func (e UserPatent) InsertUserPatentRelationship(c *gin.Context) {
-	s := service.UserPatent{}
-	req := dto.UserPatentInsertReq{}
-	req.UserId = user.GetUserId(c)
-	err := e.MakeContext(c).
-		MakeOrm().
-		Bind(&req, binding.JSON).
-		MakeService(&s.Service).
-		Errors
-	if err != nil {
-		e.Logger.Error(err)
-		e.Error(500, err, err.Error())
-		return
-	}
-	// 设置创建人
-	req.SetCreateBy(user.GetUserId(c))
-
-	if req.Type == "认领" {
-		err = s.InsertClaimRelationship(&req)
-	} else if req.Type == "关注" {
-		err = s.InsertCollectionRelationship(&req)
-	} else {
-		e.Logger.Error(err)
-		e.Error(404, err, fmt.Sprintf("invalid req.type %s", req.Type))
-		return
-	}
-
-	if req.PatentId == 0 {
-		e.Logger.Error(err)
-		e.Error(404, err, "您输入的专利id不存在！")
-		return
-	}
-
-	if err != nil {
-		e.Logger.Error(err)
-		e.Error(500, err, err.Error())
-		return
-	}
-
-	e.OK(req, "创建成功")
-}
+//// InsertUserPatentRelationship
+//// @Summary 创建用户专利关系
+//// @Description Type和PatentId为必要输入，Type只能是 认领 或者 关注 关系
+//// @Tags 用户专利关系表
+//// @Accept  application/json
+//// @Product application/json
+//// @Param data body dto.UserPatentInsertReq true "Type和PatentId为必要输入"
+//// @Router /api/v1/user-patent/ [post]
+//// @Security Bearer
+//func (e UserPatent) InsertUserPatentRelationship(c *gin.Context) {
+//	s := service.UserPatent{}
+//	req := dto.UserPatentInsertReq{}
+//	req.UserId = user.GetUserId(c)
+//	err := e.MakeContext(c).
+//		MakeOrm().
+//		Bind(&req, binding.JSON).
+//		MakeService(&s.Service).
+//		Errors
+//	if err != nil {
+//		e.Logger.Error(err)
+//		e.Error(500, err, err.Error())
+//		return
+//	}
+//	// 设置创建人
+//	req.SetCreateBy(user.GetUserId(c))
+//
+//	if req.Type == "认领" {
+//		err = s.Insert(&req)
+//	} else if req.Type == "关注" {
+//		err = s.InsertCollectionRelationship(&req)
+//	} else {
+//		e.Logger.Error(err)
+//		e.Error(404, err, fmt.Sprintf("invalid req.Type: %s, should be 认领/关注", req.Type))
+//		return
+//	}
+//
+//	if req.PatentId == 0 {
+//		e.Logger.Error(err)
+//		e.Error(404, err, "您输入的专利id不存在！")
+//		return
+//	}
+//
+//	if err != nil {
+//		e.Logger.Error(err)
+//		e.Error(500, err, err.Error())
+//		return
+//	}
+//
+//	e.OK(req, "创建成功")
+//}
 
 // DeleteUserPatentRelationship
 // @Summary 根据专利id、TYPE删除用户专利关系

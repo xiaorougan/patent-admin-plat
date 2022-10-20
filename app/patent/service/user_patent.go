@@ -68,8 +68,8 @@ func (e *UserPatent) GetPatentPagesByIds(d *dto.PatentsByIdsForRelationshipUsers
 	return nil
 }
 
-// InsertClaimRelationship 创建认领关系
-func (e *UserPatent) InsertClaimRelationship(c *dto.UserPatentInsertReq) error {
+// Insert relationship between user and patent
+func (e *UserPatent) Insert(c *dto.UserPatentObject) error {
 	var err error
 	var data models.UserPatent
 	var i int64
@@ -80,13 +80,12 @@ func (e *UserPatent) InsertClaimRelationship(c *dto.UserPatentInsertReq) error {
 		return err
 	}
 	if i > 0 {
-		err := errors.New("关系已存在！")
+		err = fmt.Errorf("%w, (p:%d, u:%d, t:%s) existed", ErrConflictBindPatent, c.PatentId, c.UserId, c.Type)
 		e.Log.Errorf("db error: %s", err)
 		return err
 	}
 
 	c.GenerateUserPatent(&data)
-	c.Type = "认领"
 	err = e.Orm.Create(&data).Error
 	if err != nil {
 		e.Log.Errorf("db error: %s", err)
@@ -95,33 +94,33 @@ func (e *UserPatent) InsertClaimRelationship(c *dto.UserPatentInsertReq) error {
 	return nil
 }
 
-// InsertCollectionRelationship 创建关注关系
-func (e *UserPatent) InsertCollectionRelationship(c *dto.UserPatentInsertReq) error {
-	var err error
-	var data models.UserPatent
-	var i int64
-	err = e.Orm.Model(&data).Where("Patent_Id = ? AND User_Id = ? AND Type = ?", c.PatentId, c.UserId, c.Type).
-		Count(&i).Error
-	if err != nil {
-		e.Log.Errorf("db error: %s", err)
-		return err
-	}
-	if i > 0 {
-		err := errors.New("关系已存在！")
-		e.Log.Errorf("db error: %s", err)
-		return err
-	}
-
-	c.GenerateUserPatent(&data)
-	c.Type = "关注"
-
-	err = e.Orm.Create(&data).Error
-	if err != nil {
-		e.Log.Errorf("db error: %s", err)
-		return err
-	}
-	return nil
-}
+//// InsertCollectionRelationship 创建关注关系
+//func (e *UserPatent) InsertCollectionRelationship(c *dto.UserPatentObject) error {
+//	var err error
+//	var data models.UserPatent
+//	var i int64
+//	err = e.Orm.Model(&data).Where("Patent_Id = ? AND User_Id = ? AND Type = ?", c.PatentId, c.UserId, c.Type).
+//		Count(&i).Error
+//	if err != nil {
+//		e.Log.Errorf("db error: %s", err)
+//		return err
+//	}
+//	if i > 0 {
+//		err := errors.New("关系已存在！")
+//		e.Log.Errorf("db error: %s", err)
+//		return err
+//	}
+//
+//	c.GenerateUserPatent(&data)
+//	c.Type = "关注"
+//
+//	err = e.Orm.Create(&data).Error
+//	if err != nil {
+//		e.Log.Errorf("db error: %s", err)
+//		return err
+//	}
+//	return nil
+//}
 
 // RemoveRelationship 根据专利id、TYPE删除用户专利关系
 func (e *UserPatent) RemoveRelationship(c *dto.UserPatentObject) error {
