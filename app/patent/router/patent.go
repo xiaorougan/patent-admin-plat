@@ -3,13 +3,12 @@ package router
 import (
 	"github.com/gin-gonic/gin"
 	jwt "github.com/go-admin-team/go-admin-core/sdk/pkg/jwtauth"
-	"go-admin/app/admin/router"
 	"go-admin/app/patent/apis"
 	"go-admin/common/middleware"
 )
 
 func init() {
-	router.RouterCheckRole = append(router.RouterCheckRole, registerPatentRouter)
+	routerCheckRole = append(routerCheckRole, registerPatentRouter)
 }
 
 // 需认证的路由代码
@@ -24,6 +23,9 @@ func registerPatentRouter(v1 *gin.RouterGroup, authMiddleware *jwt.GinJWTMiddlew
 		r.POST("", api.InsertPatent)
 		r.PUT("", api.UpdatePatent)
 		r.DELETE("/:patent_id", api.DeletePatentByPatentId)
+
+		r.POST("/claim", api.ClaimPatent)
+		r.POST("/focus", api.FocusPatent)
 	}
 
 }

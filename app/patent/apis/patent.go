@@ -1,16 +1,16 @@
 package apis
 
 import (
+	"errors"
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
+	"github.com/go-admin-team/go-admin-core/sdk/api"
 	"github.com/go-admin-team/go-admin-core/sdk/pkg/jwtauth/user"
+	_ "github.com/go-admin-team/go-admin-core/sdk/pkg/jwtauth/user"
 	"go-admin/app/patent/models"
 	"go-admin/app/patent/service"
 	"go-admin/app/patent/service/dto"
 	"net/http"
-
-	"github.com/go-admin-team/go-admin-core/sdk/api"
-	_ "github.com/go-admin-team/go-admin-core/sdk/pkg/jwtauth/user"
 )
 
 type Patent struct {
@@ -107,7 +107,7 @@ func (e Patent) InsertPatent(c *gin.Context) {
 	}
 	// 设置创建人
 	req.SetCreateBy(user.GetUserId(c))
-	err = s.InsertLists(&req)
+	err = s.Insert(&req)
 	if err != nil {
 		e.Logger.Error(err)
 		e.Error(500, err, err.Error())
@@ -186,4 +186,104 @@ func (e Patent) DeletePatentByPatentId(c *gin.Context) {
 		return
 	}
 	e.OK(req.GetPatentId(), "删除成功")
+}
+
+// ClaimPatent
+// @Summary 认领专利
+// @Description
+// @Tags 专利表
+// @Accept  application/json
+// @Product application/json
+// @Param data body dto.UserPatentInsertReq true "Type和PatentId为必要输入"
+// @Router /api/v1/patent/{patent_id}/claim [post]
+// @Security Bearer
+func (e Patent) ClaimPatent(c *gin.Context) {
+	pid, err := e.internalInsertIfAbsent(c)
+	if err != nil {
+		e.Logger.Error(err)
+		e.Error(500, err, err.Error())
+		return
+	}
+
+	s := service.UserPatent{}
+	err = e.MakeContext(c).
+		MakeOrm().
+		//Bind(&req, binding.JSON).
+		MakeService(&s.Service).
+		Errors
+	if err != nil {
+		e.Logger.Error(err)
+		e.Error(500, err, err.Error())
+		return
+	}
+
+	req := dto.NewUserPatentClaim(user.GetUserId(c), pid, user.GetUserId(c))
+
+	if err = s.Insert(req); err != nil {
+		e.Logger.Error(err)
+		if errors.Is(err, service.ErrConflictBindPatent) {
+			e.Error(409, err, err.Error())
+		} else {
+			e.Error(500, err, err.Error())
+		}
+		return
+	}
+
+	e.OK(req, "创建成功")
+}
+
+// FocusPatent
+// @Summary 关注专利
+// @Description
+// @Tags 专利表
+// @Accept  application/json
+// @Product application/json
+// @Router /api/v1/patent/{patent_id}/focus [post]
+// @Security Bearer
+func (e Patent) FocusPatent(c *gin.Context) {
+	pid, err := e.internalInsertIfAbsent(c)
+	if err != nil {
+		e.Logger.Error(err)
+		e.Error(500, err, err.Error())
+		return
+	}
+
+	s := service.UserPatent{}
+	err = e.MakeContext(c).
+		MakeOrm().
+		MakeService(&s.Service).
+		Errors
+	if err != nil {
+		e.Logger.Error(err)
+		e.Error(500, err, err.Error())
+		return
+	}
+
+	req := dto.NewUserPatentFocus(user.GetUserId(c), pid, user.GetUserId(c))
+
+	if err = s.Insert(req); err != nil {
+		e.Logger.Error(err)
+		if errors.Is(err, service.ErrConflictBindPatent) {
+			e.Error(409, err, err.Error())
+		} else {
+			e.Error(500, err, err.Error())
+		}
+		return
+	}
+
+	e.OK(req, "创建成功")
+}
+
+func (e Patent) internalInsertIfAbsent(c *gin.Context) (int, error) {
+	ps := service.Patent{}
+	req := dto.PatentInsertReq{}
+	err := e.MakeContext(c).
+		MakeOrm().
+		Bind(&req, binding.JSON).
+		MakeService(&ps.Service).
+		Errors
+	if err != nil {
+		return 0, err
+	}
+	return ps.InsertIfAbsent(&req)
 }

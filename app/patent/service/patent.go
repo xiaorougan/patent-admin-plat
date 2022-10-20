@@ -101,8 +101,8 @@ func (e *Patent) UpdateLists(c *dto.PatentUpdateReq) error {
 	return nil
 }
 
-// InsertLists 根据PatentId 创建Patent对象
-func (e *Patent) InsertLists(c *dto.PatentInsertReq) error {
+// Insert 根据PatentId 创建Patent对象
+func (e *Patent) Insert(c *dto.PatentInsertReq) error {
 	var err error
 	var data models.Patent
 	var i int64
@@ -123,4 +123,31 @@ func (e *Patent) InsertLists(c *dto.PatentInsertReq) error {
 		return err
 	}
 	return nil
+}
+
+// InsertIfAbsent 根据PatentId 创建Patent对象
+func (e *Patent) InsertIfAbsent(c *dto.PatentInsertReq) (int, error) {
+	var err error
+	var data models.Patent
+	var i int64
+	err = e.Orm.Model(&data).Where("PNM = ?", c.PNM).Count(&i).Error
+	if err != nil {
+		e.Log.Errorf("db error: %s", err)
+		return 0, err
+	}
+	if i > 0 {
+		err = e.Orm.Model(&data).Where("PNM = ?", c.PNM).First(&data).Error
+		if err != nil {
+			e.Log.Errorf("db error: %s", err)
+			return 0, err
+		}
+		return data.PatentId, nil
+	}
+	c.GenerateList(&data)
+	err = e.Orm.Create(&data).Error
+	if err != nil {
+		e.Log.Errorf("db error: %s", err)
+		return 0, err
+	}
+	return data.PatentId, nil
 }
