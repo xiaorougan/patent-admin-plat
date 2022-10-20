@@ -48,7 +48,7 @@ func (s *UserPatentInsertReq) GenerateUserPatent(g *models.UserPatent) {
 type UserPatentObject struct {
 	UserId   int    `form:"UserId" search:"type:exact;column:UserId;table:user_patent" comment:"用户ID"`
 	PatentId int    `uri:"patent_id"`
-	Type     string `uri:"type"`
+	Type     string `uri:"type"` //路由对大小写敏感
 	common.ControlBy
 }
 
@@ -58,4 +58,18 @@ func (d *UserPatentObject) GetPatentId() interface{} {
 
 func (d *UserPatentObject) GetType() interface{} {
 	return d.Type
+}
+
+type UpDateUserPatentObject struct {
+	UserId   int    `form:"UserId" search:"type:exact;column:UserId;table:user_patent" comment:"用户ID" `
+	PatentId int    `form:"PatentId" search:"type:exact;column:TagId;table:user_patent" comment:"专利ID" `
+	Type     string `json:"Type" gorm:"size:64;comment:关系类型（关注/认领）"`
+	common.ControlBy
+}
+
+func (s *UpDateUserPatentObject) GenerateUserPatent(g *models.UserPatent) {
+	g.PatentId = s.PatentId
+	g.UserId = s.UserId
+	g.Type = s.Type
+
 }

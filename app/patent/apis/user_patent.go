@@ -15,13 +15,13 @@ type UserPatent struct {
 	api.Api
 }
 
-// GetClaimPatentByUserId
-// @Summary 获得该UserId的认领专利IDs
+// GetClaims
+// @Summary 获得该UserId的认领专利列表
 // @Description 获取认领关系
 // @Tags 用户专利关系表
 // @Router /api/v1/user-patent/claim [get]
 // @Security Bearer
-func (e UserPatent) GetClaimPatentByUserId(c *gin.Context) { //gin框架里的上下文
+func (e UserPatent) GetClaims(c *gin.Context) { //gin框架里的上下文
 
 	s := service.UserPatent{}         //service中查询或者返回的结果赋值给s变量
 	req := dto.UserPatentGetPageReq{} //被绑定的数据
@@ -67,23 +67,26 @@ func (e UserPatent) GetClaimPatentByUserId(c *gin.Context) { //gin框架里的�
 	e.OK(list1, "查询成功")
 }
 
-// GetCollectionPatentByUserId
-// @Summary 获得该UserId的关注专利IDs
+// GetCollections
+// @Summary 获得该UserId的关注专利列表
 // @Description 获取关注关系
 // @Tags 用户专利关系表
 // @Router /api/v1/user-patent/collection [get]
 // @Security Bearer
-func (e UserPatent) GetCollectionPatentByUserId(c *gin.Context) { //gin框架里的上下文
+func (e UserPatent) GetCollections(c *gin.Context) { //gin框架里的上下文
 
 	s := service.UserPatent{}         //service中查询或者返回的结果赋值给s变量
 	req := dto.UserPatentGetPageReq{} //被绑定的数据
 	req1 := dto.PatentsByIdsForRelationshipUsers{}
+
 	req.UserId = user.GetUserId(c)
+
 	err := e.MakeContext(c).
 		MakeOrm().
 		Bind(&req).
 		MakeService(&s.Service).
 		Errors
+
 	if err != nil {
 		e.Logger.Error(err)
 		e.Error(500, err, err.Error())
@@ -93,27 +96,37 @@ func (e UserPatent) GetCollectionPatentByUserId(c *gin.Context) { //gin框架里
 	//p := actions.GetPermissionFromContext(c)
 	list := make([]models.UserPatent, 0)
 	list1 := make([]models.Patent, 0)
+
 	var count int64
+
 	err = s.GetCollectionLists(&req, &list, &count)
+
 	if err != nil {
 		e.Error(500, err, "查询失败")
 		return
 	}
+
 	var count2 int64
+
 	err = e.MakeContext(c).
 		MakeOrm().
 		Bind(&req1).
 		MakeService(&s.Service).
 		Errors
+
 	req1.PatentIds = make([]int, len(list))
+
 	for i := 0; i < len(list); i++ {
 		req1.PatentIds[i] = list[i].PatentId
 	}
+
 	err = s.GetPatentPagesByIds(&req1, &list1, &count2)
+
 	if err != nil {
 		e.Error(500, err, "查询失败")
 		return
 	}
+
 	e.OK(list1, "查询成功")
 }
 
@@ -169,8 +182,8 @@ func (e UserPatent) InsertUserPatentRelationship(c *gin.Context) {
 }
 
 // DeleteUserPatentRelationship
-// @Summary 输入专利id删除专利表
-// @Description  输入专利id删除专利表
+// @Summary 根据专利id、TYPE删除用户专利关系
+// @Description  根据专利id、TYPE删除用户专利关系
 // @Tags 用户专利关系表
 // @Param PatentId query string false "专利ID"
 // @Param Type query string false "关系类型"
@@ -181,24 +194,19 @@ func (e UserPatent) DeleteUserPatentRelationship(c *gin.Context) {
 	req := dto.UserPatentObject{}
 	req.UserId = user.GetUserId(c)
 
+	req.SetUpdateBy(user.GetUserId(c))
+
 	err := e.MakeContext(c).
 		MakeOrm().
 		Bind(&req). //在这一步传入request数据
 		MakeService(&s.Service).
 		Errors
 
-	fmt.Println(req.PatentId)
-	fmt.Println(req.Type)
-	fmt.Println(req.UserId)
-
 	if err != nil {
 		e.Logger.Error(err)
 		e.Error(500, err, err.Error())
 		return
 	}
-
-	// 设置编辑人
-	req.SetUpdateBy(user.GetUserId(c))
 
 	// 数据权限检查
 	//p := actions.GetPermissionFromContext(c)
@@ -209,4 +217,51 @@ func (e UserPatent) DeleteUserPatentRelationship(c *gin.Context) {
 		return
 	}
 	e.OK(req, "删除成功")
+}
+
+// UpdateUserPatentRelationship
+// @Summary 修改用户专利关系
+// @Description 需要输入专利id更新用户专利关系
+// @Tags 用户专利关系表
+// @Accept  application/json
+// @Product application/json
+// @Param data body dto.UpDateUserPatentObject true "body"
+// @Router /api/v1/user-patent [put]
+// @Security Bearer
+func (e UserPatent) UpdateUserPatentRelationship(c *gin.Context) {
+	s := service.UserPatent{}
+	req := dto.UpDateUserPatentObject{}
+	req.UserId = user.GetUserId(c)
+	err := e.MakeContext(c).
+		MakeOrm().
+		Bind(&req, binding.JSON).
+		MakeService(&s.Service).
+		Errors
+	if err != nil {
+		e.Logger.Error(err)
+		e.Error(500, err, err.Error())
+		return
+	}
+
+	req.SetUpdateBy(user.GetUserId(c))
+	//数据权限检查
+	//p := actions.GetPermissionFromContext(c)
+
+	if req.PatentId == 0 {
+		e.Logger.Error(err)
+		e.Error(404, err, "请输入专利id")
+		return
+	}
+
+	fmt.Println(req.PatentId)
+	fmt.Println(req.UserId)
+	fmt.Println(req.Type)
+
+	err = s.UpdateUserPatent(&req)
+
+	if err != nil {
+		e.Logger.Error(err)
+		return
+	}
+	e.OK(req, "更新成功")
 }
