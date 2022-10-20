@@ -3,8 +3,8 @@ package service
 import (
 	"errors"
 	"github.com/prometheus/common/log"
-	"go-admin/app/patent/models"
-	"go-admin/app/patent/service/dto"
+	"go-admin/app/user-agent/models"
+	"go-admin/app/user-agent/service/dto"
 
 	"github.com/go-admin-team/go-admin-core/sdk/service"
 	"gorm.io/gorm"

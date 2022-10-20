@@ -5,9 +5,9 @@ import (
 	"github.com/gin-gonic/gin/binding"
 	"github.com/go-admin-team/go-admin-core/sdk/api"
 	"github.com/go-admin-team/go-admin-core/sdk/pkg/jwtauth/user"
-	"go-admin/app/patent/models"
-	"go-admin/app/patent/service"
-	"go-admin/app/patent/service/dto"
+	"go-admin/app/user-agent/models"
+	"go-admin/app/user-agent/service"
+	"go-admin/app/user-agent/service/dto"
 )
 
 type PatentTag struct {

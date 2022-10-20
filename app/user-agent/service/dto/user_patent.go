@@ -1,7 +1,7 @@
 package dto
 
 import (
-	"go-admin/app/patent/models"
+	"go-admin/app/user-agent/models"
 
 	"go-admin/common/dto"
 	common "go-admin/common/models"

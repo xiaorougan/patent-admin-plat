@@ -3,8 +3,8 @@ package apis
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/go-admin-team/go-admin-core/sdk/api"
-	"go-admin/app/patent/service"
-	"go-admin/app/patent/service/dto"
+	"go-admin/app/user-agent/service"
+	"go-admin/app/user-agent/service/dto"
 )
 
 type Search struct {

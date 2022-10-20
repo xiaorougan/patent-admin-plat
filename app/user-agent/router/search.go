@@ -2,7 +2,7 @@ package router
 
 import (
 	"github.com/gin-gonic/gin"
-	"go-admin/app/patent/apis"
+	"go-admin/app/user-agent/apis"
 )
 
 func init() {
