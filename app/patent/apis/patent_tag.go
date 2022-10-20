@@ -182,3 +182,41 @@ func (e PatentTag) InsertPatentTagRelationship(c *gin.Context) {
 
 	e.OK(req, "创建成功")
 }
+
+// DeletePatentTagRelationship
+// @Summary 删除专利标签对应关系
+// @Description  根据PatentId、TagId删除专利标签对应关系
+// @Tags 专利标签关系表
+// @Param PatentId query string false "专利ID"
+// @Param TagId query string false "标签ID"
+// @Router /api/v1/patent-tag/{patent_id}/{tag_id} [delete]
+// @Security Bearer
+func (e PatentTag) DeletePatentTagRelationship(c *gin.Context) {
+	s := service.PatentTag{}
+	req := dto.PatentTagObject{}
+
+	req.SetUpdateBy(user.GetUserId(c))
+
+	err := e.MakeContext(c).
+		MakeOrm().
+		Bind(&req). //在这一步传入request数据
+		MakeService(&s.Service).
+		Errors
+
+	if err != nil {
+		e.Logger.Error(err)
+		e.Error(500, err, err.Error())
+		return
+	}
+
+	// 数据权限检查
+	//p := actions.GetPermissionFromContext(c)
+
+	err = s.RemoveRelationship(&req)
+
+	if err != nil {
+		e.Logger.Error(err)
+		return
+	}
+	e.OK(req, "删除成功")
+}

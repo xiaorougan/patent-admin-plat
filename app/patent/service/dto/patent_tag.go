@@ -74,3 +74,17 @@ type PatentUpdateReqByTag struct {
 	PatentId int `json:"PatentId" gorm:"size:128;comment:专利ID"`
 	common.ControlBy
 }
+
+type PatentTagObject struct {
+	TagId    int `uri:"tag_id"`
+	PatentId int `uri:"patent_id"`
+	common.ControlBy
+}
+
+func (d *PatentTagObject) GetPatentId() interface{} {
+	return d.PatentId
+}
+
+func (d *PatentTagObject) GetTagId() interface{} {
+	return d.TagId
+}

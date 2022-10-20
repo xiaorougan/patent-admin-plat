@@ -18,14 +18,10 @@ func registerPatentTagRouter(v1 *gin.RouterGroup, authMiddleware *jwt.GinJWTMidd
 
 	r1 := v1.Group("/patent-tag").Use(authMiddleware.MiddlewareFunc()).Use(middleware.AuthCheckRole())
 	{
-
-		r1.GET("/tags/:patent_id", api.GetTags)      //测试√
-		r1.GET("/patents/:tag_id", api.GetPatent)    //测试√
-		r1.POST("", api.InsertPatentTagRelationship) //测试√
-
+		r1.GET("/tags/:patent_id", api.GetTags)                           //测试√
+		r1.GET("/patents/:tag_id", api.GetPatent)                         //测试√
+		r1.POST("", api.InsertPatentTagRelationship)                      //测试√
+		r1.DELETE("/:patent_id/:tag_id", api.DeletePatentTagRelationship) //测试√
 		r1.PUT("", api.GetTags)
-
-		r1.DELETE("/:id", api.GetTags)
 	}
-
 }

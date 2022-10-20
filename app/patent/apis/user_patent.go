@@ -1,6 +1,7 @@
 package apis
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
 	"github.com/go-admin-team/go-admin-core/sdk/api"
@@ -161,7 +162,7 @@ func (e UserPatent) InsertUserPatentRelationship(c *gin.Context) {
 		err = s.InsertCollectionRelationship(&req)
 	} else {
 		e.Logger.Error(err)
-		e.Error(404, err, "您输入的关系类型有误！只能是 认领 或者 关注 关系")
+		e.Error(404, err, fmt.Sprintf("invalid req.type %s", req.Type))
 		return
 	}
 

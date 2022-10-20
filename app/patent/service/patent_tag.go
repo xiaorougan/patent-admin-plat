@@ -130,3 +130,23 @@ func (e *PatentTag) InsertPatentTagRelationship(c *dto.PatentTagInsertReq) error
 	}
 	return nil
 }
+
+// RemoveRelationship 根据专利id、TYPE删除用户专利关系
+func (e *PatentTag) RemoveRelationship(c *dto.PatentTagObject) error {
+	var err error
+	var data models.PatentTag
+
+	db := e.Orm.Where("Patent_Id = ? AND Tag_Id = ? ", c.PatentId, c.TagId).
+		Delete(&data)
+
+	if db.Error != nil {
+		err = db.Error
+		e.Log.Errorf("Delete error: %s", err)
+		return err
+	}
+	if db.RowsAffected == 0 {
+		err = errors.New("无权删除该数据")
+		return err
+	}
+	return nil
+}

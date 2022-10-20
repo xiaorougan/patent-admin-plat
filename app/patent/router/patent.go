@@ -24,6 +24,7 @@ func registerPatentRouter(v1 *gin.RouterGroup, authMiddleware *jwt.GinJWTMiddlew
 		r.POST("", api.InsertPatent)
 		r.PUT("", api.UpdatePatent)
 		r.DELETE("/:patent_id", api.DeletePatentByPatentId)
+		//r.POST("/claim", api.Claim)
 	}
 
 }
