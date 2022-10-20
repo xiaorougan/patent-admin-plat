@@ -1,7 +1,6 @@
 package apis
 
 import (
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
 	"github.com/go-admin-team/go-admin-core/sdk/api"
@@ -252,10 +251,6 @@ func (e UserPatent) UpdateUserPatentRelationship(c *gin.Context) {
 		e.Error(404, err, "请输入专利id")
 		return
 	}
-
-	fmt.Println(req.PatentId)
-	fmt.Println(req.UserId)
-	fmt.Println(req.Type)
 
 	err = s.UpdateUserPatent(&req)
 

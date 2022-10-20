@@ -13,11 +13,11 @@ type UserPatent struct {
 	service.Service
 }
 
-// GetClaimLists 通过UserId获得PatentId列表，通过PatentId获取Patent列表
+// GetClaimLists 通过UserId获得PatentId列表
 func (e *UserPatent) GetClaimLists(c *dto.UserPatentGetPageReq, list *[]models.UserPatent, count *int64) error {
 	var err error
 	var data models.UserPatent
-	err = e.Orm.Model(&data).Select("Patent_Id").
+	err = e.Orm.Model(&data).
 		Where("Type = ? AND User_Id = ?", "认领", c.GetUserId()).
 		Find(list).Limit(-1).Offset(-1).
 		Count(count).Error
@@ -28,7 +28,7 @@ func (e *UserPatent) GetClaimLists(c *dto.UserPatentGetPageReq, list *[]models.U
 	return nil
 }
 
-// GetCollectionLists 通过UserId获得PatentId列表，通过PatentId获取Patent列表
+// GetCollectionLists 通过UserId获得PatentId列表
 func (e *UserPatent) GetCollectionLists(c *dto.UserPatentGetPageReq, list *[]models.UserPatent, count *int64) error {
 	var err error
 	var data models.UserPatent

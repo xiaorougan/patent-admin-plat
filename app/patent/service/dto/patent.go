@@ -143,3 +143,18 @@ func (s *PatentsByIdsForRelationshipUsers) GetPatentId() []int {
 func (s *PatentsByIdsForRelationshipUsers) GetNeedSearch() interface{} {
 	return *s
 }
+
+type PatentsByIdsForRelationshipTags struct {
+	dto.ObjectOfPatentId
+}
+
+func (s *PatentsByIdsForRelationshipTags) GetNeedSearch() interface{} {
+	return *s
+}
+
+func (s *PatentsByIdsForRelationshipTags) GetPatentId() []int {
+
+	s.PatentIds = append(s.PatentIds, s.PatentId)
+	return s.PatentIds
+
+}
