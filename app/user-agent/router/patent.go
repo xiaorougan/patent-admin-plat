@@ -26,7 +26,7 @@ func registerPatentRouter(v1 *gin.RouterGroup, authMiddleware *jwt.GinJWTMiddlew
 		//显示专利包内专利
 		//显示专利所属的专利包
 
-		r.POST("", api.InsertPatent)      //添加专利
+		r.POST("", api.InsertPatent)      //添加专利√
 		r.POST("/claim", api.ClaimPatent) //认领专利√
 		r.POST("/focus", api.FocusPatent) //关注专利√
 		r.POST("/tag", api.InsertTag)     //为专利添加标签√
