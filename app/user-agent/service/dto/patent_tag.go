@@ -16,7 +16,7 @@ type PatentTagGetPageReq struct {
 type TagPageGetReq struct {
 	dto.Pagination `search:"-"`
 	PatentId       int `form:"PatentId" search:"type:exact;column:TagId;table:patent_tag" comment:"专利ID"`
-	TagId          int `uri:"tag_id"`
+	TagId          int `form:"TagId" search:"type:exact;column:TagId;table:patent_tag" comment:"标签ID"`
 	PatentTagOrder
 }
 

@@ -2,6 +2,7 @@ package apis
 
 import (
 	"errors"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
 	"github.com/go-admin-team/go-admin-core/sdk/api"
@@ -11,6 +12,7 @@ import (
 	"go-admin/app/user-agent/service"
 	"go-admin/app/user-agent/service/dto"
 	"net/http"
+	"strconv"
 )
 
 type Patent struct {
@@ -493,7 +495,7 @@ func (e Patent) DeleteClaim(c *gin.Context) {
 // @Router /api/v1/user-agent/patent/tags/{patent_id}/{tag_id} [delete]
 // @Security Bearer
 func (e Patent) DeleteTag(c *gin.Context) {
-	s := service.PatentTag{}
+	s := service.Patent{}
 	req := dto.PatentTagObject{}
 	req.SetUpdateBy(user.GetUserId(c))
 	err := e.MakeContext(c).
@@ -530,7 +532,7 @@ func (e Patent) DeleteTag(c *gin.Context) {
 // @Router /api/v1/user-agent/patent/tag [post]
 // @Security Bearer
 func (e Patent) InsertTag(c *gin.Context) {
-	s := service.PatentTag{}
+	s := service.Patent{}
 	req := dto.PatentTagInsertReq{}
 
 	err := e.MakeContext(c).
@@ -572,8 +574,12 @@ func (e Patent) InsertTag(c *gin.Context) {
 // @Security Bearer
 func (e Patent) GetPatent(c *gin.Context) {
 
-	s := service.PatentTag{}
+	s := service.Patent{}
 	req := dto.TagPageGetReq{}
+	//req的tagid从路由来
+
+	fmt.Println(req.TagId)
+
 	req1 := dto.PatentsByIdsForRelationshipTags{}
 
 	err := e.MakeContext(c).
@@ -588,6 +594,19 @@ func (e Patent) GetPatent(c *gin.Context) {
 		return
 	}
 
+	req.TagId, err = strconv.Atoi(c.Param("tag_id"))
+
+	if err != nil {
+		e.Logger.Error(err)
+		e.Error(500, err, err.Error())
+		return
+	}
+
+	fmt.Println(req.TagId)
+	fmt.Println(req.TagId)
+	fmt.Println(req.TagId)
+	fmt.Println(req.TagId)
+	
 	//数据权限检查
 	//p := actions.GetPermissionFromContext(c)
 
@@ -634,7 +653,7 @@ func (e Patent) GetPatent(c *gin.Context) {
 // @Security Bearer
 func (e Patent) GetTags(c *gin.Context) {
 
-	s := service.PatentTag{}
+	s := service.Patent{}
 	req := dto.PatentTagGetPageReq{}
 	req1 := dto.TagsByIdsForRelationshipPatents{}
 
