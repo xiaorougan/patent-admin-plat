@@ -3,15 +3,15 @@ package apis
 import (
 	"fmt"
 	"github.com/gin-gonic/gin/binding"
-	"go-admin/app/patent/models"
+	"go-admin/app/user-agent/models"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-admin-team/go-admin-core/sdk/api"
 	"github.com/go-admin-team/go-admin-core/sdk/pkg/jwtauth/user"
 	_ "github.com/go-admin-team/go-admin-core/sdk/pkg/response"
-	"go-admin/app/patent/service"
-	"go-admin/app/patent/service/dto"
+	"go-admin/app/user-agent/service"
+	"go-admin/app/user-agent/service/dto"
 )
 
 type Tag struct {

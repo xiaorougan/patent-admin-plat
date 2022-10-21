@@ -4,7 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	jwt "github.com/go-admin-team/go-admin-core/sdk/pkg/jwtauth"
 
-	"go-admin/app/patent/apis"
+	"go-admin/app/user-agent/apis"
 	"go-admin/common/middleware"
 )
 
