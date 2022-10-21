@@ -105,8 +105,3 @@ func (s *UpDateUserPatentObject) GenerateUserPatent(g *models.UserPatent) {
 	g.Type = s.Type
 
 }
-
-const (
-	claim      = "认领"
-	collection = "关注"
-)

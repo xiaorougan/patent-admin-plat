@@ -17,9 +17,6 @@ func registerUserPatentRouter(v1 *gin.RouterGroup, authMiddleware *jwt.GinJWTMid
 
 	r1 := v1.Group("/user-patent").Use(authMiddleware.MiddlewareFunc()).Use(middleware.AuthCheckRole())
 	{
-		r1.GET("/claim", api.GetClaims)           //测试√
-		r1.GET("/collection", api.GetCollections) //测试√
-		//r1.POST("", api.InsertUserPatentRelationship)                    //测试√
 		r1.DELETE("/:patent_id/:type", api.DeleteUserPatentRelationship) //测试√
 		r1.PUT("", api.UpdateUserPatentRelationship)                     //测试√
 	}
