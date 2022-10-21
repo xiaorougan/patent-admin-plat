@@ -409,3 +409,171 @@ func (e Patent) GetClaimPages(c *gin.Context) {
 
 	e.OK(list1, "查询成功")
 }
+
+//// InsertUserPatentRelationship
+//// @Summary 创建用户专利关系
+//// @Description Type和PatentId为必要输入，Type只能是 认领 或者 关注 关系
+//// @Tags 用户专利关系表
+//// @Accept  application/json
+//// @Product application/json
+//// @Param data body dto.UserPatentInsertReq true "Type和PatentId为必要输入"
+//// @Router /api/v1/user-patent/ [post]
+//// @Security Bearer
+//func (e UserPatent) InsertUserPatentRelationship(c *gin.Context) {
+//	s := service.UserPatent{}
+//	req := dto.UserPatentInsertReq{}
+//	req.UserId = user.GetUserId(c)
+//	err := e.MakeContext(c).
+//		MakeOrm().
+//		Bind(&req, binding.JSON).
+//		MakeService(&s.Service).
+//		Errors
+//	if err != nil {
+//		e.Logger.Error(err)
+//		e.Error(500, err, err.Error())
+//		return
+//	}
+//	// 设置创建人
+//	req.SetCreateBy(user.GetUserId(c))
+//
+//	if req.Type == "认领" {
+//		err = s.Insert(&req)
+//	} else if req.Type == "关注" {
+//		err = s.InsertCollectionRelationship(&req)
+//	} else {
+//		e.Logger.Error(err)
+//		e.Error(404, err, fmt.Sprintf("invalid req.Type: %s, should be 认领/关注", req.Type))
+//		return
+//	}
+//
+//	if req.PatentId == 0 {
+//		e.Logger.Error(err)
+//		e.Error(404, err, "您输入的专利id不存在！")
+//		return
+//	}
+//
+//	if err != nil {
+//		e.Logger.Error(err)
+//		e.Error(500, err, err.Error())
+//		return
+//	}
+//
+//	e.OK(req, "创建成功")
+//}
+
+// DeleteFocus
+// @Summary 取消关注
+// @Description  取消关注
+// @Tags 专利表
+// @Param PatentId query string false "专利ID"
+// @Router /api/v1/user-agent/patent/focus/{patent_id}  [delete]
+// @Security Bearer
+func (e Patent) DeleteFocus(c *gin.Context) {
+	s := service.Patent{}
+	req := dto.UserPatentObject{}
+	req.UserId = user.GetUserId(c)
+
+	req.SetUpdateBy(user.GetUserId(c))
+
+	err := e.MakeContext(c).
+		MakeOrm().
+		Bind(&req). //在这一步传入request数据
+		MakeService(&s.Service).
+		Errors
+
+	if err != nil {
+		e.Logger.Error(err)
+		e.Error(500, err, err.Error())
+		return
+	}
+
+	// 数据权限检查
+	//p := actions.GetPermissionFromContext(c)
+
+	err = s.RemoveFocus(&req)
+	if err != nil {
+		e.Logger.Error(err)
+		return
+	}
+	e.OK(req, "删除成功")
+}
+
+// DeleteClaim
+// @Summary 取消认领
+// @Description  取消认领
+// @Tags 专利表
+// @Param PatentId query string false "专利ID"
+// @Router /api/v1/user-agent/patent/claim/{patent_id} [delete]
+// @Security Bearer
+func (e Patent) DeleteClaim(c *gin.Context) {
+	s := service.Patent{}
+	req := dto.UserPatentObject{}
+	req.UserId = user.GetUserId(c)
+
+	req.SetUpdateBy(user.GetUserId(c))
+
+	err := e.MakeContext(c).
+		MakeOrm().
+		Bind(&req). //在这一步传入request数据
+		MakeService(&s.Service).
+		Errors
+
+	if err != nil {
+		e.Logger.Error(err)
+		e.Error(500, err, err.Error())
+		return
+	}
+
+	// 数据权限检查
+	//p := actions.GetPermissionFromContext(c)
+
+	err = s.RemoveClaim(&req)
+	if err != nil {
+		e.Logger.Error(err)
+		return
+	}
+	e.OK(req, "删除成功")
+}
+
+// UpdateUserPatentRelationship
+// @Summary 修改用户专利关系
+// @Description 需要输入专利id
+// @Tags 专利表
+// @Accept  application/json
+// @Product application/json
+// @Param data body dto.UpDateUserPatentObject true "body"
+// @Router /api/v1/user-agent/patent [put]
+// @Security Bearer
+func (e Patent) UpdateUserPatentRelationship(c *gin.Context) {
+	s := service.UserPatent{}
+	req := dto.UpDateUserPatentObject{}
+	req.UserId = user.GetUserId(c)
+	err := e.MakeContext(c).
+		MakeOrm().
+		Bind(&req, binding.JSON).
+		MakeService(&s.Service).
+		Errors
+	if err != nil {
+		e.Logger.Error(err)
+		e.Error(500, err, err.Error())
+		return
+	}
+
+	req.SetUpdateBy(user.GetUserId(c))
+	//数据权限检查
+	//p := actions.GetPermissionFromContext(c)
+
+	if req.PatentId == 0 {
+		e.Logger.Error(err)
+		e.Error(404, err, "请输入专利id")
+		return
+	}
+
+	err = s.UpdateUserPatent(&req)
+
+	if err != nil {
+		e.Logger.Error(err)
+		return
+	}
+	e.OK(req, "更新成功")
+}

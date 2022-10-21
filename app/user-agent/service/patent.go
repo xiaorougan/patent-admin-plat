@@ -151,3 +151,43 @@ func (e *Patent) InsertIfAbsent(c *dto.PatentInsertReq) (int, error) {
 	}
 	return data.PatentId, nil
 }
+
+// RemoveClaim 取消认领
+func (e *Patent) RemoveClaim(c *dto.UserPatentObject) error {
+	var err error
+	var data models.UserPatent
+
+	db := e.Orm.Where("Patent_Id = ? AND User_Id = ? AND Type = ?", c.PatentId, c.UserId, dto.ClaimType).
+		Delete(&data)
+
+	if db.Error != nil {
+		err = db.Error
+		e.Log.Errorf("Delete error: %s", err)
+		return err
+	}
+	if db.RowsAffected == 0 {
+		err = errors.New("无权删除该数据")
+		return err
+	}
+	return nil
+}
+
+// RemoveFocus 取消关注
+func (e *Patent) RemoveFocus(c *dto.UserPatentObject) error {
+	var err error
+	var data models.UserPatent
+
+	db := e.Orm.Where("Patent_Id = ? AND User_Id = ? AND Type = ?", c.PatentId, c.UserId, dto.FocusType).
+		Delete(&data)
+
+	if db.Error != nil {
+		err = db.Error
+		e.Log.Errorf("Delete error: %s", err)
+		return err
+	}
+	if db.RowsAffected == 0 {
+		err = errors.New("无权删除该数据")
+		return err
+	}
+	return nil
+}

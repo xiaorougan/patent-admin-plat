@@ -13,12 +13,12 @@ func init() {
 
 // 需认证的路由代码
 func registerUserPatentRouter(v1 *gin.RouterGroup, authMiddleware *jwt.GinJWTMiddleware) {
-	api := apis.UserPatent{}
+	api := apis.Patent{}
 
 	r1 := v1.Group("/user-patent").Use(authMiddleware.MiddlewareFunc()).Use(middleware.AuthCheckRole())
 	{
-		r1.DELETE("/:patent_id/:type", api.DeleteUserPatentRelationship) //测试√
-		r1.PUT("", api.UpdateUserPatentRelationship)                     //测试√
+
+		r1.PUT("", api.UpdateUserPatentRelationship) //测试√
 	}
 
 }

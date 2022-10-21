@@ -122,26 +122,6 @@ func (e *UserPatent) Insert(c *dto.UserPatentObject) error {
 //	return nil
 //}
 
-// RemoveRelationship 根据专利id、TYPE删除用户专利关系
-func (e *UserPatent) RemoveRelationship(c *dto.UserPatentObject) error {
-	var err error
-	var data models.UserPatent
-
-	db := e.Orm.Where("Patent_Id = ? AND User_Id = ? AND Type = ?", c.PatentId, c.UserId, c.Type).
-		Delete(&data)
-
-	if db.Error != nil {
-		err = db.Error
-		e.Log.Errorf("Delete error: %s", err)
-		return err
-	}
-	if db.RowsAffected == 0 {
-		err = errors.New("无权删除该数据")
-		return err
-	}
-	return nil
-}
-
 // UpdateUserPatent 根据PatentId修改Patent对象
 func (e *UserPatent) UpdateUserPatent(c *dto.UpDateUserPatentObject) error {
 	var err error
