@@ -270,7 +270,7 @@ func (e *Patent) GetClaimLists(c *dto.UserPatentGetPageReq, list *[]models.UserP
 	var err error
 	var data models.UserPatent
 	err = e.Orm.Model(&data).
-		Where("Type = ? AND User_Id = ?", "认领", c.GetUserId()).
+		Where("Type = ? AND User_Id = ?", dto.ClaimType, c.GetUserId()).
 		Find(list).Limit(-1).Offset(-1).
 		Count(count).Error
 	if err != nil {
@@ -280,12 +280,12 @@ func (e *Patent) GetClaimLists(c *dto.UserPatentGetPageReq, list *[]models.UserP
 	return nil
 }
 
-// GetCollectionLists 通过UserId获得PatentId列表
-func (e *Patent) GetCollectionLists(c *dto.UserPatentGetPageReq, list *[]models.UserPatent, count *int64) error {
+// GetFocusLists 通过UserId获得PatentId列表
+func (e *Patent) GetFocusLists(c *dto.UserPatentGetPageReq, list *[]models.UserPatent, count *int64) error {
 	var err error
 	var data models.UserPatent
 	err = e.Orm.Model(&data).
-		Where("Type = ? AND User_Id = ?", "关注", c.GetUserId()).
+		Where("Type = ? AND User_Id = ?", dto.FocusType, c.GetUserId()).
 		Find(list).Limit(-1).Offset(-1).
 		Count(count).Error
 	if err != nil {
