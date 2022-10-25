@@ -1,6 +1,7 @@
 package dto
 
 import (
+	"encoding/json"
 	"go-admin/app/user-agent/models"
 	"go-admin/common/dto"
 	common "go-admin/common/models"
@@ -18,7 +19,8 @@ type PatentGetPageReq struct {
 	CL             string `form:"CL" search:"type:exact;column:CL;table:patent" comment:"简介"`
 	PA             string `form:"PA" search:"type:exact;column:PA;table:patent" comment:"申请单位"`
 	AR             string `form:"AR" search:"type:exact;column:AR;table:patent" comment:"地址"`
-	INN            string `form:"INN" search:"type:exact;column:INN;table:patent" comment:"申请人"`
+	PINN           string `form:"PINN" search:"type:exact;column:PINN;table:patent" comment:"申请人"`
+	CLS            string `json:"CLS" gorm:"size:128;comment:法律状态"`
 	PatentOrder
 }
 
@@ -31,7 +33,8 @@ type PatentUpdateReq struct {
 	CL       string `json:"CL" gorm:"comment:简介"`
 	PA       string `json:"PA" gorm:"size:128;comment:申请单位"`
 	AR       string `json:"AR" gorm:"size:128;comment:地址"`
-	INN      string `json:"INN" gorm:"size:128;comment:申请人"`
+	PINN     string `json:"PINN" gorm:"size:128;comment:申请人"`
+	CLS      string `json:"CLS" gorm:"size:128;comment:法律状态"`
 	common.ControlBy
 }
 
@@ -50,14 +53,10 @@ func (s *PatentUpdateReq) GenerateList(model *models.Patent) {
 	if s.PatentId != 0 {
 		model.PatentId = s.PatentId
 	}
-	model.TI = s.TI
-	model.CL = s.CL
-	model.AR = s.AR
 	model.PNM = s.PNM
-	model.AD = s.AD
-	model.PD = s.PD
-	model.INN = s.INN
-	model.PA = s.PA
+
+	pbs, _ := json.Marshal(s)
+	model.PatentProperties = string(pbs)
 }
 
 type PatentInsertReq struct {
@@ -69,7 +68,8 @@ type PatentInsertReq struct {
 	CL       string `json:"CL" gorm:"comment:简介"`
 	PA       string `json:"PA" gorm:"size:128;comment:申请单位"`
 	AR       string `json:"AR" gorm:"size:128;comment:地址"`
-	INN      string `json:"INN" gorm:"size:128;comment:申请人"`
+	PINN     string `json:"PINN" gorm:"size:128;comment:申请人"`
+	CLS      string `json:"CLS" gorm:"size:128;comment:法律状态"`
 	common.ControlBy
 }
 
@@ -77,15 +77,10 @@ func (s *PatentInsertReq) GenerateList(model *models.Patent) {
 	if s.PatentId != 0 {
 		model.PatentId = s.PatentId
 	}
-	model.TI = s.TI
-	model.CL = s.CL
-	model.AR = s.AR
 	model.PNM = s.PNM
-	model.AD = s.AD
-	model.PD = s.PD
-	model.INN = s.INN
-	model.PA = s.PA
-	model.CreateBy = s.CreateBy
+
+	pbs, _ := json.Marshal(s)
+	model.PatentProperties = string(pbs)
 }
 
 func (s *PatentInsertReq) GetPatentId() interface{} {
@@ -137,9 +132,10 @@ func (d *UserPatentGetPageReq) GetPatentId() interface{} {
 }
 
 type UserPatentObject struct {
-	UserId   int    `json:"UserId" gorm:"size:128;comment:用户ID"`
-	PatentId int    `form:"PatentId" search:"type:exact;column:TagId;table:user_patent" comment:"专利ID" `
-	Type     string `json:"Type" gorm:"size:64;comment:关系类型（关注/认领）"`
+	UserId   int    `json:"userId" gorm:"size:128;comment:用户ID"`
+	PatentId int    `form:"patentId" search:"type:exact;column:TagId;table:user_patent" comment:"专利ID" `
+	Type     string `json:"type" gorm:"size:64;comment:关系类型（关注/认领）"`
+	PNM      string `json:"PNM" gorm:"size:128;comment:申请号"`
 	common.ControlBy
 }
 
@@ -155,13 +151,15 @@ func (d *UserPatentObject) GenerateUserPatent(g *models.UserPatent) {
 	g.PatentId = d.PatentId
 	g.UserId = d.UserId
 	g.Type = d.Type
+	g.PNM = d.PNM
 }
 
-func NewUserPatentClaim(userId, patentId, createdBy, updatedBy int) *UserPatentObject {
+func NewUserPatentClaim(userId, patentId, createdBy, updatedBy int, PNM string) *UserPatentObject {
 	return &UserPatentObject{
 		UserId:   userId,
 		PatentId: patentId,
 		Type:     ClaimType,
+		PNM:      PNM,
 		ControlBy: common.ControlBy{
 			CreateBy: createdBy,
 			UpdateBy: updatedBy,
@@ -169,11 +167,12 @@ func NewUserPatentClaim(userId, patentId, createdBy, updatedBy int) *UserPatentO
 	}
 }
 
-func NewUserPatentFocus(userId, patentId, createdBy, updatedBy int) *UserPatentObject {
+func NewUserPatentFocus(userId, patentId, createdBy, updatedBy int, PNM string) *UserPatentObject {
 	return &UserPatentObject{
 		UserId:   userId,
 		PatentId: patentId,
 		Type:     FocusType,
+		PNM:      PNM,
 		ControlBy: common.ControlBy{
 			CreateBy: createdBy,
 			UpdateBy: updatedBy,
