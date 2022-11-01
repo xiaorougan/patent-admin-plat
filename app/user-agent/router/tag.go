@@ -22,9 +22,5 @@ func registerTagRouter(v1 *gin.RouterGroup, authMiddleware *jwt.GinJWTMiddleware
 		r.POST("", api.Insert)
 		r.DELETE("", api.Delete)
 	}
-	//r1 := v1.Group("").Use(authMiddleware.MiddlewareFunc())
-	//{
-	//	//r1.PUT("/role-status", api.Update2Status)
-	//	//r1.PUT("/roledatascope", api.Update2DataScope)
-	//}
+
 }
