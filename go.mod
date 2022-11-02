@@ -23,7 +23,6 @@ require (
 	github.com/stretchr/testify v1.8.0
 	github.com/swaggo/files v0.0.0-20220728132757-551d4a08d97a
 	github.com/swaggo/gin-swagger v1.5.0
-	github.com/swaggo/swag v1.8.3
 	github.com/unrolled/secure v1.0.8
 	golang.org/x/crypto v0.0.0-20220411220226-7b82a4e95df4
 	gorm.io/driver/mysql v1.3.5
@@ -151,6 +150,7 @@ require (
 	github.com/go-openapi/swag v0.22.3 // indirect
 	github.com/konsorten/go-windows-terminal-sequences v1.0.3 // indirect
 	github.com/sirupsen/logrus v1.6.0 // indirect
+	github.com/swaggo/swag v1.8.3 // indirect
 	golang.org/x/net v0.0.0-20220909164309-bea034e7d591 // indirect
 	golang.org/x/sys v0.0.0-20220915200043-7b5979e65e41 // indirect
 	golang.org/x/tools v0.1.12 // indirect
