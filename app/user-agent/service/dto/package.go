@@ -14,14 +14,12 @@ type PackageGetPageReq struct {
 	Desc           string `form:"desc" search:"type:contains;column:desc;table:package" comment:"描述"`
 }
 
-type PackageOrder struct {
-	UserIdOrder    string `search:"type:order;column:user_id;table:sys_user" form:"packageIdOrder"`
-	UsernameOrder  string `search:"type:order;column:username;table:sys_user" form:"packageNameOrder"`
-	CreatedAtOrder string `search:"type:order;column:created_at;table:sys_user" form:"createdAtOrder"`
-}
-
 func (m *PackageGetPageReq) GetNeedSearch() interface{} {
 	return *m
+}
+
+type PackageListReq struct {
+	UserId int `form:"desc" search:"type:order;column:created_at;table:package"`
 }
 
 type PackageInsertReq struct {
@@ -37,6 +35,7 @@ func (s *PackageInsertReq) Generate(model *models.Package) {
 	}
 	model.PackageName = s.PackageName
 	model.Desc = s.Desc
+	model.ControlBy = s.ControlBy
 }
 
 func (s *PackageInsertReq) GetId() interface{} {
