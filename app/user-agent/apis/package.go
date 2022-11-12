@@ -27,7 +27,7 @@ type Package struct {
 //// @Security Bearer
 //func (e Package) GetPage(c *gin.Context) {
 //	s := service.Package{}
-//	req := dto.PackageGetPageReq{}
+//	req := dtos.PackageGetPageReq{}
 //	err := e.MakeContext(c).
 //		MakeOrm().
 //		Bind(&req).
