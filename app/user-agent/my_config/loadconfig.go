@@ -13,6 +13,7 @@ var (
 type PatentConfig struct {
 	InnojoyUser     string
 	InnojoyPassword string
+	FileUrl         string
 }
 
 func LoadPatentConfig() {
@@ -20,6 +21,7 @@ func LoadPatentConfig() {
 		CurrentPatentConfig = &PatentConfig{
 			InnojoyUser:     viper.GetString("settings.patent.innojoy.user"),
 			InnojoyPassword: viper.GetString("settings.patent.innojoy.password"),
+			FileUrl:         viper.GetString("settings.files.url"),
 		}
 	})
 }
