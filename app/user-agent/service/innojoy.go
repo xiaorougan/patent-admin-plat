@@ -6,6 +6,7 @@ import (
 	s_cache "github.com/Gleiphir2769/s-cache"
 	"go-admin/app/user-agent/models"
 	"go-admin/app/user-agent/my_config"
+	"go-admin/app/user-agent/service/charts"
 	"go-admin/app/user-agent/service/dto"
 	"io/ioutil"
 	"strconv"
@@ -15,8 +16,9 @@ import (
 )
 
 const (
-	authUrl   = "http://www.innojoy.com/accountAuth.aspx"
-	searchUrl = "http://www.innojoy.com/service/patentSearch.aspx"
+	authUrl      = "http://www.innojoy.com/accountAuth.aspx"
+	searchUrl    = "http://www.innojoy.com/service/patentSearch.aspx"
+	statisticUrl = "http://www.innojoy.com/service/patentStat.aspx"
 
 	searchListFields = "TI,AN,AD,PNM,PD,PA,PINN,CL,CD,AR,CLS"
 	searchSortBy     = "-公开（公告）日,公开（公告）号"
@@ -58,7 +60,7 @@ func newInnojoyClient() *InnojoyClient {
 }
 
 func (ic *InnojoyClient) autoLogin() error {
-	req := &loginReq{UserConfig: UserConfig{
+	req := &dto.LoginReq{UserConfig: dto.UserConfig{
 		EMail:    ic.email,
 		Password: ic.password,
 	}}
@@ -73,7 +75,7 @@ func (ic *InnojoyClient) autoLogin() error {
 		return err
 	}
 
-	loginRes := loginResp{}
+	loginRes := dto.LoginResp{}
 	if err = json.Unmarshal(buf, &loginRes); err != nil {
 		return err
 	} else if loginRes.ReturnValue != 0 {
@@ -100,14 +102,14 @@ func (ic *InnojoyClient) Search(req *dto.SimpleSearchReq, relatedPatents []model
 	return res, nil
 }
 
-func (ic *InnojoyClient) parseSearchQuery(query string, db string, pageIndex int, pageSize int) *SearchReq {
+func (ic *InnojoyClient) parseSearchQuery(query string, db string, pageIndex int, pageSize int) *dto.SearchReq {
 	var guid string
 	if pageIndex > 0 {
 		guid = ic.pc.Get(query)
 	}
-	return &SearchReq{
+	return &dto.SearchReq{
 		Token: ic.token,
-		PatentSearchConfig: &PatentSearchConfig{
+		PatentSearchConfig: &dto.PatentSearchConfig{
 			GUID:      guid,
 			Action:    "Search",
 			Query:     query,
@@ -120,7 +122,7 @@ func (ic *InnojoyClient) parseSearchQuery(query string, db string, pageIndex int
 	}
 }
 
-func (ic *InnojoyClient) search(sr *SearchReq, cb callback) (result []*dto.PatentDetail, err error) {
+func (ic *InnojoyClient) search(sr *dto.SearchReq, cb callback) (result []*dto.PatentDetail, err error) {
 	var retried bool
 	for {
 		resp, err := ic.hc.Post(searchUrl, sr, nil)
@@ -156,37 +158,6 @@ func (ic *InnojoyClient) search(sr *SearchReq, cb callback) (result []*dto.Paten
 			return searchRes.Option.PatentList, nil
 		}
 	}
-}
-
-type SearchReq struct {
-	Token              string              `json:"token"`
-	PatentSearchConfig *PatentSearchConfig `json:"patentSearchConfig"`
-}
-
-type PatentSearchConfig struct {
-	GUID      string `json:"GUID"`
-	Action    string `json:"Action"`
-	Query     string `json:"Query"`
-	Database  string `json:"Database"`
-	Page      string `json:"Page"`
-	PageSize  string `json:"PageSize"`
-	Sortby    string `json:"Sortby"`
-	FieldList string `json:"FieldList"`
-}
-
-type loginReq struct {
-	UserConfig UserConfig `json:"userConfig"`
-}
-
-type UserConfig struct {
-	EMail    string `json:"EMail"`
-	Password string `json:"Password"`
-}
-
-type loginResp struct {
-	ReturnValue int    `json:"ReturnValue"`
-	Option      string `json:"Option"`
-	ErrorInfo   string `json:"ErrorInfo"`
 }
 
 // refine patent title
@@ -240,6 +211,73 @@ func markRelation(res []*dto.PatentDetail, related []models.UserPatent) {
 				r.IsFocused = true
 			}
 			r.PatentId = rel.PatentId
+		}
+	}
+}
+
+func (ic *InnojoyClient) GetChart(aid int, req *dto.SimpleSearchReq) (*dto.ChartProfile, error) {
+	sr := ic.genStatisticQuery(aid, req)
+	res, err := ic.statistic(sr, ic.autoLogin)
+	if err != nil {
+		return nil, err
+	}
+	c, err := charts.GetChart(aid)
+	if err != nil {
+		return nil, err
+	}
+	option, err := c.Serialize(res)
+	if err != nil {
+		return nil, err
+	}
+	return &dto.ChartProfile{
+		Name:   c.Name(),
+		Option: option,
+	}, nil
+}
+
+func (ic *InnojoyClient) genStatisticQuery(aid int, req *dto.SimpleSearchReq) *dto.StatisticReq {
+	return &dto.StatisticReq{
+		Token: ic.token,
+		PatentSearchConfig: &dto.PatentSearchConfig{
+			Query:    req.Query,
+			Database: req.DB,
+			PageSize: "1",
+		},
+		AnalyseConfig: &dto.AnalyseConfig{AID: strconv.Itoa(aid)},
+		Language:      "zh",
+	}
+}
+
+func (ic *InnojoyClient) statistic(sr *dto.StatisticReq, cb callback) (result []byte, err error) {
+	var retried bool
+	for {
+		resp, err := ic.hc.Post(statisticUrl, sr, nil)
+		if err != nil {
+			return nil, err
+		}
+
+		buf, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			return nil, err
+		}
+
+		searchRes := dto.InnojoySearchResult{}
+		if err = json.Unmarshal(buf, &searchRes); err != nil {
+			return nil, err
+		}
+
+		if searchRes.ReturnValue != 0 {
+			if retried {
+				return nil, fmt.Errorf("patent search failed: %s", searchRes.ErrorInfo)
+			}
+			if err = cb(); err != nil {
+				return nil, fmt.Errorf("search call callback error: %w", err)
+			}
+			// reset token
+			sr.Token = ic.token
+			retried = true
+		} else {
+			return buf, nil
 		}
 	}
 }
