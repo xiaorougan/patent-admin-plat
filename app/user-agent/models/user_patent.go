@@ -13,8 +13,7 @@ type UserPatent struct {
 	PNM      string `json:"PNM" gorm:"size:128;comment:申请号"`
 	Type     string `json:"Type" gorm:"size:64;comment:关系类型（关注/认领）"`
 
-	CreatedAt string `json:"createdAt" gorm:"comment:创建时间"`
-	UpdatedAt string `json:"updatedAt" gorm:"comment:最后更新时间"`
+	models.ModelTime
 	models.ControlBy
 }
 

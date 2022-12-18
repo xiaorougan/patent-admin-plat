@@ -34,6 +34,7 @@ func _1599190683659Tables(db *gorm.DB, version string) error {
 			new(modelsUser.Tag),
 			new(modelsUser.UserPatent),
 			new(modelsUser.PatentPackage),
+			new(modelsUser.StoredQuery),
 			new(model.Report),
 			new(model.ReportRelation),
 			new(model.Dept),

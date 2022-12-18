@@ -122,7 +122,6 @@ func (e *Patent) Insert(c *dto.PatentReq) error {
 		return err
 	}
 	c.GenerateList(&data)
-	data.UpdatedAt = dtos.UpdateTime()
 	err = e.Orm.Create(&data).Error
 	if err != nil {
 		e.Log.Errorf("db error: %s", err)
@@ -150,7 +149,6 @@ func (e *Patent) InsertIfAbsent(c *dto.PatentReq) (*models.Patent, error) {
 		return &data, nil
 	}
 	c.GenerateList(&data)
-	data.UpdatedAt = dtos.UpdateTime()
 	err = e.Orm.Create(&data).Error
 	if err != nil {
 		e.Log.Errorf("db error: %s", err)
@@ -170,10 +168,8 @@ func (e *Patent) UpdateLists(c *dto.PatentReq) error {
 	}
 	if db.RowsAffected == 0 {
 		return errors.New("专利不存在")
-
 	}
 	c.GenerateList(&model)
-	model.UpdatedAt = dtos.UpdateTime()
 	update := e.Orm.Model(&model).Where("patent_id = ?", &model.PatentId).Updates(&model)
 	if err = update.Error; err != nil {
 		e.Log.Errorf("db error: %s", err)
@@ -193,7 +189,6 @@ func (e *Patent) Remove(c *dto.PatentById) error {
 	var data models.Patent
 
 	db := e.Orm.Delete(&data, c.PatentId)
-	data.UpdatedAt = dtos.UpdateTime()
 	if db.Error != nil {
 		err = db.Error
 		e.Log.Errorf("Delete error: %s", err)

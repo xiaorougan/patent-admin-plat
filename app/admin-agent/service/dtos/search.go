@@ -5,7 +5,7 @@ import "go-admin/common/dto"
 type SimpleSearchReq struct {
 	dto.Pagination
 
-	Query string `json:"Query"`
+	Query string `json:"query"`
 	DB    string `json:"DB"`
 
 	UserId int `json:"-"`
@@ -14,6 +14,6 @@ type SimpleSearchReq struct {
 type TableSearchReq struct {
 	dto.Pagination
 
-	Query string `json:"Query"`
+	Query string `json:"query"`
 	DB    string `json:"DB"`
 }

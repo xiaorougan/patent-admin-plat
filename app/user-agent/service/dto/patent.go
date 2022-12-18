@@ -45,8 +45,6 @@ type PatentReq struct {
 	PINN     string `json:"PINN" gorm:"size:128;comment:申请人"`
 	CLS      string `json:"CLS" gorm:"size:128;comment:法律状态"`
 	common.ControlBy
-	CreatedAt string `json:"CreatedAt" gorm:"comment:创建时间"`
-	UpdatedAt string `json:"UpdatedAt" gorm:"comment:最后更新时间"`
 }
 
 func (s *PatentReq) GenerateList(model *models.Patent) {
@@ -55,8 +53,6 @@ func (s *PatentReq) GenerateList(model *models.Patent) {
 	}
 	model.PNM = s.PNM
 	model.ControlBy = s.ControlBy
-	model.CreatedAt = s.CreatedAt
-	model.UpdatedAt = s.UpdatedAt
 	pbs, _ := json.Marshal(s)            //把s（json）转化为byte[]
 	model.PatentProperties = string(pbs) //把byte[]转化为string
 }
