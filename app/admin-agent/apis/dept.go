@@ -221,7 +221,6 @@ func (e Dept) ReOnlineDept(c *gin.Context) {
 		return
 	}
 	req.DeptId, err = strconv.Atoi(c.Param("dept_id"))
-	fmt.Println(req.DeptId)
 	req.SetUpdateBy(user.GetUserId(c))
 	req.DeptStatus = dtos.Online
 
