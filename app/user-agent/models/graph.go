@@ -25,6 +25,6 @@ type OneUserPatents struct {
 }
 
 type InventorPatent struct {
-	UserId   int
-	PatentId int
+	InventorId int
+	PatentId   int
 }
