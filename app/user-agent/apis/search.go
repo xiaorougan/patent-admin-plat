@@ -64,6 +64,8 @@ func (e Search) AuthSearch(c *gin.Context) {
 		return
 	}
 
+	internalTrace(searchTracing(req.UserId, req.Query, c.Request.RequestURI), c)
+
 	e.PageOK(ps, req.PageSize, req.PageIndex, len(ps), "查询成功")
 }
 
@@ -106,7 +108,7 @@ func (e Search) Search(c *gin.Context) {
 // SearchFullText
 // @Summary 专利搜索全文
 // @Description 根据查询字符串进行搜索全文
-// @Tags 专利搜索全文
+// @Tags 专利检索
 // @Param data body dto.SimpleSearchReq true "用户数据"
 // @Success 200 {object} dto.PatentDetail
 // @Router /api/v1/user-agent/auth-search/full [post]
