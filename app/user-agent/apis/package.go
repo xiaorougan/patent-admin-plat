@@ -461,3 +461,55 @@ func (e Package) DeletePackagePatent(c *gin.Context) {
 	}
 	e.OK(req.PackageBack, "删除成功")
 }
+
+//---------------------------------------------------patent--graph-------------------------------------------------------
+
+// GetRelationGraphByPackage
+// @Summary 获取专利包中专利的发明人的关系
+// @Description  获取专利包中专利的发明人的关系
+// @Tags 专利表
+// @Router /api/v1/user-agent/package/{packageId}/relationship3 [get]
+// @Security Bearer
+func (e Package) GetRelationGraphByPackage(c *gin.Context) {
+	sp := service.Patent{}
+	reqp := dto.PatentsIds{}
+	spp := service.PatentPackage{}
+	reqpp := dto.PackagePageGetReq{}
+	Inventorgraph := models.Graph{}
+	var err error
+	reqpp.PackageId, err = strconv.Atoi(c.Param("id"))
+	err = e.MakeContext(c).
+		MakeOrm().
+		MakeService(&spp.Service).
+		Errors
+	if err != nil {
+		e.Logger.Error(err)
+		e.Error(500, err, err.Error())
+		return
+	}
+	reqpp.SetUpdateBy(user.GetUserId(c))
+	listpp := make([]models.PatentPackage, 0)
+	var count int64
+	err = spp.GetPatentIdByPackageId(&reqpp, &listpp, &count)
+	reqp.PatentIds = make([]int, len(listpp))
+	for i := 0; i < len(listpp); i++ {
+		reqp.PatentIds[i] = listpp[i].PatentId
+	}
+	listp := make([]models.Patent, 0)
+	err = e.MakeContext(c).
+		MakeOrm().
+		MakeService(&sp.Service).
+		Errors
+
+	err = sp.GetPageByIds(&reqp, &listp, &count)
+	if err != nil {
+		e.Logger.Error(err)
+		return
+	}
+	err = sp.GetGraphByPatents(listp, &Inventorgraph)
+	if err != nil {
+		e.Logger.Error(err)
+		return
+	}
+	e.OK(Inventorgraph, "查询成功")
+}
