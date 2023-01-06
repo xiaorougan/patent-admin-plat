@@ -241,7 +241,7 @@ func (e *Patent) GetGraphByPatents(ListPatents []models.Patent, Inventorgraph *m
 	if len(Inventors) == 0 {
 		return err
 	}
-	StrongRelationInventors := MinResult(len(Inventors)/10+1, 10) //chose the top10%(maximum is 10) inventors as StrongRelationInventors(must show)
+	StrongRelationInventors := MinResult(len(Inventors), 10) //chose the top10%(maximum is 10) inventors as StrongRelationInventors(must show)
 	for i, inventor := range Inventors[0:StrongRelationInventors] {
 		PreNodeList = append(PreNodeList, models.PreNode{NodeId: inventor.Id, NodeCategory: i})
 	}
