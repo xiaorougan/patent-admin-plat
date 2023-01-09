@@ -42,8 +42,9 @@ type PatentReq struct {
 	CL       string `json:"CL" gorm:"comment:简介"`
 	PA       string `json:"PA" gorm:"size:128;comment:申请单位"`
 	AR       string `json:"AR" gorm:"size:128;comment:地址"`
-	PINN     string `json:"PINN" gorm:"size:128;comment:申请人"`
+	PINN     string `json:"PINN" gorm:"size:128;comment:主发明人"`
 	CLS      string `json:"CLS" gorm:"size:128;comment:法律状态"`
+	INN      string `json:"INN" gorm:"size:128;comment:发明人"`
 	Desc     string `json:"desc" gorm:"size:128;comment:描述"`
 	common.ControlBy
 }
