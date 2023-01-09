@@ -1,7 +1,9 @@
 package service
 
 import (
+	"encoding/json"
 	"errors"
+	"fmt"
 	"github.com/go-admin-team/go-admin-core/sdk/service"
 	"github.com/prometheus/common/log"
 	"go-admin/app/admin-agent/service/dtos"
@@ -10,11 +12,15 @@ import (
 	"gorm.io/gorm"
 	"sort"
 	"strconv"
+	"strings"
 )
 
 type Patent struct {
 	service.Service
 }
+
+// MaxInventors is package relation graph max inventors included
+const MaxInventors = 200
 
 // GetPage 获取Patent列表
 func (e *Patent) GetPage(c *dto.PatentReq, list *[]models.Patent, count *int64) error {
@@ -232,13 +238,16 @@ func (e *Patent) Remove(c *dto.PatentById) error {
 // GetGraphByPatents 通过Patent数组获得专利发明人的关系图
 func (e *Patent) GetGraphByPatents(ListPatents []models.Patent, Inventorgraph *models.Graph) error {
 	var err error
-	NodeList := make([]models.Node, 0)                                                       //return node
-	LinkList := make([]models.Link, 0)                                                       //return link
-	MaxInventors := 200                                                                      //check max 200 Inventors in the ListPatents
-	PreNodeList := make([]models.PreNode, 0)                                                 //Similar to node struct and need change some attributes to become NodeList
-	PreLinkList := make([]models.PreLink, 0)                                                 //Similar to link struct and need change some attributes to become LinkList
-	Inventors, Relations := FindInventorsAndRelationsFromPatents(ListPatents, &MaxInventors) //relations is an Upper Triangle
+	NodeList := make([]models.Node, 0)                                                           //return node
+	LinkList := make([]models.Link, 0)                                                           //return link
+	PreNodeList := make([]models.PreNode, 0)                                                     //Similar to node struct and need change some attributes to become NodeList
+	PreLinkList := make([]models.PreLink, 0)                                                     //Similar to link struct and need change some attributes to become LinkList
+	Inventors, Relations, err := FindInventorsAndRelationsFromPatents(ListPatents, MaxInventors) //relations is an Upper Triangle
+	if err != nil {
+		return err
+	}
 	if len(Inventors) == 0 {
+		err = fmt.Errorf("inventors is null")
 		return err
 	}
 	StrongRelationInventors := MinResult(len(Inventors), 10) //chose the top10%(maximum is 10) inventors as StrongRelationInventors(must show)
@@ -349,32 +358,24 @@ func FindRelationFrequencyAndSort(relations []int, sources []models.Inventor, ta
 
 // FindInventorsAndRelationsFromPatents --------------------------------------------------------------------------
 // 通过patents数组查找patents数组中的发明人以及专利和发明人的关系
-func FindInventorsAndRelationsFromPatents(listpatents []models.Patent, n *int) ([]models.Inventor, []int) {
+func FindInventorsAndRelationsFromPatents(listpatents []models.Patent, maxInventors int) ([]models.Inventor, []int, error) {
 
 	ListPreInventors := make([]models.PreInventor, 0)
 	//find every patents' Inventor and count
 	for z := 0; z < len(listpatents); z++ {
-		words := make([]string, 0)
-		for i := 0; i < len(listpatents[z].PatentProperties); i++ {
-			if listpatents[z].PatentProperties[i] == '"' && listpatents[z].PatentProperties[i+1] == 'P' && listpatents[z].PatentProperties[i+2] == 'I' && listpatents[z].PatentProperties[i-1] == ',' && listpatents[z].PatentProperties[i+8] != '"' {
-				now := i + 8
-				for j := i + 8; j < len(listpatents[z].PatentProperties); j++ {
-					if listpatents[z].PatentProperties[j] == '"' {
-						words = append(words, listpatents[z].PatentProperties[now:j])
-						break
-					}
-					if listpatents[z].PatentProperties[j] == ';' {
-						words = append(words, listpatents[z].PatentProperties[now:j])
-						now = j + 1
-					}
-				}
-				break
-			}
+		patentDetail := dto.PatentDetail{}
+		if err := json.Unmarshal([]byte(listpatents[z].PatentProperties), &patentDetail); err != nil {
+			return nil, nil, err
 		}
-		for i := 0; i < len(words); i++ {
+
+		raw := strings.Split(patentDetail.Inn, ";")
+		// filter the English name, such as 沈航;阮辰晖;白光伟;SHEN HANG;RUAN CHENHUI;BAI GUANGWEI
+		inventors := raw[:len(raw)/2]
+
+		for i := 0; i < len(inventors); i++ {
 			InventorExist := false
 			for j := 0; j < len(ListPreInventors); j++ {
-				if ListPreInventors[j].Name == words[i] {
+				if ListPreInventors[j].Name == inventors[i] {
 					ListPreInventors[j].TheNumberOfPatents++
 					InventorExist = true
 					ListPreInventors[j].PatentsId = append(ListPreInventors[j].PatentsId, listpatents[z].PatentId)
@@ -384,7 +385,7 @@ func FindInventorsAndRelationsFromPatents(listpatents []models.Patent, n *int) (
 			if !InventorExist {
 				NewPatents := make([]int, 0)
 				ListPreInventors = append(ListPreInventors, models.PreInventor{
-					Name:               words[i],
+					Name:               inventors[i],
 					TheNumberOfPatents: 1,
 					PatentsId:          append(NewPatents, listpatents[z].PatentId),
 				})
@@ -404,10 +405,10 @@ func FindInventorsAndRelationsFromPatents(listpatents []models.Patent, n *int) (
 		ListPreInventors[i].Id = i
 	}
 	//create Relations
-	*n = MinResult(*n, len(ListPreInventors))
-	ListRelations := make([]int, (*n)*(*n))
-	for i := 0; i < *n; i++ {
-		for j := i; j < *n; j++ {
+	maxInventors = MinResult(maxInventors, len(ListPreInventors))
+	ListRelations := make([]int, maxInventors*maxInventors)
+	for i := 0; i < maxInventors; i++ {
+		for j := i; j < maxInventors; j++ {
 			var count int
 			source := make(map[int]bool)
 			for _, OneOfPatentId := range ListPreInventors[i].PatentsId {
@@ -420,7 +421,7 @@ func FindInventorsAndRelationsFromPatents(listpatents []models.Patent, n *int) (
 				}
 
 			}
-			ListRelations[i*(*n)+j] = count
+			ListRelations[i*(maxInventors)+j] = count
 		}
 	}
 
@@ -430,7 +431,7 @@ func FindInventorsAndRelationsFromPatents(listpatents []models.Patent, n *int) (
 		NowInventor := models.Inventor{Id: i.Id, Name: i.Name, TheNumberOfPatents: i.TheNumberOfPatents}
 		ListInventors = append(ListInventors, NowInventor)
 	}
-	return ListInventors, ListRelations
+	return ListInventors, ListRelations, nil
 }
 
 // MinResult --------------------------------------------------------------------------------------------------------------------
