@@ -363,7 +363,7 @@ func (e Package) IsPatentInPackage(c *gin.Context) {
 // @Accept  application/json
 // @Product application/json
 // @Param data body dto.PatentReq true "专利表数据"
-// @Router /api/v1/user-agent/package/{package_id}/patent/{patent_id} [post]
+// @Router /api/v1/user-agent/package/{package_id}/patent [post]
 // @Security Bearer
 func (e Package) InsertPackagePatent(c *gin.Context) {
 	var err error
@@ -421,7 +421,7 @@ func (e Package) InsertPackagePatent(c *gin.Context) {
 // @Tags 专利包
 // @Param PatentId query string false "专利ID"
 // @Param PackageId query string false "专利包ID"
-// @Router /api/v1/user-agent/package/{package_id}/patent/{patent_id} [delete]
+// @Router /api/v1/user-agent/package/{package_id}/patent/{PNM} [delete]
 // @Security Bearer
 func (e Package) DeletePackagePatent(c *gin.Context) {
 	s := service.PatentPackage{}
