@@ -533,19 +533,21 @@ func (e Patent) GetClaimPages(c *gin.Context) {
 // @Summary 取消关注
 // @Description  取消关注
 // @Tags 专利表
-// @Param PatentId query string false "专利ID"
-// @Router /api/v1/user-agent/patent/focus/{patent_id}  [delete]
+// @Param PNM query string false "专利PNM"
+// @Router /api/v1/user-agent/patent/focus/{PNM}  [delete]
 // @Security Bearer
 func (e Patent) DeleteFocus(c *gin.Context) {
+	var err error
 	s := service.UserPatent{}
-	pid, err := strconv.Atoi(c.Param("patent_id"))
-	if err != nil {
+	PNM := c.Param("PNM")
+	if len(PNM) == 0 {
+		err = fmt.Errorf("PNM should be provided in path")
 		e.Logger.Error(err)
 		e.Error(500, err, err.Error())
 		return
 	}
 
-	req := dto.NewUserPatentFocus(user.GetUserId(c), pid, user.GetUserId(c), user.GetUserId(c), "", "")
+	req := dto.NewUserPatentFocus(user.GetUserId(c), -1, user.GetUserId(c), user.GetUserId(c), PNM, "")
 
 	err = e.MakeContext(c).
 		MakeOrm().
@@ -575,20 +577,22 @@ func (e Patent) DeleteFocus(c *gin.Context) {
 // @Summary 取消认领
 // @Description  取消认领
 // @Tags 专利表
-// @Param PatentId query string false "专利ID"
-// @Router /api/v1/user-agent/patent/claim/{patent_id} [delete]
+// @Param PNM query string false "专利PNM"
+// @Router /api/v1/user-agent/patent/claim/{PNM} [delete]
 // @Security Bearer
 func (e Patent) DeleteClaim(c *gin.Context) {
-
+	var err error
 	s := service.UserPatent{}
 
-	pid, err := strconv.Atoi(c.Param("patent_id"))
-	if err != nil {
+	PNM := c.Param("PNM")
+	if len(PNM) == 0 {
+		err = fmt.Errorf("PNM should be provided in path")
 		e.Logger.Error(err)
+		e.Error(500, err, err.Error())
 		return
 	}
 
-	req := dto.NewUserPatentClaim(user.GetUserId(c), pid, user.GetUserId(c), user.GetUserId(c), "", "")
+	req := dto.NewUserPatentClaim(user.GetUserId(c), -1, user.GetUserId(c), user.GetUserId(c), PNM, "")
 
 	err = e.MakeContext(c).
 		MakeOrm().

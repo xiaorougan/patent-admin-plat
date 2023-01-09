@@ -1,7 +1,6 @@
 package service
 
 import (
-	"errors"
 	"fmt"
 
 	"github.com/go-admin-team/go-admin-core/sdk/service"
@@ -79,16 +78,12 @@ func (e *UserPatent) RemoveClaim(c *dto.UserPatentObject) error {
 	var err error
 	var data models.UserPatent
 
-	db := e.Orm.Where("Patent_Id = ? AND User_Id = ? AND Type = ?", c.PatentId, c.UserId, dto.ClaimType).
+	db := e.Orm.Where("PNM = ? AND User_Id = ? AND Type = ?", c.PNM, c.UserId, dto.ClaimType).
 		Delete(&data)
 
 	if db.Error != nil {
 		err = db.Error
 		e.Log.Errorf("Delete error: %s", err)
-		return err
-	}
-	if db.RowsAffected == 0 {
-		err = errors.New("无权删除该数据")
 		return err
 	}
 	return nil
@@ -99,16 +94,12 @@ func (e *UserPatent) RemoveFocus(c *dto.UserPatentObject) error {
 	var err error
 	var data models.UserPatent
 
-	db := e.Orm.Where("Patent_Id = ? AND User_Id = ? AND Type = ?", c.PatentId, c.UserId, dto.FocusType).
+	db := e.Orm.Where("PNM = ? AND User_Id = ? AND Type = ?", c.PNM, c.UserId, dto.FocusType).
 		Delete(&data)
 
 	if db.Error != nil {
 		err = db.Error
 		e.Log.Errorf("Delete error: %s", err)
-		return err
-	}
-	if db.RowsAffected == 0 {
-		err = errors.New("无权删除该数据")
 		return err
 	}
 	return nil
