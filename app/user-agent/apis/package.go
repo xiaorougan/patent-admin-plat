@@ -470,7 +470,7 @@ func (e Package) DeletePackagePatent(c *gin.Context) {
 // GetRelationGraphByPackage
 // @Summary 获取专利包关系图谱
 // @Description  获取专利包关系图谱
-// @Tags 专利表
+// @Tags 专利包
 // @Router /api/v1/user-agent/package/{packageId}/graph/relation [get]
 // @Security Bearer
 func (e Package) GetRelationGraphByPackage(c *gin.Context) {
