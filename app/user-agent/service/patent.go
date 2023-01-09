@@ -406,8 +406,8 @@ func FindInventorsAndRelationsFromPatents(listpatents []models.Patent, maxInvent
 	}
 	//create Relations
 	ListRelations := make([]int, maxInventors*maxInventors)
-	for i := 0; i < maxInventors; i++ {
-		for j := i; j < maxInventors; j++ {
+	for i := 0; i < MinResult(maxInventors, len(ListPreInventors)); i++ {
+		for j := i; j < MinResult(maxInventors, len(ListPreInventors)); j++ {
 			var count int
 			source := make(map[int]bool)
 			for _, OneOfPatentId := range ListPreInventors[i].PatentsId {
