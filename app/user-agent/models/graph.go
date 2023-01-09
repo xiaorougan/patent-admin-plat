@@ -8,11 +8,24 @@ type Node struct {
 	NodeCategory      int     `grom:"" json:"category"`
 }
 
+type PreNode struct {
+	NodeId            int
+	NodeName          string
+	NodeSymbolizeSize float32
+	NodeValue         int
+	NodeCategory      int
+}
+
 // Link n--n的关系
 type Link struct {
 	Source string `json:"source"`
 	Target string `json:"target"`
 	Value  int    `json:"value"`
+}
+type PreLink struct {
+	Source int
+	Target int
+	Value  int
 }
 
 type Graph struct {
@@ -20,11 +33,27 @@ type Graph struct {
 	Links []Link `json:"links"`
 }
 
+func (e *Node) TableName() string {
+	return "Node"
+}
+
 type OneUserPatents struct {
 	Patentsid []int
 }
 
 type InventorPatent struct {
-	UserId   int
-	PatentId int
+	InventorId int
+	PatentId   int
+}
+type Inventor struct {
+	Id                 int
+	Name               string
+	TheNumberOfPatents int
+	InTheGraph         bool
+}
+type PreInventor struct {
+	Id                 int
+	Name               string
+	TheNumberOfPatents int
+	PatentsId          []int
 }

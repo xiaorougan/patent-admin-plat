@@ -17,7 +17,7 @@ type UserPatentObject struct {
 	PatentId int    `form:"patentId" search:"type:exact;column:TagId;table:user_patent" comment:"专利ID" `
 	Type     string `json:"type" gorm:"size:64;comment:关系类型（关注/认领）"`
 	PNM      string `json:"PNM" gorm:"size:128;comment:申请号"`
-
+	Desc     string `json:"desc" gorm:"size:128;comment:描述"`
 	common.ControlBy
 }
 
@@ -34,15 +34,16 @@ func (d *UserPatentObject) GenerateUserPatent(g *models.UserPatent) {
 	g.UserId = d.UserId
 	g.Type = d.Type
 	g.PNM = d.PNM
-
+	g.Desc = d.Desc
 }
 
-func NewUserPatentClaim(userId, patentId, createdBy, updatedBy int, PNM string) *UserPatentObject {
+func NewUserPatentClaim(userId, patentId, createdBy, updatedBy int, PNM string, Desc string) *UserPatentObject {
 	return &UserPatentObject{
 		UserId:   userId,
 		PatentId: patentId,
 		Type:     ClaimType,
 		PNM:      PNM,
+		Desc:     Desc,
 		ControlBy: common.ControlBy{
 			CreateBy: createdBy,
 			UpdateBy: updatedBy,
@@ -50,15 +51,20 @@ func NewUserPatentClaim(userId, patentId, createdBy, updatedBy int, PNM string) 
 	}
 }
 
-func NewUserPatentFocus(userId, patentId, createdBy, updatedBy int, PNM string) *UserPatentObject {
+func NewUserPatentFocus(userId, patentId, createdBy, updatedBy int, PNM string, Desc string) *UserPatentObject {
 	return &UserPatentObject{
 		UserId:   userId,
 		PatentId: patentId,
 		Type:     FocusType,
 		PNM:      PNM,
+		Desc:     Desc,
 		ControlBy: common.ControlBy{
 			CreateBy: createdBy,
 			UpdateBy: updatedBy,
 		},
 	}
+}
+
+type ClaimReq struct {
+	Desc string `json:"desc"`
 }

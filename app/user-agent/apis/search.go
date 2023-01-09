@@ -64,6 +64,8 @@ func (e Search) AuthSearch(c *gin.Context) {
 		return
 	}
 
+	internalTrace(searchTracing(req.UserId, req.Query, c.Request.RequestURI), c)
+
 	e.PageOK(ps, req.PageSize, req.PageIndex, len(ps), "查询成功")
 }
 
@@ -101,6 +103,42 @@ func (e Search) Search(c *gin.Context) {
 	}
 
 	e.PageOK(ps, req.PageSize, req.PageIndex, len(ps), "查询成功")
+}
+
+// SearchFullText
+// @Summary 专利搜索全文
+// @Description 根据查询字符串进行搜索全文
+// @Tags 专利检索
+// @Param data body dto.SimpleSearchReq true "用户数据"
+// @Success 200 {object} dto.PatentDetail
+// @Router /api/v1/user-agent/auth-search/full [post]
+// @Security Bearer
+func (e Search) SearchFullText(c *gin.Context) {
+	ic := service.GetCurrentInnojoy()
+	req := dto.SimpleSearchReq{}
+
+	err := e.MakeContext(c).
+		Bind(&req).
+		Errors
+	if err != nil {
+		e.Logger.Error(err)
+		e.Error(500, err, err.Error())
+		return
+	}
+
+	if len(req.DB) == 0 {
+		// todo: 设置默认数据库配置文件
+		req.DB = "wgzl,syxx,fmzl"
+	}
+
+	ps, err := ic.SearchFullText(&req)
+	if err != nil {
+		e.Logger.Error(err)
+		e.Error(500, err, err.Error())
+		return
+	}
+
+	e.OK(ps, "查询成功")
 }
 
 // GetChart

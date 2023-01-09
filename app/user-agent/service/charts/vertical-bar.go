@@ -1,6 +1,6 @@
 package charts
 
-const barProfile = `{
+const verticalBarProfile = `{
   "tooltip": {
     "trigger": "axis",
     "axisPointer": {
@@ -15,37 +15,33 @@ const barProfile = `{
   },
   "xAxis": [
     {
+      "type": "value"
+    }
+  ],
+  "yAxis": [
+    {
       "type": "category",
       "data": $CATE,
       $ROTATE
     }
   ],
-  "yAxis": [
-    {
-      "type": "value"
-    }
-  ],
   "series": [
     {
-      "name": "Direct",
       "type": "bar",
-      "barWidth": "60%",
+      "stack": "total",
+      "label": {
+        "show": true
+      },
+      "emphasis": {
+        "focus": "series"
+      },
       "data": $DATA
     }
   ]
 }`
 
-const ROTATE = `
-      "axisTick": {
-        "alignWithLabel": true
-      },
-      "axisLabel": {
-        "interval": 0,
-        "rotate": 45
-      }`
-
-func genBarProfile(cate []string, data []int, isRotate bool) string {
-	p := newProfile(barProfile)
+func genVerticalBarProfile(cate []string, data []int, isRotate bool) string {
+	p := newProfile(verticalBarProfile)
 	if isRotate {
 		p = p.replace("$ROTATE", ROTATE)
 	} else {

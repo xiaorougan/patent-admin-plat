@@ -34,5 +34,7 @@ func registerAuthedSearchRouter(v1 *gin.RouterGroup, authMiddleware *jwt.GinJWTM
 		r.POST("/queries", api.InsertStoredQuery)
 		r.DELETE("/queries/:qid", api.RemoveStoredQuery)
 		r.PUT("/queries/:qid", api.UpdateStoredQuery)
+
+		r.POST("/full", api.SearchFullText)
 	}
 }

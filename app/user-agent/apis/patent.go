@@ -283,8 +283,7 @@ func (e Patent) GetUserPatentsPages(c *gin.Context) {
 // @Security Bearer
 func (e Patent) ClaimPatent(c *gin.Context) {
 
-	pid, PNM, err := e.internalInsertIfAbsent(c)
-
+	pid, PNM, desc, err := e.internalInsertIfAbsent(c)
 	if err != nil {
 		e.Logger.Error(err)
 		e.Error(500, err, err.Error())
@@ -294,7 +293,6 @@ func (e Patent) ClaimPatent(c *gin.Context) {
 	s := service.UserPatent{}
 	err = e.MakeContext(c).
 		MakeOrm().
-		//Bind(&req, binding.JSON).
 		MakeService(&s.Service).
 		Errors
 	if err != nil {
@@ -303,7 +301,7 @@ func (e Patent) ClaimPatent(c *gin.Context) {
 		return
 	}
 
-	req := dto.NewUserPatentClaim(user.GetUserId(c), pid, user.GetUserId(c), user.GetUserId(c), PNM)
+	req := dto.NewUserPatentClaim(user.GetUserId(c), pid, user.GetUserId(c), user.GetUserId(c), PNM, desc)
 
 	if err = s.InsertUserPatent(req); err != nil {
 		e.Logger.Error(err)
@@ -329,7 +327,7 @@ func (e Patent) ClaimPatent(c *gin.Context) {
 // @Security Bearer
 func (e Patent) FocusPatent(c *gin.Context) {
 
-	pid, PNM, err := e.internalInsertIfAbsent(c)
+	pid, PNM, desc, err := e.internalInsertIfAbsent(c)
 
 	if err != nil {
 		e.Logger.Error(err)
@@ -348,7 +346,7 @@ func (e Patent) FocusPatent(c *gin.Context) {
 		return
 	}
 
-	req := dto.NewUserPatentFocus(user.GetUserId(c), pid, user.GetUserId(c), user.GetUserId(c), PNM)
+	req := dto.NewUserPatentFocus(user.GetUserId(c), pid, user.GetUserId(c), user.GetUserId(c), PNM, desc)
 
 	if err = s.InsertUserPatent(req); err != nil {
 		e.Logger.Error(err)
@@ -373,7 +371,7 @@ func (e Patent) FocusPatent(c *gin.Context) {
 // @Router /api/v1/user-agent/patent [post]
 // @Security Bearer
 func (e Patent) InsertIfAbsent(c *gin.Context) {
-	pid, pnm, err := e.internalInsertIfAbsent(c)
+	pid, pnm, _, err := e.internalInsertIfAbsent(c)
 	if err != nil {
 		e.Logger.Error(err)
 		e.Error(500, err, err.Error())
@@ -391,7 +389,7 @@ func (e Patent) InsertIfAbsent(c *gin.Context) {
 	e.OK(&dto.PatentBriefInfo{PatentId: pid, PNM: pnm}, "success")
 }
 
-func (e Patent) internalInsertIfAbsent(c *gin.Context) (int, string, error) {
+func (e Patent) internalInsertIfAbsent(c *gin.Context) (int, string, string, error) {
 	ps := service.Patent{}
 	req := dto.PatentReq{}
 	err := e.MakeContext(c).
@@ -400,14 +398,14 @@ func (e Patent) internalInsertIfAbsent(c *gin.Context) (int, string, error) {
 		MakeService(&ps.Service).
 		Errors
 	if err != nil {
-		return 0, "", err
+		return 0, "", "", err
 	}
 	req.CreateBy = user.GetUserId(c)
 	p, err := ps.InsertIfAbsent(&req)
 	if err != nil {
-		return 0, "", err
+		return 0, "", "", err
 	}
-	return p.PatentId, p.PNM, nil
+	return p.PatentId, p.PNM, req.Desc, nil
 }
 
 // GetFocusPages
@@ -547,7 +545,7 @@ func (e Patent) DeleteFocus(c *gin.Context) {
 		return
 	}
 
-	req := dto.NewUserPatentFocus(user.GetUserId(c), pid, user.GetUserId(c), user.GetUserId(c), "")
+	req := dto.NewUserPatentFocus(user.GetUserId(c), pid, user.GetUserId(c), user.GetUserId(c), "", "")
 
 	err = e.MakeContext(c).
 		MakeOrm().
@@ -590,7 +588,7 @@ func (e Patent) DeleteClaim(c *gin.Context) {
 		return
 	}
 
-	req := dto.NewUserPatentClaim(user.GetUserId(c), pid, user.GetUserId(c), user.GetUserId(c), "")
+	req := dto.NewUserPatentClaim(user.GetUserId(c), pid, user.GetUserId(c), user.GetUserId(c), "", "")
 
 	err = e.MakeContext(c).
 		MakeOrm().

@@ -3,10 +3,10 @@ package charts
 import "encoding/json"
 
 func init() {
-	globalCharts[301] = newChart301()
+	globalCharts[1315] = newChart1315()
 }
 
-type resp301 struct {
+type resp1315 struct {
 	ReturnValue int `json:"ReturnValue"`
 	Option      struct {
 		Statistics [][]int  `json:"Statistics"`
@@ -14,18 +14,18 @@ type resp301 struct {
 	} `json:"Option"`
 }
 
-type chart301 struct {
+type chart1315 struct {
 	name string
 }
 
-func newChart301() *chart301 {
-	return &chart301{
-		name: "申请人排行榜",
+func newChart1315() *chart1315 {
+	return &chart1315{
+		name: "年度专利许可趋势分析",
 	}
 }
 
-func (c *chart301) Serialize(params []byte) (string, error) {
-	resp := &resp301{}
+func (c *chart1315) Serialize(params []byte) (string, error) {
+	resp := &resp1315{}
 	if err := json.Unmarshal(params, resp); err != nil {
 		return "", err
 	}
@@ -34,11 +34,11 @@ func (c *chart301) Serialize(params []byte) (string, error) {
 	for _, s := range resp.Option.Statistics {
 		data = append(data, s[0])
 	}
-	chart := genBarProfile(resp.Option.Classes, data, true)
+	chart := genLineSmoothProfile(resp.Option.Classes, data, true)
 
 	return chart, nil
 }
 
-func (c *chart301) Name() string {
+func (c *chart1315) Name() string {
 	return c.name
 }
