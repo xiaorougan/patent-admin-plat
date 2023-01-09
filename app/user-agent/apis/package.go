@@ -494,6 +494,11 @@ func (e Package) GetRelationGraphByPackage(c *gin.Context) {
 	listpp := make([]models.PatentPackage, 0)
 	var count int64
 	err = spp.GetPatentIdByPackageId(&reqpp, &listpp, &count)
+	if err != nil {
+		e.Logger.Error(err)
+		e.Error(500, err, err.Error())
+		return
+	}
 	reqp.PatentIds = make([]int, len(listpp))
 	for i := 0; i < len(listpp); i++ {
 		reqp.PatentIds[i] = listpp[i].PatentId
@@ -507,11 +512,13 @@ func (e Package) GetRelationGraphByPackage(c *gin.Context) {
 	err = sp.GetPageByIds(&reqp, &listp, &count)
 	if err != nil {
 		e.Logger.Error(err)
+		e.Error(500, err, err.Error())
 		return
 	}
 	err = sp.GetGraphByPatents(listp, &Inventorgraph)
 	if err != nil {
 		e.Logger.Error(err)
+		e.Error(500, err, err.Error())
 		return
 	}
 	e.OK(Inventorgraph, "查询成功")
