@@ -68,10 +68,6 @@ func (e *PatentPackage) RemovePackagePatent(c *dto.PackagePageGetReq) error {
 		e.Log.Errorf("Delete error: %s", err)
 		return err
 	}
-	if db.RowsAffected == 0 {
-		err = errors.New("无权删除该数据")
-		return err
-	}
 	return nil
 }
 

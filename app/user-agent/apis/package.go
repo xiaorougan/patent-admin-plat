@@ -1,6 +1,7 @@
 package apis
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin/binding"
 	"go-admin/app/user-agent/models"
 	"net/http"
@@ -445,13 +446,14 @@ func (e Package) DeletePackagePatent(c *gin.Context) {
 	}
 	req.PackageId = packageId
 
-	patentId, err := strconv.Atoi(c.Param("pid"))
-	if err != nil {
+	PNM := c.Param("PNM")
+	if len(PNM) == 0 {
+		err = fmt.Errorf("PNM should be provided in path")
 		e.Logger.Error(err)
 		e.Error(500, err, err.Error())
 		return
 	}
-	req.PatentId = patentId
+	req.PNM = PNM
 
 	err = s.RemovePackagePatent(&req)
 
