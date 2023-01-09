@@ -468,10 +468,10 @@ func (e Package) DeletePackagePatent(c *gin.Context) {
 //---------------------------------------------------patent--graph-------------------------------------------------------
 
 // GetRelationGraphByPackage
-// @Summary 获取专利包中专利的发明人的关系
-// @Description  获取专利包中专利的发明人的关系
+// @Summary 获取专利包关系图谱
+// @Description  获取专利包关系图谱
 // @Tags 专利表
-// @Router /api/v1/user-agent/package/{packageId}/relationship3 [get]
+// @Router /api/v1/user-agent/package/{packageId}/graph/relation [get]
 // @Security Bearer
 func (e Package) GetRelationGraphByPackage(c *gin.Context) {
 	sp := service.Patent{}
