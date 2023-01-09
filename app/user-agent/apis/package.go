@@ -395,6 +395,7 @@ func (e Package) InsertPackagePatent(c *gin.Context) {
 	}
 
 	req.CreateBy = user.GetUserId(c)
+	req.Desc = patentReq.Desc
 
 	err = e.MakeContext(c).
 		MakeOrm().
