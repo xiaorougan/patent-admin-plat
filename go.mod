@@ -26,6 +26,7 @@ require (
 	github.com/swaggo/gin-swagger v1.5.0
 	github.com/swaggo/swag v1.8.3
 	github.com/unrolled/secure v1.0.8
+	github.com/yanyiwu/gojieba v1.2.0
 	golang.org/x/crypto v0.0.0-20220411220226-7b82a4e95df4
 	gorm.io/driver/mysql v1.3.5
 	gorm.io/driver/postgres v1.3.8
