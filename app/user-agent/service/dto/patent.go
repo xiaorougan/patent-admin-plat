@@ -8,8 +8,7 @@ import (
 )
 
 type PatentGetPageReq struct {
-	dto.Pagination `search:"-"`
-	PatentId       int    `form:"patentId" search:"type:exact;column:PatentId;table:patent" comment:"专利ID"`
+	PatentId       int    `form:"patentId" search:"type:exact;column:PatentId;table:patent;primaryKey;" comment:"专利ID"`
 	TI             string `form:"TI" search:"type:exact;column:TI;table:patent" comment:"专利名"`
 	PNM            string `form:"PNM" search:"type:exact;column:PNN;table:patent" comment:"申请号"`
 	AD             string `form:"AD" search:"type:exact;column:AD;table:patent" comment:"申请日"`
@@ -19,7 +18,13 @@ type PatentGetPageReq struct {
 	AR             string `form:"AR" search:"type:exact;column:AR;table:patent" comment:"地址"`
 	PINN           string `form:"PINN" search:"type:exact;column:PINN;table:patent" comment:"申请人"`
 	CLS            string `json:"CLS" gorm:"size:128;comment:法律状态"`
+	CLM            string `json:"CLM" gorm:"comment:权利要求书"`
+	dto.Pagination `search:"-"`
 	PatentOrder
+}
+
+func (PatentGetPageReq) TableName() string {
+	return "patent"
 }
 
 type PatentOrder struct {
