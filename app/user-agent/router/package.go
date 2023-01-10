@@ -26,6 +26,7 @@ func registerPackageRouter(v1 *gin.RouterGroup, authMiddleware *jwt.GinJWTMiddle
 		r.POST("/:id/patent", api.InsertPackagePatent)              //将专利加入专利包√
 		r.DELETE("/:id/patent/:PNM", api.DeletePackagePatent)       //取消加入该专利包
 		r.GET("/:id/patent/:PNM/isExist", api.IsPatentInPackage)    //取消加入该专利包
+		r.PUT("/:id/patent/:PNM/desc", api.UpdatePackagePatentDesc) //修改专利包内专利简介
 		r.GET("/:id/graph/relation", api.GetRelationGraphByPackage) //获取该专利包的发明人关系图谱(点位置随机、大小数量和线的数量、值根据数据生成)
 		r.GET("/:id/graph/tech", api.GetTechGraphByPackage)         //获取该专利包的技术关系图谱(点位置随机、大小数量和线的数量、值根据数据生成)
 	}

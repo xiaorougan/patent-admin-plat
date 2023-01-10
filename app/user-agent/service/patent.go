@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"github.com/go-admin-team/go-admin-core/sdk/service"
 	"github.com/prometheus/common/log"
-	"github.com/yanyiwu/gojieba"
 	"go-admin/app/admin-agent/service/dtos"
 	"go-admin/app/user-agent/models"
 	"go-admin/app/user-agent/service/dto"

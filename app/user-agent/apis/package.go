@@ -465,6 +465,55 @@ func (e Package) DeletePackagePatent(c *gin.Context) {
 	e.OK(req.PackageBack, "删除成功")
 }
 
+// UpdatePackagePatentDesc
+// @Summary 更新专利包专利描述
+// @Description  更新专利包专利描述
+// @Tags 专利包
+// @Param data body dto.PatentDescReq true "专利描述"
+// @Router /api/v1/user-agent/package/{package_id}/patent/{PNM}/desc [put]
+// @Security Bearer
+func (e Package) UpdatePackagePatentDesc(c *gin.Context) {
+	s := service.PatentPackage{}
+	req := dto.PatentDescReq{}
+	req.SetUpdateBy(user.GetUserId(c))
+	err := e.MakeContext(c).
+		MakeOrm().
+		Bind(&req).
+		MakeService(&s.Service).
+		Errors
+
+	if err != nil {
+		e.Logger.Error(err)
+		e.Error(500, err, err.Error())
+		return
+	}
+
+	packageId, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		e.Logger.Error(err)
+		e.Error(500, err, err.Error())
+		return
+	}
+	req.PackageID = packageId
+
+	PNM := c.Param("PNM")
+	if len(PNM) == 0 {
+		err = fmt.Errorf("PNM should be provided in path")
+		e.Logger.Error(err)
+		e.Error(500, err, err.Error())
+		return
+	}
+	req.PNM = PNM
+
+	err = s.UpdatePackagePatentDesc(&req)
+
+	if err != nil {
+		e.Logger.Error(err)
+		return
+	}
+	e.OK(req, "更新成功")
+}
+
 //---------------------------------------------------patent--graph-------------------------------------------------------
 
 // GetRelationGraphByPackage
@@ -494,6 +543,11 @@ func (e Package) GetRelationGraphByPackage(c *gin.Context) {
 	listpp := make([]models.PatentPackage, 0)
 	var count int64
 	err = spp.GetPatentIdByPackageId(&reqpp, &listpp, &count)
+	if err != nil {
+		e.Logger.Error(err)
+		e.Error(500, err, err.Error())
+		return
+	}
 	reqp.PatentIds = make([]int, len(listpp))
 	for i := 0; i < len(listpp); i++ {
 		reqp.PatentIds[i] = listpp[i].PatentId
@@ -507,11 +561,13 @@ func (e Package) GetRelationGraphByPackage(c *gin.Context) {
 	err = sp.GetPageByIds(&reqp, &listp, &count)
 	if err != nil {
 		e.Logger.Error(err)
+		e.Error(500, err, err.Error())
 		return
 	}
 	Inventors, Relations, err := sp.FindInventorsAndRelationsFromPatents(listp) //relations is an Upper Triangle
 	if err != nil {
 		e.Logger.Error(err)
+		e.Error(500, err, err.Error())
 		return
 	}
 	InventorGraph, err = sp.GetGraphByPatents(Inventors, Relations)

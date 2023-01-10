@@ -159,6 +159,7 @@ func (e Patent) UpdatePatent(c *gin.Context) {
 	err = s.UpdateLists(&req)
 	if err != nil {
 		e.Logger.Error(err)
+		e.Error(500, err, err.Error())
 		return
 	}
 	e.OK(req, "更新成功")
@@ -533,19 +534,21 @@ func (e Patent) GetClaimPages(c *gin.Context) {
 // @Summary 取消关注
 // @Description  取消关注
 // @Tags 专利表
-// @Param PatentId query string false "专利ID"
-// @Router /api/v1/user-agent/patent/focus/{patent_id}  [delete]
+// @Param PNM query string false "专利PNM"
+// @Router /api/v1/user-agent/patent/focus/{PNM}  [delete]
 // @Security Bearer
 func (e Patent) DeleteFocus(c *gin.Context) {
+	var err error
 	s := service.UserPatent{}
-	pid, err := strconv.Atoi(c.Param("patent_id"))
-	if err != nil {
+	PNM := c.Param("PNM")
+	if len(PNM) == 0 {
+		err = fmt.Errorf("PNM should be provided in path")
 		e.Logger.Error(err)
 		e.Error(500, err, err.Error())
 		return
 	}
 
-	req := dto.NewUserPatentFocus(user.GetUserId(c), pid, user.GetUserId(c), user.GetUserId(c), "", "")
+	req := dto.NewUserPatentFocus(user.GetUserId(c), -1, user.GetUserId(c), user.GetUserId(c), PNM, "")
 
 	err = e.MakeContext(c).
 		MakeOrm().
@@ -575,20 +578,22 @@ func (e Patent) DeleteFocus(c *gin.Context) {
 // @Summary 取消认领
 // @Description  取消认领
 // @Tags 专利表
-// @Param PatentId query string false "专利ID"
-// @Router /api/v1/user-agent/patent/claim/{patent_id} [delete]
+// @Param PNM query string false "专利PNM"
+// @Router /api/v1/user-agent/patent/claim/{PNM} [delete]
 // @Security Bearer
 func (e Patent) DeleteClaim(c *gin.Context) {
-
+	var err error
 	s := service.UserPatent{}
 
-	pid, err := strconv.Atoi(c.Param("patent_id"))
-	if err != nil {
+	PNM := c.Param("PNM")
+	if len(PNM) == 0 {
+		err = fmt.Errorf("PNM should be provided in path")
 		e.Logger.Error(err)
+		e.Error(500, err, err.Error())
 		return
 	}
 
-	req := dto.NewUserPatentClaim(user.GetUserId(c), pid, user.GetUserId(c), user.GetUserId(c), "", "")
+	req := dto.NewUserPatentClaim(user.GetUserId(c), -1, user.GetUserId(c), user.GetUserId(c), PNM, "")
 
 	err = e.MakeContext(c).
 		MakeOrm().
@@ -607,6 +612,49 @@ func (e Patent) DeleteClaim(c *gin.Context) {
 	}
 
 	e.OK(req, "取消认领成功")
+}
+
+// UpdateUserPatentDesc
+// @Summary 更新认领/关注专利备注
+// @Description  更新认领/关注专利备注
+// @Tags 专利表
+// @Param data body dto.PatentDescReq true "专利描述"
+// @Router /api/v1/user-agent/patent/{PNM}/desc [put]
+// @Security Bearer
+func (e Patent) UpdateUserPatentDesc(c *gin.Context) {
+	s := service.UserPatent{}
+	req := dto.PatentDescReq{}
+	req.UserId = user.GetUserId(c)
+	req.SetUpdateBy(user.GetUserId(c))
+	err := e.MakeContext(c).
+		MakeOrm().
+		Bind(&req).
+		MakeService(&s.Service).
+		Errors
+
+	if err != nil {
+		e.Logger.Error(err)
+		e.Error(500, err, err.Error())
+		return
+	}
+
+	PNM := c.Param("PNM")
+	if len(PNM) == 0 {
+		err = fmt.Errorf("PNM should be provided in path")
+		e.Logger.Error(err)
+		e.Error(500, err, err.Error())
+		return
+	}
+	req.PNM = PNM
+
+	err = s.UpdateUserPatentDesc(&req)
+
+	if err != nil {
+		e.Logger.Error(err)
+		e.Error(500, err, err.Error())
+		return
+	}
+	e.OK(req, "更新成功")
 }
 
 //----------------------------------------user-patent 修改用户专利关系----------------------------------------
