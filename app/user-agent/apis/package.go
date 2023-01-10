@@ -478,7 +478,7 @@ func (e Package) GetRelationGraphByPackage(c *gin.Context) {
 	reqp := dto.PatentsIds{}
 	spp := service.PatentPackage{}
 	reqpp := dto.PackagePageGetReq{}
-	Inventorgraph := models.Graph{}
+	InventorGraph := models.Graph{}
 	var err error
 	reqpp.PackageId, err = strconv.Atoi(c.Param("id"))
 	err = e.MakeContext(c).
@@ -509,10 +509,70 @@ func (e Package) GetRelationGraphByPackage(c *gin.Context) {
 		e.Logger.Error(err)
 		return
 	}
-	err = sp.GetGraphByPatents(listp, &Inventorgraph)
+	Inventors, Relations, err := sp.FindInventorsAndRelationsFromPatents(listp) //relations is an Upper Triangle
 	if err != nil {
 		e.Logger.Error(err)
 		return
 	}
-	e.OK(Inventorgraph, "查询成功")
+	InventorGraph, err = sp.GetGraphByPatents(Inventors, Relations)
+	if err != nil {
+		e.Logger.Error(err)
+		return
+	}
+	e.OK(InventorGraph, "查询成功")
+}
+
+// GetTechGraphByPackage
+// @Summary 获取专利包技术图谱
+// @Description  获取专利包技术图谱
+// @Tags 专利包
+// @Router /api/v1/user-agent/package/{packageId}/graph/tech [get]
+// @Security Bearer
+func (e Package) GetTechGraphByPackage(c *gin.Context) {
+	sp := service.Patent{}
+	reqp := dto.PatentsIds{}
+	spp := service.PatentPackage{}
+	reqpp := dto.PackagePageGetReq{}
+	InventorGraph := models.Graph{}
+	var err error
+	reqpp.PackageId, err = strconv.Atoi(c.Param("id"))
+	err = e.MakeContext(c).
+		MakeOrm().
+		MakeService(&spp.Service).
+		Errors
+	if err != nil {
+		e.Logger.Error(err)
+		e.Error(500, err, err.Error())
+		return
+	}
+	reqpp.SetUpdateBy(user.GetUserId(c))
+	listpp := make([]models.PatentPackage, 0)
+	var count int64
+	err = spp.GetPatentIdByPackageId(&reqpp, &listpp, &count)
+	reqp.PatentIds = make([]int, len(listpp))
+	for i := 0; i < len(listpp); i++ {
+		reqp.PatentIds[i] = listpp[i].PatentId
+	}
+	listp := make([]models.Patent, 0)
+	err = e.MakeContext(c).
+		MakeOrm().
+		MakeService(&sp.Service).
+		Errors
+
+	err = sp.GetPageByIds(&reqp, &listp, &count)
+	if err != nil {
+		e.Logger.Error(err)
+		return
+	}
+	keyWords, Relations, err := sp.FindKeywordsAndRelationsFromPatents(listp) //relations is an Upper Triangle
+	if err != nil {
+		e.Logger.Error(err)
+		return
+	}
+	InventorGraph, err = sp.GetGraphByPatents(keyWords, Relations)
+	if err != nil {
+		e.Logger.Error(err)
+		return
+	}
+	e.OK(InventorGraph, "查询成功")
 }
