@@ -254,7 +254,7 @@ func (e *Report) GetNovelty(c *dto.NoveltyReportReq) (string, error) {
 			header := report.GenConclusionHeader(closeCount, checkList[i].Pinn, checkList[i].Pa, checkList[i].Ti,
 				checkList[i].Pnm, checkList[i].Ad, report.Score2Str(sims[i].Score), checkList[i].Abst)
 			conclusion = append(conclusion, header)
-			retconc = retconc + "专利" + strconv.Itoa(closeCount) + "是" + report.CutFirst(checkList[i].Clm) + "\n"
+			retconc = retconc + "专利" + strconv.Itoa(closeCount) + "是" + checkList[i].Cl + "\n"
 			closeCount++
 		}
 	}

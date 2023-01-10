@@ -105,15 +105,6 @@ type TextSimilarity struct {
 // allows you to use the defaults.
 type Option func(TextSimilarity) TextSimilarity
 
-func CutFirst(claims string) string {
-	res := strings.Split(claims, "2.")
-	res2 := strings.Split(res[0], "1.")
-	if len(res2) > 0 {
-		return res2[1]
-	}
-	return res2[0]
-}
-
 // Cosine returns the Cosine Similarity between two vectors.
 func Cosine(a, b []float64) (float64, error) {
 	count := 0
