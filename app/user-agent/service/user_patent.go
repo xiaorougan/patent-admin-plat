@@ -2,7 +2,6 @@ package service
 
 import (
 	"fmt"
-
 	"github.com/go-admin-team/go-admin-core/sdk/service"
 	"go-admin/app/user-agent/models"
 	"go-admin/app/user-agent/service/dto"
@@ -126,6 +125,36 @@ func (e *UserPatent) InsertUserPatent(c *dto.UserPatentObject) error {
 	err = e.Orm.Create(&data).Error
 	if err != nil {
 		e.Log.Errorf("db error: %s", err)
+		return err
+	}
+	return nil
+}
+
+func (e *UserPatent) UpdateUserPatentDesc(c *dto.PatentDescReq) error {
+	var err error
+	var data models.UserPatent
+	var i int64
+	err = e.Orm.Model(&data).Where("PNM = ? AND User_Id = ?", c.PNM, c.UserId).
+		Count(&i).Error
+	if err != nil {
+		e.Log.Errorf("db error: %s", err)
+		return err
+	}
+	if i == 0 {
+		err = fmt.Errorf("%w, (PNM:%s, u:%d) not existed", ErrCanNotUpdate, c.PNM, c.UserId)
+		e.Log.Errorf("db error: %s", err)
+		return err
+	}
+
+	c.GenerateUserPatent(&data)
+	update := e.Orm.Model(&data).Where("PNM = ? AND User_Id = ?", c.PNM, c.UserId).Updates(&data)
+	if err = update.Error; err != nil {
+		e.Log.Errorf("db error: %s", err)
+		return err
+	}
+	if update.RowsAffected == 0 {
+		err = fmt.Errorf("update desc for patent %s failed", c.PNM)
+		e.Log.Errorf("db update error")
 		return err
 	}
 	return nil

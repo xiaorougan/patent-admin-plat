@@ -78,3 +78,26 @@ type PatentBriefInfo struct {
 	PatentId int    `json:"patentId" gorm:"size:128;comment:专利ID"`
 	PNM      string `json:"PNM" gorm:"size:128;comment:申请号" vd:"len($)>0"`
 }
+
+type PatentDescReq struct {
+	PNM       string `json:"PNM"`
+	UserId    int    `json:"userId"`
+	PackageID int    `json:"packageId"`
+	Desc      string `json:"desc"`
+
+	common.ControlBy
+}
+
+func (r *PatentDescReq) GenerateUserPatent(model *models.UserPatent) {
+	model.PNM = r.PNM
+	model.UserId = r.UserId
+	model.Desc = r.Desc
+	model.CreateBy = r.CreateBy
+	model.UpdateBy = r.UpdateBy
+}
+
+func (r *PatentDescReq) GeneratePatentPackage(model *models.PatentPackage) {
+	model.PNM = r.PNM
+	model.PackageId = r.PackageID
+	model.Desc = r.Desc
+}
