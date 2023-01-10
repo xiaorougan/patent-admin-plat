@@ -614,21 +614,21 @@ func (e Patent) DeleteClaim(c *gin.Context) {
 	e.OK(req, "取消认领成功")
 }
 
-// UpdateUserPatentDesc
-// @Summary 更新认领/关注专利备注
-// @Description  更新认领/关注专利备注
+// UpdateClaimDesc
+// @Summary 更新认领专利备注
+// @Description  更新认领专利备注
 // @Tags 专利表
 // @Param data body dto.PatentDescReq true "专利描述"
-// @Router /api/v1/user-agent/patent/{PNM}/desc [put]
+// @Router /api/v1/user-agent/patent/claim/{PNM}/desc [put]
 // @Security Bearer
-func (e Patent) UpdateUserPatentDesc(c *gin.Context) {
+func (e Patent) UpdateClaimDesc(c *gin.Context) {
 	s := service.UserPatent{}
-	req := dto.PatentDescReq{}
+	req := dto.NewEmptyClaim()
 	req.UserId = user.GetUserId(c)
 	req.SetUpdateBy(user.GetUserId(c))
 	err := e.MakeContext(c).
 		MakeOrm().
-		Bind(&req).
+		Bind(req).
 		MakeService(&s.Service).
 		Errors
 
@@ -647,7 +647,50 @@ func (e Patent) UpdateUserPatentDesc(c *gin.Context) {
 	}
 	req.PNM = PNM
 
-	err = s.UpdateUserPatentDesc(&req)
+	err = s.UpdateUserPatentDesc(req)
+
+	if err != nil {
+		e.Logger.Error(err)
+		e.Error(500, err, err.Error())
+		return
+	}
+	e.OK(req, "更新成功")
+}
+
+// UpdateFocusDesc
+// @Summary 更新认领专利备注
+// @Description  更新认领专利备注
+// @Tags 专利表
+// @Param data body dto.PatentDescReq true "专利描述"
+// @Router /api/v1/user-agent/patent/focus/{PNM}/desc [put]
+// @Security Bearer
+func (e Patent) UpdateFocusDesc(c *gin.Context) {
+	s := service.UserPatent{}
+	req := dto.NewEmptyFocus()
+	req.UserId = user.GetUserId(c)
+	req.SetUpdateBy(user.GetUserId(c))
+	err := e.MakeContext(c).
+		MakeOrm().
+		Bind(req).
+		MakeService(&s.Service).
+		Errors
+
+	if err != nil {
+		e.Logger.Error(err)
+		e.Error(500, err, err.Error())
+		return
+	}
+
+	PNM := c.Param("PNM")
+	if len(PNM) == 0 {
+		err = fmt.Errorf("PNM should be provided in path")
+		e.Logger.Error(err)
+		e.Error(500, err, err.Error())
+		return
+	}
+	req.PNM = PNM
+
+	err = s.UpdateUserPatentDesc(req)
 
 	if err != nil {
 		e.Logger.Error(err)

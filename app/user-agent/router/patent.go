@@ -32,8 +32,9 @@ func registerPatentRouter(v1 *gin.RouterGroup, authMiddleware *jwt.GinJWTMiddlew
 		r.POST("/focus", api.FocusPatent) //关注专利√
 		r.POST("/tag", api.InsertTag)     //为专利添加标签√
 
-		r.PUT("", api.UpdatePatent)                   //修改专利
-		r.PUT("/:PNM/desc", api.UpdateUserPatentDesc) //修改关注/认领专利简介
+		r.PUT("", api.UpdatePatent)                    //修改专利
+		r.PUT("/claim/:PNM/desc", api.UpdateClaimDesc) //修改认领专利简介
+		r.PUT("/focus/:PNM/desc", api.UpdateFocusDesc) //修改关注专利简介
 
 		r.DELETE("/:patent_id", api.DeletePatent)            //删除该专利√
 		r.DELETE("/claim/:PNM", api.DeleteClaim)             //取消关注√
