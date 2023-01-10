@@ -428,8 +428,8 @@ func (e Report) UserGetReportById(c *gin.Context) {
 // @Summary 查新报告
 // @Description  通过patentId生成查新报告
 // @Tags 用户-报告
-// @Param ReportId query string false "专利ID"
-// @Router /apis/v1/user-agent/report/novelty/{patent_id} [post]
+// @Success 200 {object} dto.NoveltyReportReq
+// @Router /apis/v1/user-agent/report/novelty [post]
 // @Security Bearer
 func (e Report) GenPatentNovelty(c *gin.Context) {
 	s := serviceUser.Report{}     //service中查询或者返回的结果赋值给s变量
