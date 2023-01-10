@@ -927,3 +927,111 @@ func (e Patent) GetTags(c *gin.Context) {
 	e.OK(list1, "查询成功")
 
 }
+
+//-----------------------------------------------foucs-graph--------------------------------------------------
+
+// GetRelationGraphByFocus
+// @Summary 获取关注专利的关系图谱
+// @Description  获取关注专利的关系图谱
+// @Tags 专利包
+// @Router /api/v1/user-agent/patent/focus/graph/relation [get]
+// @Security Bearer
+func (e Patent) GetRelationGraphByFocus(c *gin.Context) {
+	sp := service.Patent{}
+	reqp := dto.PatentsIds{}
+	sup := service.UserPatent{}
+	upDto := dto.UserPatentObject{}
+	InventorGraph := models.Graph{}
+	upList := make([]models.UserPatent, 0)
+	var err error
+	var count int64
+	err = e.MakeContext(c).
+		MakeOrm().
+		MakeService(&sup.Service).
+		Errors
+	if err != nil {
+		e.Logger.Error(err)
+		e.Error(500, err, err.Error())
+		return
+	}
+	upDto.UserId = user.GetUserId(c)
+	err = sup.GetFocusLists(&upDto, &upList, &count)
+	reqp.PatentIds = make([]int, len(upList))
+	for i := 0; i < len(upList); i++ {
+		reqp.PatentIds[i] = upList[i].PatentId
+	}
+	listp := make([]models.Patent, 0)
+	err = e.MakeContext(c).
+		MakeOrm().
+		MakeService(&sp.Service).
+		Errors
+	err = sp.GetPageByIds(&reqp, &listp, &count)
+	if err != nil {
+		e.Logger.Error(err)
+		return
+	}
+	Inventors, Relations, err := sp.FindInventorsAndRelationsFromPatents(listp) //relations is an Upper Triangle
+	if err != nil {
+		e.Logger.Error(err)
+		return
+	}
+	InventorGraph, err = sp.GetGraphByPatents(Inventors, Relations)
+	if err != nil {
+		e.Logger.Error(err)
+		return
+	}
+	e.OK(InventorGraph, "查询成功")
+}
+
+// GetTechGraphByFocus
+// @Summary 获取关注专利的技术图谱
+// @Description  获取关注专利的技术图谱
+// @Tags 专利包
+// @Router /api/v1/user-agent/patent/focus/graph/tech [get]
+// @Security Bearer
+func (e Patent) GetTechGraphByFocus(c *gin.Context) {
+	sp := service.Patent{}
+	reqp := dto.PatentsIds{}
+	sup := service.UserPatent{}
+	upDto := dto.UserPatentObject{}
+	InventorGraph := models.Graph{}
+	upList := make([]models.UserPatent, 0)
+	var err error
+	var count int64
+	err = e.MakeContext(c).
+		MakeOrm().
+		MakeService(&sup.Service).
+		Errors
+	if err != nil {
+		e.Logger.Error(err)
+		e.Error(500, err, err.Error())
+		return
+	}
+	upDto.UserId = user.GetUserId(c)
+	err = sup.GetFocusLists(&upDto, &upList, &count)
+	reqp.PatentIds = make([]int, len(upList))
+	for i := 0; i < len(upList); i++ {
+		reqp.PatentIds[i] = upList[i].PatentId
+	}
+	listp := make([]models.Patent, 0)
+	err = e.MakeContext(c).
+		MakeOrm().
+		MakeService(&sp.Service).
+		Errors
+	err = sp.GetPageByIds(&reqp, &listp, &count)
+	if err != nil {
+		e.Logger.Error(err)
+		return
+	}
+	keyWords, Relations, err := sp.FindKeywordsAndRelationsFromPatents(listp) //relations is an Upper Triangle
+	if err != nil {
+		e.Logger.Error(err)
+		return
+	}
+	InventorGraph, err = sp.GetGraphByPatents(keyWords, Relations)
+	if err != nil {
+		e.Logger.Error(err)
+		return
+	}
+	e.OK(InventorGraph, "查询成功")
+}

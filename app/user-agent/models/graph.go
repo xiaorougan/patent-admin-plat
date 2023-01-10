@@ -37,21 +37,23 @@ func (e *Node) TableName() string {
 	return "Node"
 }
 
-type OneUserPatents struct {
-	Patentsid []int
-}
-
 type InventorPatent struct {
 	InventorId int
 	PatentId   int
 }
-type Inventor struct {
+type SimplifiedNode struct { //has some basic information of nodes
 	Id                 int
 	Name               string
 	TheNumberOfPatents int
 	InTheGraph         bool
 }
-type PreInventor struct {
+type Inventor struct {
+	Id                 int
+	Name               string
+	TheNumberOfPatents int
+	PatentsId          []int
+}
+type KeyWord struct {
 	Id                 int
 	Name               string
 	TheNumberOfPatents int

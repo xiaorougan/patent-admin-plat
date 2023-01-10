@@ -19,8 +19,8 @@ type Patent struct {
 	service.Service
 }
 
-// MaxInventors is package relation graph max inventors included
-const MaxInventors = 200
+// MaxSimplifiedNodes is package relation graph max inventors included
+const MaxSimplifiedNodes = 200
 
 // GetPage 获取Patent列表
 func (e *Patent) GetPage(c *dto.PatentReq, list *[]models.Patent, count *int64) error {
@@ -236,60 +236,57 @@ func (e *Patent) Remove(c *dto.PatentById) error {
 }
 
 // GetGraphByPatents 通过Patent数组获得专利发明人的关系图
-func (e *Patent) GetGraphByPatents(ListPatents []models.Patent, Inventorgraph *models.Graph) error {
+func (e *Patent) GetGraphByPatents(simplifiedNodes []models.SimplifiedNode, Relations []int) (models.Graph, error) {
 	var err error
-	NodeList := make([]models.Node, 0)                                                           //return node
-	LinkList := make([]models.Link, 0)                                                           //return link
-	PreNodeList := make([]models.PreNode, 0)                                                     //Similar to node struct and need change some attributes to become NodeList
-	PreLinkList := make([]models.PreLink, 0)                                                     //Similar to link struct and need change some attributes to become LinkList
-	Inventors, Relations, err := FindInventorsAndRelationsFromPatents(ListPatents, MaxInventors) //relations is an Upper Triangle
-	if err != nil {
-		return err
+	NodeList := make([]models.Node, 0)       //return node
+	LinkList := make([]models.Link, 0)       //return link
+	PreNodeList := make([]models.PreNode, 0) //Similar to node struct and need change some attributes type to become NodeList
+	PreLinkList := make([]models.PreLink, 0) //Similar to link struct and need change some attributes type to become LinkList
+	InventorGraph := models.Graph{}
+	if len(simplifiedNodes) == 0 {
+		err = fmt.Errorf("simplifiedNodes is null")
+		return InventorGraph, err
 	}
-	if len(Inventors) == 0 {
-		err = fmt.Errorf("inventors is null")
-		return err
-	}
-	StrongRelationInventors := MinResult(len(Inventors), 10) //chose the top10%(maximum is 10) inventors as StrongRelationInventors(must show)
-	for i, inventor := range Inventors[0:StrongRelationInventors] {
+	StrongRelationInventors := MinResult(len(simplifiedNodes), 10) //chose the top10%(maximum is 10) inventors as StrongRelationInventors(must show)
+	for i, inventor := range simplifiedNodes[0:StrongRelationInventors] {
 		PreNodeList = append(PreNodeList, models.PreNode{NodeId: inventor.Id, NodeCategory: i})
 	}
 	//build top10% to top10% relationship
 	MaxNumberOfLinks := 15 //the maximum find link
 	MaxExpansion := 4      //every Node can extend the number of nodes
-	NowLink := FindRelationFrequencyAndSort(Relations, Inventors[0:StrongRelationInventors], Inventors[0:StrongRelationInventors], MaxNumberOfLinks, MaxExpansion, MaxInventors)
+	NowLink := FindRelationFrequencyAndSort(Relations, simplifiedNodes[0:StrongRelationInventors], simplifiedNodes[0:StrongRelationInventors], MaxNumberOfLinks, MaxExpansion, MaxSimplifiedNodes)
 	PreLinkList = append(PreLinkList, NowLink...)
 	//build top10% to others relationship
 	MaxNumberOfLinks = 200
 	MaxExpansion = 5
-	NowLink = FindRelationFrequencyAndSort(Relations, Inventors[0:StrongRelationInventors], Inventors[StrongRelationInventors:], MaxNumberOfLinks, MaxExpansion, MaxInventors)
+	NowLink = FindRelationFrequencyAndSort(Relations, simplifiedNodes[0:StrongRelationInventors], simplifiedNodes[StrongRelationInventors:], MaxNumberOfLinks, MaxExpansion, MaxSimplifiedNodes)
 	PreLinkList = append(PreLinkList, NowLink...)
 	//add the extended nodes
 	for _, i := range NowLink {
-		if !Inventors[i.Target].InTheGraph {
+		if !simplifiedNodes[i.Target].InTheGraph {
 			PreNodeList = append(PreNodeList, models.PreNode{NodeId: i.Target, NodeCategory: PreNodeList[i.Source].NodeCategory})
-			Inventors[i.Target].InTheGraph = true
+			simplifiedNodes[i.Target].InTheGraph = true
 		}
 	}
 	//build others to others relationship
-	SourceNode := make([]models.Inventor, 0)
-	TargetNode := make([]models.Inventor, 0)
+	SourceNode := make([]models.SimplifiedNode, 0)
+	TargetNode := make([]models.SimplifiedNode, 0)
 	for _, node := range PreNodeList[StrongRelationInventors:] {
-		SourceNode = append(SourceNode, models.Inventor{Id: node.NodeId})
-		TargetNode = append(SourceNode, models.Inventor{Id: node.NodeId})
+		SourceNode = append(SourceNode, models.SimplifiedNode{Id: node.NodeId})
+		TargetNode = append(SourceNode, models.SimplifiedNode{Id: node.NodeId})
 	}
 	MaxNumberOfLinks = 100
 	MaxExpansion = 3
-	NowLink = FindRelationFrequencyAndSort(Relations, SourceNode, TargetNode, MaxNumberOfLinks, MaxExpansion, MaxInventors)
+	NowLink = FindRelationFrequencyAndSort(Relations, SourceNode, TargetNode, MaxNumberOfLinks, MaxExpansion, MaxSimplifiedNodes)
 	PreLinkList = append(PreLinkList, NowLink...)
 	//deal the struct PreLink and PreNode
 	MaxSizeofNode := 50
 	for _, node := range PreNodeList {
 		NodeList = append(NodeList, models.Node{
 			NodeId:            strconv.FormatInt(int64(node.NodeId), 10),
-			NodeName:          Inventors[node.NodeId].Name,
-			NodeValue:         Inventors[node.NodeId].TheNumberOfPatents,
-			NodeSymbolizeSize: float32((Inventors[node.NodeId].TheNumberOfPatents) * MaxSizeofNode / Inventors[0].TheNumberOfPatents),
+			NodeName:          simplifiedNodes[node.NodeId].Name,
+			NodeValue:         simplifiedNodes[node.NodeId].TheNumberOfPatents,
+			NodeSymbolizeSize: float32((simplifiedNodes[node.NodeId].TheNumberOfPatents) * MaxSizeofNode / simplifiedNodes[0].TheNumberOfPatents),
 			NodeCategory:      node.NodeCategory,
 		})
 	}
@@ -300,13 +297,13 @@ func (e *Patent) GetGraphByPatents(ListPatents []models.Patent, Inventorgraph *m
 			Value:  link.Value,
 		})
 	}
-	Inventorgraph.Links = LinkList
-	Inventorgraph.Nodes = NodeList
-	return nil
+	InventorGraph.Links = LinkList
+	InventorGraph.Nodes = NodeList
+	return InventorGraph, nil
 }
 
 // FindRelationFrequencyAndSort 建立边关系
-func FindRelationFrequencyAndSort(relations []int, sources []models.Inventor, targets []models.Inventor, MaxNumberOfLinks int, MaxExtend int, MaxInventors int) []models.PreLink {
+func FindRelationFrequencyAndSort(relations []int, sources []models.SimplifiedNode, targets []models.SimplifiedNode, MaxNumberOfLinks int, MaxExtend int, MaxInventors int) []models.PreLink {
 	LinkList := make([]models.PreLink, 0)
 	LinkSum := 0
 	LinkExtend := make(map[int]int)
@@ -323,9 +320,12 @@ func FindRelationFrequencyAndSort(relations []int, sources []models.Inventor, ta
 				continue
 			}
 			if _, ok := LinkSearch[source.Id*MaxInventors+target.Id]; ok {
-				continue
+				if _, ok1 := LinkSearch[target.Id*MaxInventors+source.Id]; ok1 {
+					continue
+				}
 			}
 			LinkSearch[source.Id*MaxInventors+target.Id] = true
+			LinkSearch[target.Id*MaxInventors+source.Id] = true
 			if source.Id < target.Id {
 				LinkList = append(LinkList, models.PreLink{Source: source.Id, Target: target.Id, Value: relations[source.Id*MaxInventors+target.Id]})
 			} else {
@@ -358,13 +358,13 @@ func FindRelationFrequencyAndSort(relations []int, sources []models.Inventor, ta
 
 // FindInventorsAndRelationsFromPatents --------------------------------------------------------------------------
 // 通过patents数组查找patents数组中的发明人以及专利和发明人的关系
-func FindInventorsAndRelationsFromPatents(listpatents []models.Patent, maxInventors int) ([]models.Inventor, []int, error) {
+func (e *Patent) FindInventorsAndRelationsFromPatents(listPatents []models.Patent) ([]models.SimplifiedNode, []int, error) {
 
-	ListPreInventors := make([]models.PreInventor, 0)
-	//find every patents' Inventor and count
-	for z := 0; z < len(listpatents); z++ {
+	ListInventors := make([]models.Inventor, 0)
+	//find every patents' SimplifiedNode and count
+	for z := 0; z < len(listPatents); z++ {
 		patentDetail := dto.PatentDetail{}
-		if err := json.Unmarshal([]byte(listpatents[z].PatentProperties), &patentDetail); err != nil {
+		if err := json.Unmarshal([]byte(listPatents[z].PatentProperties), &patentDetail); err != nil {
 			return nil, nil, err
 		}
 
@@ -374,63 +374,162 @@ func FindInventorsAndRelationsFromPatents(listpatents []models.Patent, maxInvent
 
 		for i := 0; i < len(inventors); i++ {
 			InventorExist := false
-			for j := 0; j < len(ListPreInventors); j++ {
-				if ListPreInventors[j].Name == inventors[i] {
-					ListPreInventors[j].TheNumberOfPatents++
+			for j := 0; j < len(ListInventors); j++ {
+				if ListInventors[j].Name == inventors[i] {
+					ListInventors[j].TheNumberOfPatents++
 					InventorExist = true
-					ListPreInventors[j].PatentsId = append(ListPreInventors[j].PatentsId, listpatents[z].PatentId)
+					ListInventors[j].PatentsId = append(ListInventors[j].PatentsId, listPatents[z].PatentId)
 					break
 				}
 			}
 			if !InventorExist {
 				NewPatents := make([]int, 0)
-				ListPreInventors = append(ListPreInventors, models.PreInventor{
+				ListInventors = append(ListInventors, models.Inventor{
 					Name:               inventors[i],
 					TheNumberOfPatents: 1,
-					PatentsId:          append(NewPatents, listpatents[z].PatentId),
+					PatentsId:          append(NewPatents, listPatents[z].PatentId),
 				})
 			}
 		}
 	}
 	//sort Inventors
-	sort.Slice(ListPreInventors, func(i, j int) bool {
-		if ListPreInventors[i].TheNumberOfPatents > ListPreInventors[j].TheNumberOfPatents {
+	sort.Slice(ListInventors, func(i, j int) bool {
+		if ListInventors[i].TheNumberOfPatents > ListInventors[j].TheNumberOfPatents {
 			return true
 		}
 		return false
 	})
 
 	//write the id to Inventors
-	for i := 0; i < len(ListPreInventors); i++ {
-		ListPreInventors[i].Id = i
+	for i := 0; i < len(ListInventors); i++ {
+		ListInventors[i].Id = i
 	}
 	//create Relations
-	ListRelations := make([]int, maxInventors*maxInventors)
-	for i := 0; i < MinResult(maxInventors, len(ListPreInventors)); i++ {
-		for j := i; j < MinResult(maxInventors, len(ListPreInventors)); j++ {
+	NowInventorNumbers := MinResult(MaxSimplifiedNodes, len(ListInventors))
+	ListRelations := make([]int, MaxSimplifiedNodes*MaxSimplifiedNodes)
+	for i := 0; i < NowInventorNumbers; i++ {
+		for j := i; j < NowInventorNumbers; j++ {
 			var count int
 			source := make(map[int]bool)
-			for _, OneOfPatentId := range ListPreInventors[i].PatentsId {
+			for _, OneOfPatentId := range ListInventors[i].PatentsId {
 				source[OneOfPatentId] = true
 
 			}
-			for _, OneOfPatentId := range ListPreInventors[j].PatentsId {
+			for _, OneOfPatentId := range ListInventors[j].PatentsId {
 				if _, ok := source[OneOfPatentId]; ok {
 					count++
 				}
 
 			}
-			ListRelations[i*(maxInventors)+j] = count
+			ListRelations[i*(MaxSimplifiedNodes)+j] = count
 		}
 	}
 
 	//change preInventors to Inventors(delete preInventor->patents)
-	ListInventors := make([]models.Inventor, 0)
-	for _, i := range ListPreInventors {
-		NowInventor := models.Inventor{Id: i.Id, Name: i.Name, TheNumberOfPatents: i.TheNumberOfPatents}
-		ListInventors = append(ListInventors, NowInventor)
+	ListSimplifiedNodes := make([]models.SimplifiedNode, 0)
+	for _, i := range ListInventors {
+		NowInventor := models.SimplifiedNode{Id: i.Id, Name: i.Name, TheNumberOfPatents: i.TheNumberOfPatents}
+		ListSimplifiedNodes = append(ListSimplifiedNodes, NowInventor)
 	}
-	return ListInventors, ListRelations, nil
+	return ListSimplifiedNodes, ListRelations, nil
+}
+
+// FindKeywordsAndRelationsFromPatents --------------------------------------------------------------------------
+// 通过patents数组查找patents数组中的关键字以及专利和关键字的关系
+func (e *Patent) FindKeywordsAndRelationsFromPatents(listPatents []models.Patent) ([]models.SimplifiedNode, []int, error) {
+
+	ListKeyWords := make([]models.KeyWord, 0)
+	//find every patents' SimplifiedNode and count
+	TiOfPatentsList := make([]string, 0)
+	//keywordsList :=make([][]string,len(listPatents))
+	for _, p := range listPatents {
+		patentDetail := dto.PatentDetail{}
+		if err := json.Unmarshal([]byte(p.PatentProperties), &patentDetail); err != nil {
+			return nil, nil, err
+		}
+		TiOfPatentsList = append(TiOfPatentsList, patentDetail.Ti)
+	}
+	keywordsList := FindKeyWords(TiOfPatentsList)
+	for z := 0; z < len(listPatents); z++ {
+		for i := 0; i < len(keywordsList[z]); i++ {
+			InventorExist := false
+			for j := 0; j < len(ListKeyWords); j++ {
+				if ListKeyWords[j].Name == keywordsList[z][i] && ListKeyWords[j].PatentsId[len(ListKeyWords[j].PatentsId)-1] != listPatents[z].PatentId {
+					ListKeyWords[j].TheNumberOfPatents++
+					InventorExist = true
+					ListKeyWords[j].PatentsId = append(ListKeyWords[j].PatentsId, listPatents[z].PatentId)
+					break
+				}
+			}
+			if !InventorExist {
+				NewPatents := make([]int, 0)
+				ListKeyWords = append(ListKeyWords, models.KeyWord{
+					Name:               keywordsList[z][i],
+					TheNumberOfPatents: 1,
+					PatentsId:          append(NewPatents, listPatents[z].PatentId),
+				})
+			}
+		}
+	}
+	//sort Inventors
+	sort.Slice(ListKeyWords, func(i, j int) bool {
+		if ListKeyWords[i].TheNumberOfPatents > ListKeyWords[j].TheNumberOfPatents {
+			return true
+		}
+		return false
+	})
+
+	//write the id to Inventors
+	for i := 0; i < len(ListKeyWords); i++ {
+		ListKeyWords[i].Id = i
+	}
+	//create Relations
+	NowKeyWordsNumbers := MinResult(MaxSimplifiedNodes, len(ListKeyWords))
+	ListRelations := make([]int, MaxSimplifiedNodes*MaxSimplifiedNodes)
+	for i := 0; i < NowKeyWordsNumbers; i++ {
+		for j := i; j < NowKeyWordsNumbers; j++ {
+			var count int
+			source := make(map[int]bool)
+			for _, OneOfPatentId := range ListKeyWords[i].PatentsId {
+				source[OneOfPatentId] = true
+
+			}
+			for _, OneOfPatentId := range ListKeyWords[j].PatentsId {
+				if _, ok := source[OneOfPatentId]; ok {
+					count++
+				}
+
+			}
+			ListRelations[i*(MaxSimplifiedNodes)+j] = count
+		}
+	}
+
+	//change preInventors to Inventors(delete preInventor->patents)
+	ListSimplifiedNodes := make([]models.SimplifiedNode, 0)
+	for _, i := range ListKeyWords {
+		NowInventor := models.SimplifiedNode{Id: i.Id, Name: i.Name, TheNumberOfPatents: i.TheNumberOfPatents}
+		ListSimplifiedNodes = append(ListSimplifiedNodes, NowInventor)
+	}
+	return ListSimplifiedNodes, ListRelations, nil
+}
+
+// FindKeyWords find the KeyWords from Sentence
+func FindKeyWords(Sentences []string) [][]string {
+	jieBa := gojieba.NewJieba()
+	Results := make([][]string, 0)
+	for _, s := range Sentences {
+		TagReturn := jieBa.Tag(s)
+		WordResult := make([]string, 0)
+		for _, word := range TagReturn {
+			nowWord := strings.Split(word, "/")
+			//fmt.Println(len(nowWord))
+			if len(nowWord[0]) > 6 {
+				WordResult = append(WordResult, nowWord[0])
+			}
+		}
+		Results = append(Results, WordResult)
+	}
+	return Results
 }
 
 // MinResult --------------------------------------------------------------------------------------------------------------------
