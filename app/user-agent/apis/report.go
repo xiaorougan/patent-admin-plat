@@ -148,7 +148,6 @@ func (e Report) InsertReport(c *gin.Context) {
 	req.CreateBy = user.GetUserId(c)
 	req.RejectTag = dtos.ApplyTag
 	req.Type = reqIn.Type
-	req.CreatedAt = reqIn.CreatedAt
 
 	err, f = s.InsertReport(&req, req.Type)
 	if err != nil {

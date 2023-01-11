@@ -2,6 +2,7 @@ package service
 
 import (
 	"errors"
+	"fmt"
 	log "github.com/go-admin-team/go-admin-core/logger"
 	"github.com/go-admin-team/go-admin-core/sdk/service"
 	"github.com/google/uuid"
@@ -21,6 +22,8 @@ import (
 type Report struct {
 	service.Service
 }
+
+const noveltyReportType = "novelty"
 
 // UserGetRepoById 获取Report对象
 func (e *Report) UserGetRepoById(id int, model *model.Report) error {
@@ -58,7 +61,6 @@ func (e *Report) InsertReport(c *dtos.ReportGetPageReq, typer string) (error, *m
 	}
 
 	c.Generate(&data)
-	data.CreatedAt = dtos.UpdateTime()
 	data.ReportName = typer + ".defaultName." + uuid.New().String()
 	err = e.Orm.Create(&data).Error
 	if err != nil {
@@ -111,7 +113,6 @@ func (e *Report) UpdateReport(c *dtos.ReportGetPageReq) error {
 		return errors.New("报告不存在")
 	}
 	c.Generate(&model)
-	model.UpdatedAt = dtos.UpdateTime()
 	update := e.Orm.Model(&model).Where("report_id = ?", &model.ReportId).Updates(&model)
 	if err = update.Error; err != nil {
 		e.Log.Errorf("db error: %s", err)
@@ -157,7 +158,7 @@ func (e *Report) UpdateReport(c *dtos.ReportGetPageReq) error {
 //}
 
 // GetNovelty 获取查新报告
-func (e *Report) GetNovelty(c *dto.NoveltyReportReq) (string, error) {
+func (e *Report) GetNovelty(c *dto.NoveltyReportReq) (*dto.NoveltyReportResp, error) {
 	query := report.GenQuery(c.KeyWords)
 
 	checkMap := make(map[string]*dto.PatentDetail)
@@ -172,7 +173,7 @@ func (e *Report) GetNovelty(c *dto.NoveltyReportReq) (string, error) {
 		}
 		checkListTemp, err := GetCurrentInnojoy().Search(searchReq, nil)
 		if err != nil {
-			return "", err
+			return nil, err
 		}
 		for _, res := range checkListTemp {
 			if _, ok := checkMap[res.Pnm]; !ok {
@@ -270,28 +271,38 @@ func (e *Report) GetNovelty(c *dto.NoveltyReportReq) (string, error) {
 	} else {
 		realteCount = len(checkList)
 	}
-	reportBase := report.NewNoveltyTemplate()
-	reportBase.Replace("$NUMBER", uuid.New().String()).
-		Replace("$DEPART_NAME", my_config.CurrentPatentConfig.NoveltyReportConfig.DepartName).
-		Replace("$CONTACT_ADDR", my_config.CurrentPatentConfig.NoveltyReportConfig.ContactAddr).
-		Replace("$ZIP_CODE", my_config.CurrentPatentConfig.NoveltyReportConfig.ZipCode).
-		Replace("$MANAGER_NAME", my_config.CurrentPatentConfig.NoveltyReportConfig.ManagerName).
-		Replace("$MANAGER_TEL", my_config.CurrentPatentConfig.NoveltyReportConfig.ManagerTel).
-		Replace("$CONTACT_NAME", my_config.CurrentPatentConfig.NoveltyReportConfig.ContactName).
-		Replace("$CONTACT_TEL", my_config.CurrentPatentConfig.NoveltyReportConfig.ContactTel).
-		Replace("$EMAIL", my_config.CurrentPatentConfig.NoveltyReportConfig.Email).
-		Replace("$DATABASE", my_config.CurrentPatentConfig.NoveltyReportConfig.DataBase).
-		Replace("$PATENT_NAME", c.Title).
-		Replace("$USER_NAME", c.Applicant).
-		Replace("$Institution", c.Org).
-		Replace("$FINISH_DATE", utils.FormatCurrentTime()).
-		Replace("$TECH_POINT", c.CL).
-		Replace("$QUERY_WORD", report.ToHtml(searchList)).
-		Replace("$QUERY_EXPRESSION", report.ToHtml(queryExpression)).
-		Replace("$RELATIVE_NUM", strconv.Itoa(realteCount)).
-		Replace("$VERY_RELATIVE_NUM", strconv.Itoa(closeCount-1)).
-		Replace("$SEARCH_RESULT", report.ToHtml(strings.Join(conclusion, "\n"))).
-		Replace("$CONCLUSION", report.ToHtml(retconc))
 
-	return reportBase.String(), nil
+	data := model.Report{
+		ReportName: fmt.Sprintf("%s 查新报告", c.Title),
+		Type:       noveltyReportType,
+	}
+	err := e.Orm.Create(&data).Error
+	if err != nil {
+		e.Log.Errorf("db error: %s", err)
+		return nil, err
+	}
+
+	return &dto.NoveltyReportResp{
+		Number:          uuid.New().String(),
+		DepartName:      my_config.CurrentPatentConfig.NoveltyReportConfig.DepartName,
+		ContactAddr:     my_config.CurrentPatentConfig.NoveltyReportConfig.ContactAddr,
+		ZipCode:         my_config.CurrentPatentConfig.NoveltyReportConfig.ZipCode,
+		ManagerName:     my_config.CurrentPatentConfig.NoveltyReportConfig.ManagerName,
+		ManagerTel:      my_config.CurrentPatentConfig.NoveltyReportConfig.ManagerTel,
+		ContactName:     my_config.CurrentPatentConfig.NoveltyReportConfig.ContactName,
+		ContactTel:      my_config.CurrentPatentConfig.NoveltyReportConfig.ContactTel,
+		Email:           my_config.CurrentPatentConfig.NoveltyReportConfig.Email,
+		Database:        my_config.CurrentPatentConfig.NoveltyReportConfig.DataBase,
+		PatentName:      c.Title,
+		UserName:        c.Applicant,
+		Institution:     c.Org,
+		FinishData:      utils.FormatCurrentTime(),
+		TechPoint:       c.CL,
+		QueryWord:       searchList,
+		QueryExpression: queryExpression,
+		RelativeNum:     strconv.Itoa(realteCount),
+		VeryRelativeNum: strconv.Itoa(closeCount - 1),
+		SearchResult:    strings.Join(conclusion, "\n"),
+		Conclusion:      retconc,
+	}, nil
 }

@@ -159,7 +159,6 @@ func (e *Report) UpdateReports(c *dtos.ReportGetPageReq) error {
 
 	}
 	c.GenerateNoneFile(&model)
-	model.UpdatedAt = dtos.UpdateTime()
 	update := e.Orm.Model(&model).Where("report_id = ?", &model.ReportId).Updates(&model)
 	if err = update.Error; err != nil {
 		e.Log.Errorf("db error: %s", err)
@@ -195,7 +194,6 @@ func (e *Report) UploadReport(c *dtos.ReportGetPageReq) error {
 		c.Generate(&model)
 	}
 
-	model.UpdatedAt = dtos.UpdateTime()
 	update := e.Orm.Model(&model).Where("report_id = ?", &model.ReportId).Updates(&model)
 
 	if err = update.Error; err != nil {

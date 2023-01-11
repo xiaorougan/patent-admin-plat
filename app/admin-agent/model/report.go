@@ -11,9 +11,8 @@ type Report struct {
 	Type             string `json:"Type" gorm:"size:64;comment:报告类型（侵权/估值）"`
 	RejectTag        string `json:"rejectTag" gorm:"size:8;comment:驳回标签(null:未审核/reject/upload)"`
 	models.ControlBy
-	CreatedAt string `json:"CreatedAt" gorm:"comment:创建时间"`
-	UpdatedAt string `json:"UpdatedAt" gorm:"comment:最后更新时间"`
-	Files     string `json:"files" comment:"报告文件"`
+	models.ModelTime
+	Files string `json:"files" comment:"报告文件"`
 }
 
 func (Report) TableName() string {
