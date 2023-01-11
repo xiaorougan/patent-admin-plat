@@ -22,6 +22,7 @@ type Patent struct {
 
 // MaxSimplifiedNodes is package relation graph max inventors included
 const MaxSimplifiedNodes = 200
+const priceBase = 8000
 
 // GetPage 获取Patent列表
 func (e *Patent) GetPage(c *dto.PatentReq, list *[]models.Patent, count *int64) error {
@@ -38,29 +39,38 @@ func (e *Patent) GetPage(c *dto.PatentReq, list *[]models.Patent, count *int64) 
 }
 
 // GetPageByIds 通过Id数组获取Patent对象列表
-func (e *Patent) GetPageByIds(d *dto.PatentsIds, list *[]models.Patent, count *int64) error {
+func (e *Patent) GetPageByIds(d *dto.PatentsIds, count *int64) ([]models.Patent, error) {
 	var err error
 	var ids []int = d.GetPatentId()
+	res := make([]models.Patent, 0, len(ids))
 	for i := 0; i < len(ids); i++ {
 		if ids[i] != 0 {
-			var data1 models.Patent
-			err = e.Orm.Model(&data1).
+			var patentData models.Patent
+			err = e.Orm.Model(&patentData).
 				Where("Patent_Id = ? ", ids[i]).
-				First(&data1).Limit(-1).Offset(-1).
+				First(&patentData).Limit(-1).Offset(-1).
 				Count(count).Error
-			*list = append(*list, data1)
+
 			if err != nil {
 				e.Log.Errorf("db error:%s", err)
-				return err
+				return nil, err
 			}
+
+			pd := dto.PatentDetail{}
+			err = json.Unmarshal([]byte(patentData.PatentProperties), &pd)
+			if err != nil {
+				return nil, err
+			}
+			patentData.Price = pd.Idx * priceBase
+
+			res = append(res, patentData)
 		}
 	}
-
 	if err != nil {
 		e.Log.Errorf("db error:%s", err)
-		return err
+		return nil, err
 	}
-	return nil
+	return res, nil
 }
 
 // GetInventorPageByIds 通过Id数组获取Patent对象列表

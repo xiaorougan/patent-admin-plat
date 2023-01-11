@@ -20,7 +20,7 @@ const (
 	searchUrl    = "http://www.innojoy.com/service/patentSearch.aspx"
 	statisticUrl = "http://www.innojoy.com/service/patentStat.aspx"
 
-	searchListFields     = "TI,AN,AD,PNM,PD,PA,PINN,CL,CD,AR,CLS,INN,ABST"
+	searchListFields     = "TI,AN,AD,PNM,PD,PA,PINN,CL,CD,AR,CLS,INN,ABST,IDX"
 	searchFullTextFields = "TI,AN,AD,PNM,PD,PA,PINN,CL,CD,AR,CLS,ABST,ABSTEN,CLM,DESCR"
 	searchSortBy         = "-公开（公告）日,公开（公告）号"
 

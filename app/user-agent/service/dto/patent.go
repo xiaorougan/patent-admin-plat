@@ -3,39 +3,11 @@ package dto
 import (
 	"encoding/json"
 	"go-admin/app/user-agent/models"
-	"go-admin/common/dto"
 	common "go-admin/common/models"
 )
 
-type PatentGetPageReq struct {
-	PatentId       int    `form:"patentId" search:"type:exact;column:PatentId;table:patent;primaryKey;" comment:"专利ID"`
-	TI             string `form:"TI" search:"type:exact;column:TI;table:patent" comment:"专利名"`
-	PNM            string `form:"PNM" search:"type:exact;column:PNN;table:patent" comment:"申请号"`
-	AD             string `form:"AD" search:"type:exact;column:AD;table:patent" comment:"申请日"`
-	PD             string `form:"PD" search:"type:exact;column:PD;table:patent" comment:"公开日"`
-	CL             string `form:"CL" search:"type:exact;column:CL;table:patent" comment:"简介"`
-	PA             string `form:"PA" search:"type:exact;column:PA;table:patent" comment:"申请单位"`
-	AR             string `form:"AR" search:"type:exact;column:AR;table:patent" comment:"地址"`
-	PINN           string `form:"PINN" search:"type:exact;column:PINN;table:patent" comment:"申请人"`
-	CLS            string `json:"CLS" gorm:"size:128;comment:法律状态"`
-	CLM            string `json:"CLM" gorm:"comment:权利要求书"`
-	dto.Pagination `search:"-"`
-	PatentOrder
-}
-
-func (PatentGetPageReq) TableName() string {
-	return "patent"
-}
-
 type PatentOrder struct {
 	CreatedAtOrder string `search:"type:order;column:created_at;table:patent" form:"createdAtOrder"`
-}
-
-func (m *PatentGetPageReq) GetNeedSearch() interface{} {
-	return *m
-}
-func (m *PatentGetPageReq) GetPatentId() interface{} {
-	return m.PatentId
 }
 
 type PatentReq struct {
@@ -50,6 +22,7 @@ type PatentReq struct {
 	PINN     string `json:"PINN" gorm:"size:128;comment:主发明人"`
 	CLS      string `json:"CLS" gorm:"size:128;comment:法律状态"`
 	INN      string `json:"INN" gorm:"size:128;comment:发明人"`
+	IDX      int    `json:"IDX" gorm:"size:128;comment:价值指数"`
 	Desc     string `json:"desc" gorm:"size:128;comment:描述"`
 	common.ControlBy
 }

@@ -239,7 +239,6 @@ func (e Patent) GetUserPatentsPages(c *gin.Context) {
 	//数据权限检查
 	//p := actions.GetPermissionFromContext(c)
 	list := make([]models.UserPatent, 0)
-	list1 := make([]models.Patent, 0)
 
 	var count int64
 
@@ -262,15 +261,13 @@ func (e Patent) GetUserPatentsPages(c *gin.Context) {
 		req1.PatentIds[i] = list[i].PatentId
 	}
 
-	err = s1.GetPageByIds(&req1, &list1, &count2)
-
-	fmt.Println(list1)
-
+	res, err := s1.GetPageByIds(&req1, &count2)
 	if err != nil {
 		e.Error(500, err, "查询失败")
 		return
 	}
-	e.OK(list1, "查询成功")
+
+	e.OK(res, "查询成功")
 }
 
 // ClaimPatent
@@ -438,11 +435,11 @@ func (e Patent) GetFocusPages(c *gin.Context) {
 	//数据权限检查
 	//p := actions.GetPermissionFromContext(c)
 	list := make([]models.UserPatent, 0)
-	list1 := make([]models.Patent, 0)
+	res := make([]models.Patent, 0)
 	var count int64
 	err = s.GetFocusLists(&req, &list, &count)
 	if err != nil {
-		e.Error(500, err, "查询失败")
+		e.Error(500, err, err.Error())
 		return
 	}
 	var count2 int64
@@ -455,17 +452,17 @@ func (e Patent) GetFocusPages(c *gin.Context) {
 	for i := 0; i < len(list); i++ {
 		req1.PatentIds[i] = list[i].PatentId
 	}
-	err = s1.GetPageByIds(&req1, &list1, &count2)
+	res, err = s1.GetPageByIds(&req1, &count2)
 	if err != nil {
-		e.Error(500, err, "查询失败")
+		e.Error(500, err, err.Error())
 		return
 	}
 
-	for i := range list1 {
-		list1[i].Desc = list[i].Desc
+	for i := range res {
+		res[i].Desc = list[i].Desc
 	}
 
-	e.OK(list1, "查询成功")
+	e.OK(res, "查询成功")
 }
 
 // GetClaimPages
@@ -496,13 +493,12 @@ func (e Patent) GetClaimPages(c *gin.Context) {
 		return
 	}
 	list := make([]models.UserPatent, 0)
-	list1 := make([]models.Patent, 0)
 
 	var count int64
 	err = s.GetClaimLists(&req, &list, &count)
 
 	if err != nil {
-		e.Error(500, err, "查询失败")
+		e.Error(500, err, err.Error())
 		return
 	}
 
@@ -525,18 +521,18 @@ func (e Patent) GetClaimPages(c *gin.Context) {
 		req1.PatentIds[i] = list[i].PatentId
 	}
 
-	err = s1.GetPageByIds(&req1, &list1, &count2)
+	res, err := s1.GetPageByIds(&req1, &count2)
 
 	if err != nil {
-		e.Error(500, err, "查询失败")
+		e.Error(500, err, err.Error())
 		return
 	}
 
-	for i := range list1 {
-		list1[i].Desc = list[i].Desc
+	for i := range res {
+		res[i].Desc = list[i].Desc
 	}
 
-	e.OK(list1, "查询成功")
+	e.OK(res, "查询成功")
 }
 
 // DeleteFocus
@@ -878,7 +874,6 @@ func (e Patent) GetPatent(c *gin.Context) {
 	//p := actions.GetPermissionFromContext(c)
 
 	list := make([]models.PatentTag, 0)
-	list1 := make([]models.Patent, 0)
 	var count int64
 
 	err = s.GetPatentIdByTagId(&req, &list, &count)
@@ -902,12 +897,12 @@ func (e Patent) GetPatent(c *gin.Context) {
 		req1.PatentIds[i] = list[i].PatentId
 	}
 
-	err = s1.GetPageByIds(&req1, &list1, &count2)
+	res, err := s1.GetPageByIds(&req1, &count2)
 	if err != nil {
 		e.Error(500, err, "查询失败")
 		return
 	}
-	e.OK(list1, "查询成功")
+	e.OK(res, "查询成功")
 
 }
 
@@ -1012,12 +1007,11 @@ func (e Patent) GetRelationGraphByFocus(c *gin.Context) {
 	for i := 0; i < len(upList); i++ {
 		reqp.PatentIds[i] = upList[i].PatentId
 	}
-	listp := make([]models.Patent, 0)
 	err = e.MakeContext(c).
 		MakeOrm().
 		MakeService(&sp.Service).
 		Errors
-	err = sp.GetPageByIds(&reqp, &listp, &count)
+	listp, err := sp.GetPageByIds(&reqp, &count)
 	if err != nil {
 		e.Logger.Error(err)
 		return
@@ -1065,12 +1059,11 @@ func (e Patent) GetTechGraphByFocus(c *gin.Context) {
 	for i := 0; i < len(upList); i++ {
 		reqp.PatentIds[i] = upList[i].PatentId
 	}
-	listp := make([]models.Patent, 0)
 	err = e.MakeContext(c).
 		MakeOrm().
 		MakeService(&sp.Service).
 		Errors
-	err = sp.GetPageByIds(&reqp, &listp, &count)
+	listp, err := sp.GetPageByIds(&reqp, &count)
 	if err != nil {
 		e.Logger.Error(err)
 		return
