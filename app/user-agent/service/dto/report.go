@@ -21,7 +21,7 @@ type NoveltyReportResp struct {
 	Database        string `json:"DATABASE"`
 	PatentName      string `json:"PATENT_NAME"`
 	UserName        string `json:"USER_NAME"`
-	Institution     string `json:"Institution"`
+	Institution     string `json:"INSTITUTION"`
 	FinishData      string `json:"FINISH_DATE"`
 	TechPoint       string `json:"TECH_POINT"`
 	QueryWord       string `json:"QUERY_WORD"`
