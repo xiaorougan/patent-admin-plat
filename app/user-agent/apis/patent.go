@@ -460,6 +460,11 @@ func (e Patent) GetFocusPages(c *gin.Context) {
 		e.Error(500, err, "查询失败")
 		return
 	}
+
+	for i := range list1 {
+		list1[i].Desc = list[i].Desc
+	}
+
 	e.OK(list1, "查询成功")
 }
 
@@ -525,6 +530,10 @@ func (e Patent) GetClaimPages(c *gin.Context) {
 	if err != nil {
 		e.Error(500, err, "查询失败")
 		return
+	}
+
+	for i := range list1 {
+		list1[i].Desc = list[i].Desc
 	}
 
 	e.OK(list1, "查询成功")

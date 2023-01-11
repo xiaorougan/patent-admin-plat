@@ -309,6 +309,11 @@ func (e Package) GetPackagePatents(c *gin.Context) {
 		e.Error(500, err, "查询失败")
 		return
 	}
+
+	for i := range list1 {
+		list1[i].Desc = list[i].Desc
+	}
+
 	e.PageOK(list1, int(count2), req.GetPageIndex(), req.GetPageSize(), "查询成功")
 
 }
