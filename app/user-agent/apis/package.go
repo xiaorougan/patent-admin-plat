@@ -278,13 +278,14 @@ func (e Package) GetPackagePatents(c *gin.Context) {
 	//数据权限检查
 	//p := actions.GetPermissionFromContext(c)
 
-	list := make([]models.PatentPackage, 0)
+	var list []models.PatentPackage
 	var count int64
 
 	err = s.GetPatentIdByPackageId(&req, &list, &count)
 
 	if err != nil {
-		e.Error(500, err, "查询失败")
+		e.Logger.Error(err)
+		e.Error(500, err, err.Error())
 		return
 	}
 
@@ -300,14 +301,14 @@ func (e Package) GetPackagePatents(c *gin.Context) {
 		return
 	}
 
-	ids := make([]int, 0, len(list))
+	ids := make([]int, len(list))
 	for i := 0; i < len(list); i++ {
 		ids[i] = list[i].PatentId
 	}
 
 	res, err := s1.GetPageByIds(ids, &count2)
 	if err != nil {
-		e.Error(500, err, "查询失败")
+		e.Error(500, err, err.Error())
 		return
 	}
 
