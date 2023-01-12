@@ -23,6 +23,9 @@ type Patent struct {
 // MaxSimplifiedNodes is package relation graph max inventors included
 const MaxSimplifiedNodes = 200
 
+// Some useless Words of Patent
+const uselessWords = "本发明"
+
 // GetPage 获取Patent列表
 func (e *Patent) GetPage(c *dto.PatentReq, list *[]models.Patent, count *int64) error {
 	var err error
@@ -452,18 +455,20 @@ func (e *Patent) FindKeywordsAndRelationsFromPatents(listPatents []models.Patent
 		if err := json.Unmarshal([]byte(p.PatentProperties), &patentDetail); err != nil {
 			return nil, nil, err
 		}
-		TiOfPatentsList = append(TiOfPatentsList, patentDetail.Ti)
+		TiOfPatentsList = append(TiOfPatentsList, patentDetail.Ti+patentDetail.Abst)
 	}
 	keywordsList := FindKeyWords(TiOfPatentsList)
 	for z := 0; z < len(listPatents); z++ {
 		for i := 0; i < len(keywordsList[z]); i++ {
 			InventorExist := false
 			for j := 0; j < len(ListKeyWords); j++ {
-				if ListKeyWords[j].Name == keywordsList[z][i] && ListKeyWords[j].PatentsId[len(ListKeyWords[j].PatentsId)-1] != listPatents[z].PatentId {
-					ListKeyWords[j].TheNumberOfPatents++
+				if ListKeyWords[j].Name == keywordsList[z][i] {
 					InventorExist = true
-					ListKeyWords[j].PatentsId = append(ListKeyWords[j].PatentsId, listPatents[z].PatentId)
-					break
+					if ListKeyWords[j].PatentsId[len(ListKeyWords[j].PatentsId)-1] != listPatents[z].PatentId {
+						ListKeyWords[j].TheNumberOfPatents++
+						ListKeyWords[j].PatentsId = append(ListKeyWords[j].PatentsId, listPatents[z].PatentId)
+						break
+					}
 				}
 			}
 			if !InventorExist {
@@ -527,8 +532,7 @@ func FindKeyWords(Sentences []string) [][]string {
 		WordResult := make([]string, 0)
 		for _, word := range TagReturn {
 			nowWord := strings.Split(word, "/")
-			//fmt.Println(len(nowWord))
-			if len(nowWord[0]) > 6 {
+			if len(nowWord[0]) > 6 && nowWord[0] != uselessWords && nowWord[1][0] == 'n' {
 				WordResult = append(WordResult, nowWord[0])
 			}
 		}

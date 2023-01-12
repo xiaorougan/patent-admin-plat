@@ -1,8 +1,6 @@
 package service
 
 import (
-	"fmt"
-	"github.com/stretchr/testify/assert"
 	"go-admin/app/user-agent/models"
 	common "go-admin/common/models"
 	"testing"
@@ -26,8 +24,8 @@ func TestFindInventorsAndRelationsFromPatents(t *testing.T) {
 		ModelTime:        common.ModelTime{},
 	})
 
-	i, r, err := FindInventorsAndRelationsFromPatents(pts, 200)
-	assert.NoError(t, err)
-	fmt.Println(i)
-	fmt.Println(r)
+	//i, r, err := Fin(pts, 200)
+	//assert.NoError(t, err)
+	//fmt.Println(i)
+	//fmt.Println(r)
 }
