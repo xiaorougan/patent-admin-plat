@@ -977,7 +977,7 @@ func (e Patent) GetTags(c *gin.Context) {
 // GetRelationGraphByFocus
 // @Summary 获取关注专利的关系图谱
 // @Description  获取关注专利的关系图谱
-// @Tags 专利包
+// @Tags 专利表
 // @Router /api/v1/user-agent/patent/focus/graph/relation [get]
 // @Security Bearer
 func (e Patent) GetRelationGraphByFocus(c *gin.Context) {
@@ -1034,7 +1034,7 @@ func (e Patent) GetRelationGraphByFocus(c *gin.Context) {
 // GetTechGraphByFocus
 // @Summary 获取关注专利的技术图谱
 // @Description  获取关注专利的技术图谱
-// @Tags 专利包
+// @Tags 专利表
 // @Router /api/v1/user-agent/patent/focus/graph/tech [get]
 // @Security Bearer
 func (e Patent) GetTechGraphByFocus(c *gin.Context) {
