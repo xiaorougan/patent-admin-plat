@@ -43,6 +43,22 @@ func (e *UserPatent) GetClaimLists(c *dto.UserPatentObject, list *[]models.UserP
 	return nil
 }
 
+// GetClaimCount 通过专利列表的ID数组获得认领专利数量
+func (e *UserPatent) GetClaimCount(c *dto.UserPatentObject, count *int64) error {
+	var err error
+	var data models.UserPatent
+	err = e.Orm.Model(&data).
+		Where("Type = ? AND User_Id = ?", dto.ClaimType, c.UserId).
+		Count(count).Error
+
+	if err != nil {
+		e.Log.Errorf("db error:%s", err)
+		return err
+	}
+
+	return nil
+}
+
 // GetFocusLists 通过专利列表的ID数组获得关注专利列表
 func (e *UserPatent) GetFocusLists(c *dto.UserPatentObject, list *[]models.UserPatent, count *int64) error {
 	var err error
@@ -50,6 +66,20 @@ func (e *UserPatent) GetFocusLists(c *dto.UserPatentObject, list *[]models.UserP
 	err = e.Orm.Model(&data).
 		Where("Type = ? AND User_Id = ?", dto.FocusType, c.UserId).
 		Find(list).Limit(-1).Offset(-1).
+		Count(count).Error
+	if err != nil {
+		e.Log.Errorf("db error:%s", err)
+		return err
+	}
+	return nil
+}
+
+// GetFocusCount 通过专利列表的ID数组获得关注专利数量
+func (e *UserPatent) GetFocusCount(c *dto.UserPatentObject, count *int64) error {
+	var err error
+	var data models.UserPatent
+	err = e.Orm.Model(&data).
+		Where("Type = ? AND User_Id = ?", dto.FocusType, c.UserId).
 		Count(count).Error
 	if err != nil {
 		e.Log.Errorf("db error:%s", err)
@@ -130,24 +160,24 @@ func (e *UserPatent) InsertUserPatent(c *dto.UserPatentObject) error {
 	return nil
 }
 
-func (e *UserPatent) UpdateUserPatentDesc(c *dto.PatentDescReq) error {
+func (e *UserPatent) UpdateUserPatentDesc(c *dto.UserPatentObject) error {
 	var err error
 	var data models.UserPatent
 	var i int64
-	err = e.Orm.Model(&data).Where("PNM = ? AND User_Id = ?", c.PNM, c.UserId).
+	err = e.Orm.Model(&data).Where("PNM = ? AND User_Id = ? AND Type = ?", c.PNM, c.UserId, c.Type).
 		Count(&i).Error
 	if err != nil {
 		e.Log.Errorf("db error: %s", err)
 		return err
 	}
 	if i == 0 {
-		err = fmt.Errorf("%w, (PNM:%s, u:%d) not existed", ErrCanNotUpdate, c.PNM, c.UserId)
+		err = fmt.Errorf("%w, (PNM:%s, user_id:%d, type: %s) not existed", ErrCanNotUpdate, c.PNM, c.UserId, c.Type)
 		e.Log.Errorf("db error: %s", err)
 		return err
 	}
 
 	c.GenerateUserPatent(&data)
-	update := e.Orm.Model(&data).Where("PNM = ? AND User_Id = ?", c.PNM, c.UserId).Updates(&data)
+	update := e.Orm.Model(&data).Where("PNM = ? AND User_Id = ? AND Type = ?", c.PNM, c.UserId, c.Type).Updates(&data)
 	if err = update.Error; err != nil {
 		e.Log.Errorf("db error: %s", err)
 		return err

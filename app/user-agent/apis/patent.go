@@ -221,7 +221,6 @@ func (e Patent) GetUserPatentsPages(c *gin.Context) {
 	s := service.UserPatent{}
 	s1 := service.Patent{}
 	req := dto.UserPatentObject{}
-	req1 := dto.PatentsIds{}
 
 	req.UserId = user.GetUserId(c)
 
@@ -230,47 +229,42 @@ func (e Patent) GetUserPatentsPages(c *gin.Context) {
 		Bind(&req).
 		MakeService(&s.Service).
 		Errors
-
 	if err != nil {
 		e.Logger.Error(err)
 		e.Error(500, err, err.Error())
 		return
 	}
-	//数据权限检查
-	//p := actions.GetPermissionFromContext(c)
+
 	list := make([]models.UserPatent, 0)
-	list1 := make([]models.Patent, 0)
 
 	var count int64
 
 	err = s.GetUserPatentIds(&req, &list, &count)
-
 	if err != nil {
-		e.Error(500, err, "查询失败")
+		e.Logger.Error(err)
+		e.Error(500, err, err.Error())
 		return
 	}
 
 	var count2 int64
 	err = e.MakeContext(c).
 		MakeOrm().
-		Bind(&req1).
 		MakeService(&s.Service).
 		Errors
 
-	req1.PatentIds = make([]int, len(list))
+	ids := make([]int, len(list))
 	for i := 0; i < len(list); i++ {
-		req1.PatentIds[i] = list[i].PatentId
+		ids[i] = list[i].PatentId
 	}
 
-	err = s1.GetPageByIds(&req1, &list1, &count2)
-
-	fmt.Println(list1)
-
+	res, err := s1.GetPageByIds(ids, &count2)
 	if err != nil {
-		e.Error(500, err, "查询失败")
+		e.Logger.Error(err)
+		e.Error(500, err, err.Error())
 		return
 	}
-	e.OK(list1, "查询成功")
+
+	e.OK(res, "查询成功")
 }
 
 // ClaimPatent
@@ -422,7 +416,6 @@ func (e Patent) GetFocusPages(c *gin.Context) {
 	s1 := service.Patent{}
 	req := dto.UserPatentObject{}
 	req.UserId = user.GetUserId(c)
-	req1 := dto.PatentsIds{}
 
 	err := e.MakeContext(c).
 		MakeOrm().
@@ -438,29 +431,40 @@ func (e Patent) GetFocusPages(c *gin.Context) {
 	//数据权限检查
 	//p := actions.GetPermissionFromContext(c)
 	list := make([]models.UserPatent, 0)
-	list1 := make([]models.Patent, 0)
+	res := make([]models.Patent, 0)
 	var count int64
 	err = s.GetFocusLists(&req, &list, &count)
 	if err != nil {
-		e.Error(500, err, "查询失败")
+		e.Error(500, err, err.Error())
 		return
 	}
 	var count2 int64
 	err = e.MakeContext(c).
 		MakeOrm().
-		Bind(&req1).
 		MakeService(&s1.Service).
 		Errors
-	req1.PatentIds = make([]int, len(list))
-	for i := 0; i < len(list); i++ {
-		req1.PatentIds[i] = list[i].PatentId
-	}
-	err = s1.GetPageByIds(&req1, &list1, &count2)
 	if err != nil {
-		e.Error(500, err, "查询失败")
+		e.Logger.Error(err)
+		e.Error(500, err, err.Error())
 		return
 	}
-	e.OK(list1, "查询成功")
+
+	ids := make([]int, len(list))
+	for i := 0; i < len(list); i++ {
+		ids[i] = list[i].PatentId
+	}
+	res, err = s1.GetPageByIds(ids, &count2)
+	if err != nil {
+		e.Logger.Error(err)
+		e.Error(500, err, err.Error())
+		return
+	}
+
+	for i := range res {
+		res[i].Desc = list[i].Desc
+	}
+
+	e.OK(res, "查询成功")
 }
 
 // GetClaimPages
@@ -475,7 +479,6 @@ func (e Patent) GetClaimPages(c *gin.Context) {
 	s := service.UserPatent{}
 	s1 := service.Patent{}
 	req := dto.UserPatentObject{} //被绑定的数据
-	req1 := dto.PatentsIds{}
 
 	req.UserId = user.GetUserId(c)
 
@@ -491,13 +494,12 @@ func (e Patent) GetClaimPages(c *gin.Context) {
 		return
 	}
 	list := make([]models.UserPatent, 0)
-	list1 := make([]models.Patent, 0)
 
 	var count int64
 	err = s.GetClaimLists(&req, &list, &count)
 
 	if err != nil {
-		e.Error(500, err, "查询失败")
+		e.Error(500, err, err.Error())
 		return
 	}
 
@@ -505,7 +507,6 @@ func (e Patent) GetClaimPages(c *gin.Context) {
 
 	err = e.MakeContext(c).
 		MakeOrm().
-		Bind(&req1).
 		MakeService(&s1.Service).
 		Errors
 	if err != nil {
@@ -514,20 +515,24 @@ func (e Patent) GetClaimPages(c *gin.Context) {
 		return
 	}
 
-	req1.PatentIds = make([]int, len(list))
+	ids := make([]int, len(list))
 
 	for i := 0; i < len(list); i++ {
-		req1.PatentIds[i] = list[i].PatentId
+		ids[i] = list[i].PatentId
 	}
 
-	err = s1.GetPageByIds(&req1, &list1, &count2)
-
+	res, err := s1.GetPageByIds(ids, &count2)
 	if err != nil {
-		e.Error(500, err, "查询失败")
+		e.Logger.Error(err)
+		e.Error(500, err, err.Error())
 		return
 	}
 
-	e.OK(list1, "查询成功")
+	for i := range res {
+		res[i].Desc = list[i].Desc
+	}
+
+	e.OK(res, "查询成功")
 }
 
 // DeleteFocus
@@ -614,21 +619,21 @@ func (e Patent) DeleteClaim(c *gin.Context) {
 	e.OK(req, "取消认领成功")
 }
 
-// UpdateUserPatentDesc
-// @Summary 更新认领/关注专利备注
-// @Description  更新认领/关注专利备注
+// UpdateClaimDesc
+// @Summary 更新认领专利备注
+// @Description  更新认领专利备注
 // @Tags 专利表
 // @Param data body dto.PatentDescReq true "专利描述"
-// @Router /api/v1/user-agent/patent/{PNM}/desc [put]
+// @Router /api/v1/user-agent/patent/claim/{PNM}/desc [put]
 // @Security Bearer
-func (e Patent) UpdateUserPatentDesc(c *gin.Context) {
+func (e Patent) UpdateClaimDesc(c *gin.Context) {
 	s := service.UserPatent{}
-	req := dto.PatentDescReq{}
+	req := dto.NewEmptyClaim()
 	req.UserId = user.GetUserId(c)
 	req.SetUpdateBy(user.GetUserId(c))
 	err := e.MakeContext(c).
 		MakeOrm().
-		Bind(&req).
+		Bind(req).
 		MakeService(&s.Service).
 		Errors
 
@@ -647,7 +652,50 @@ func (e Patent) UpdateUserPatentDesc(c *gin.Context) {
 	}
 	req.PNM = PNM
 
-	err = s.UpdateUserPatentDesc(&req)
+	err = s.UpdateUserPatentDesc(req)
+
+	if err != nil {
+		e.Logger.Error(err)
+		e.Error(500, err, err.Error())
+		return
+	}
+	e.OK(req, "更新成功")
+}
+
+// UpdateFocusDesc
+// @Summary 更新认领专利备注
+// @Description  更新认领专利备注
+// @Tags 专利表
+// @Param data body dto.PatentDescReq true "专利描述"
+// @Router /api/v1/user-agent/patent/focus/{PNM}/desc [put]
+// @Security Bearer
+func (e Patent) UpdateFocusDesc(c *gin.Context) {
+	s := service.UserPatent{}
+	req := dto.NewEmptyFocus()
+	req.UserId = user.GetUserId(c)
+	req.SetUpdateBy(user.GetUserId(c))
+	err := e.MakeContext(c).
+		MakeOrm().
+		Bind(req).
+		MakeService(&s.Service).
+		Errors
+
+	if err != nil {
+		e.Logger.Error(err)
+		e.Error(500, err, err.Error())
+		return
+	}
+
+	PNM := c.Param("PNM")
+	if len(PNM) == 0 {
+		err = fmt.Errorf("PNM should be provided in path")
+		e.Logger.Error(err)
+		e.Error(500, err, err.Error())
+		return
+	}
+	req.PNM = PNM
+
+	err = s.UpdateUserPatentDesc(req)
 
 	if err != nil {
 		e.Logger.Error(err)
@@ -800,7 +848,6 @@ func (e Patent) GetPatent(c *gin.Context) {
 	s := service.PatentTag{}
 	s1 := service.Patent{}
 	req := dto.PatentTagGetPageReq{}
-	req1 := dto.PatentsIds{}
 
 	err := e.MakeContext(c).
 		MakeOrm().
@@ -815,7 +862,6 @@ func (e Patent) GetPatent(c *gin.Context) {
 	}
 
 	req.TagId, err = strconv.Atoi(c.Param("tag_id"))
-
 	if err != nil {
 		e.Logger.Error(err)
 		e.Error(500, err, err.Error())
@@ -826,13 +872,12 @@ func (e Patent) GetPatent(c *gin.Context) {
 	//p := actions.GetPermissionFromContext(c)
 
 	list := make([]models.PatentTag, 0)
-	list1 := make([]models.Patent, 0)
 	var count int64
 
 	err = s.GetPatentIdByTagId(&req, &list, &count)
-
 	if err != nil {
-		e.Error(500, err, "查询失败")
+		e.Logger.Error(err)
+		e.Error(500, err, err.Error())
 		return
 	}
 
@@ -840,22 +885,21 @@ func (e Patent) GetPatent(c *gin.Context) {
 
 	err = e.MakeContext(c).
 		MakeOrm().
-		Bind(&req1).
 		MakeService(&s.Service).
 		Errors
 
-	req1.PatentIds = make([]int, len(list))
-
+	ids := make([]int, len(list))
 	for i := 0; i < len(list); i++ {
-		req1.PatentIds[i] = list[i].PatentId
+		ids[i] = list[i].PatentId
 	}
 
-	err = s1.GetPageByIds(&req1, &list1, &count2)
+	res, err := s1.GetPageByIds(ids, &count2)
 	if err != nil {
-		e.Error(500, err, "查询失败")
+		e.Logger.Error(err)
+		e.Error(500, err, err.Error())
 		return
 	}
-	e.OK(list1, "查询成功")
+	e.OK(res, "查询成功")
 
 }
 
@@ -933,12 +977,11 @@ func (e Patent) GetTags(c *gin.Context) {
 // GetRelationGraphByFocus
 // @Summary 获取关注专利的关系图谱
 // @Description  获取关注专利的关系图谱
-// @Tags 专利包
+// @Tags 专利表
 // @Router /api/v1/user-agent/patent/focus/graph/relation [get]
 // @Security Bearer
 func (e Patent) GetRelationGraphByFocus(c *gin.Context) {
 	sp := service.Patent{}
-	reqp := dto.PatentsIds{}
 	sup := service.UserPatent{}
 	upDto := dto.UserPatentObject{}
 	InventorGraph := models.Graph{}
@@ -956,16 +999,21 @@ func (e Patent) GetRelationGraphByFocus(c *gin.Context) {
 	}
 	upDto.UserId = user.GetUserId(c)
 	err = sup.GetFocusLists(&upDto, &upList, &count)
-	reqp.PatentIds = make([]int, len(upList))
-	for i := 0; i < len(upList); i++ {
-		reqp.PatentIds[i] = upList[i].PatentId
+	if err != nil {
+		e.Logger.Error(err)
+		e.Error(500, err, err.Error())
+		return
 	}
-	listp := make([]models.Patent, 0)
+
+	ids := make([]int, len(upList))
+	for i := 0; i < len(upList); i++ {
+		ids[i] = upList[i].PatentId
+	}
 	err = e.MakeContext(c).
 		MakeOrm().
 		MakeService(&sp.Service).
 		Errors
-	err = sp.GetPageByIds(&reqp, &listp, &count)
+	listp, err := sp.GetPageByIds(ids, &count)
 	if err != nil {
 		e.Logger.Error(err)
 		return
@@ -986,12 +1034,11 @@ func (e Patent) GetRelationGraphByFocus(c *gin.Context) {
 // GetTechGraphByFocus
 // @Summary 获取关注专利的技术图谱
 // @Description  获取关注专利的技术图谱
-// @Tags 专利包
+// @Tags 专利表
 // @Router /api/v1/user-agent/patent/focus/graph/tech [get]
 // @Security Bearer
 func (e Patent) GetTechGraphByFocus(c *gin.Context) {
 	sp := service.Patent{}
-	reqp := dto.PatentsIds{}
 	sup := service.UserPatent{}
 	upDto := dto.UserPatentObject{}
 	InventorGraph := models.Graph{}
@@ -1009,16 +1056,21 @@ func (e Patent) GetTechGraphByFocus(c *gin.Context) {
 	}
 	upDto.UserId = user.GetUserId(c)
 	err = sup.GetFocusLists(&upDto, &upList, &count)
-	reqp.PatentIds = make([]int, len(upList))
-	for i := 0; i < len(upList); i++ {
-		reqp.PatentIds[i] = upList[i].PatentId
+	if err != nil {
+		e.Logger.Error(err)
+		e.Error(500, err, err.Error())
+		return
 	}
-	listp := make([]models.Patent, 0)
+
+	ids := make([]int, len(upList))
+	for i := 0; i < len(upList); i++ {
+		ids[i] = upList[i].PatentId
+	}
 	err = e.MakeContext(c).
 		MakeOrm().
 		MakeService(&sp.Service).
 		Errors
-	err = sp.GetPageByIds(&reqp, &listp, &count)
+	listp, err := sp.GetPageByIds(ids, &count)
 	if err != nil {
 		e.Logger.Error(err)
 		return

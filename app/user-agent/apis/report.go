@@ -11,6 +11,7 @@ import (
 	"go-admin/app/admin-agent/service/dtos"
 	"go-admin/app/user-agent/models"
 	serviceUser "go-admin/app/user-agent/service"
+	"go-admin/app/user-agent/service/dto"
 	"strconv"
 )
 
@@ -147,7 +148,6 @@ func (e Report) InsertReport(c *gin.Context) {
 	req.CreateBy = user.GetUserId(c)
 	req.RejectTag = dtos.ApplyTag
 	req.Type = reqIn.Type
-	req.CreatedAt = reqIn.CreatedAt
 
 	err, f = s.InsertReport(&req, req.Type)
 	if err != nil {
@@ -421,4 +421,35 @@ func (e Report) UserGetReportById(c *gin.Context) {
 		return
 	}
 	e.OK(model, "查询成功")
+}
+
+// GenPatentNovelty
+// @Summary 查新报告
+// @Description  通过patentId生成查新报告
+// @Tags 用户-报告
+// @Success 200 {object} dto.NoveltyReportReq
+// @Router /apis/v1/user-agent/report/novelty [post]
+// @Security Bearer
+func (e Report) GenPatentNovelty(c *gin.Context) {
+	s := serviceUser.Report{}     //service中查询或者返回的结果赋值给s变量
+	req := dto.NoveltyReportReq{} //被绑定的数据
+	err := e.MakeContext(c).
+		MakeOrm().
+		Bind(&req).
+		MakeService(&s.Service).
+		Errors
+	if err != nil {
+		e.Logger.Error(err)
+		e.Error(500, err, err.Error())
+		return
+	}
+
+	report, err := s.GetNovelty(&req)
+	if err != nil {
+		e.Logger.Error(err)
+		e.Error(500, err, "生成失败")
+		return
+	}
+
+	e.OK(report, "生成成功")
 }

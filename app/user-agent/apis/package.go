@@ -81,7 +81,7 @@ func (e Package) ListByCurrentUser(c *gin.Context) {
 
 	err = s.ListByUserId(&req, &list)
 	if err != nil {
-		e.Error(500, err, "查询失败")
+		e.Error(500, err, err.Error())
 		return
 	}
 
@@ -254,7 +254,6 @@ func (e Package) GetPackagePatents(c *gin.Context) {
 	s := service.PatentPackage{}
 	s1 := service.Patent{}
 	req := dto.PackagePageGetReq{}
-	req1 := dto.PatentsIds{}
 
 	err := e.MakeContext(c).
 		MakeOrm().
@@ -279,14 +278,14 @@ func (e Package) GetPackagePatents(c *gin.Context) {
 	//数据权限检查
 	//p := actions.GetPermissionFromContext(c)
 
-	list := make([]models.PatentPackage, 0)
-	list1 := make([]models.Patent, 0)
+	var list []models.PatentPackage
 	var count int64
 
 	err = s.GetPatentIdByPackageId(&req, &list, &count)
 
 	if err != nil {
-		e.Error(500, err, "查询失败")
+		e.Logger.Error(err)
+		e.Error(500, err, err.Error())
 		return
 	}
 
@@ -294,22 +293,30 @@ func (e Package) GetPackagePatents(c *gin.Context) {
 
 	err = e.MakeContext(c).
 		MakeOrm().
-		Bind(&req1).
 		MakeService(&s1.Service).
 		Errors
-
-	req1.PatentIds = make([]int, len(list))
-
-	for i := 0; i < len(list); i++ {
-		req1.PatentIds[i] = list[i].PatentId
-	}
-
-	err = s1.GetPageByIds(&req1, &list1, &count2)
 	if err != nil {
-		e.Error(500, err, "查询失败")
+		e.Logger.Error(err)
+		e.Error(500, err, err.Error())
 		return
 	}
-	e.PageOK(list1, int(count2), req.GetPageIndex(), req.GetPageSize(), "查询成功")
+
+	ids := make([]int, len(list))
+	for i := 0; i < len(list); i++ {
+		ids[i] = list[i].PatentId
+	}
+
+	res, err := s1.GetPageByIds(ids, &count2)
+	if err != nil {
+		e.Error(500, err, err.Error())
+		return
+	}
+
+	for i := range res {
+		res[i].Desc = list[i].Desc
+	}
+
+	e.PageOK(res, int(count2), req.GetPageIndex(), req.GetPageSize(), "查询成功")
 
 }
 
@@ -524,7 +531,6 @@ func (e Package) UpdatePackagePatentDesc(c *gin.Context) {
 // @Security Bearer
 func (e Package) GetRelationGraphByPackage(c *gin.Context) {
 	sp := service.Patent{}
-	reqp := dto.PatentsIds{}
 	spp := service.PatentPackage{}
 	reqpp := dto.PackagePageGetReq{}
 	InventorGraph := models.Graph{}
@@ -548,17 +554,16 @@ func (e Package) GetRelationGraphByPackage(c *gin.Context) {
 		e.Error(500, err, err.Error())
 		return
 	}
-	reqp.PatentIds = make([]int, len(listpp))
+	ids := make([]int, len(listpp))
 	for i := 0; i < len(listpp); i++ {
-		reqp.PatentIds[i] = listpp[i].PatentId
+		ids[i] = listpp[i].PatentId
 	}
-	listp := make([]models.Patent, 0)
 	err = e.MakeContext(c).
 		MakeOrm().
 		MakeService(&sp.Service).
 		Errors
 
-	err = sp.GetPageByIds(&reqp, &listp, &count)
+	listp, err := sp.GetPageByIds(ids, &count)
 	if err != nil {
 		e.Logger.Error(err)
 		e.Error(500, err, err.Error())
@@ -586,7 +591,6 @@ func (e Package) GetRelationGraphByPackage(c *gin.Context) {
 // @Security Bearer
 func (e Package) GetTechGraphByPackage(c *gin.Context) {
 	sp := service.Patent{}
-	reqp := dto.PatentsIds{}
 	spp := service.PatentPackage{}
 	reqpp := dto.PackagePageGetReq{}
 	InventorGraph := models.Graph{}
@@ -605,17 +609,16 @@ func (e Package) GetTechGraphByPackage(c *gin.Context) {
 	listpp := make([]models.PatentPackage, 0)
 	var count int64
 	err = spp.GetPatentIdByPackageId(&reqpp, &listpp, &count)
-	reqp.PatentIds = make([]int, len(listpp))
+	ids := make([]int, len(listpp))
 	for i := 0; i < len(listpp); i++ {
-		reqp.PatentIds[i] = listpp[i].PatentId
+		ids[i] = listpp[i].PatentId
 	}
-	listp := make([]models.Patent, 0)
 	err = e.MakeContext(c).
 		MakeOrm().
 		MakeService(&sp.Service).
 		Errors
 
-	err = sp.GetPageByIds(&reqp, &listp, &count)
+	listp, err := sp.GetPageByIds(ids, &count)
 	if err != nil {
 		e.Logger.Error(err)
 		return

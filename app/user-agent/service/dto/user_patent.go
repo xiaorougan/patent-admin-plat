@@ -51,6 +51,12 @@ func NewUserPatentClaim(userId, patentId, createdBy, updatedBy int, PNM string, 
 	}
 }
 
+func NewEmptyClaim() *UserPatentObject {
+	return &UserPatentObject{
+		Type: ClaimType,
+	}
+}
+
 func NewUserPatentFocus(userId, patentId, createdBy, updatedBy int, PNM string, Desc string) *UserPatentObject {
 	return &UserPatentObject{
 		UserId:   userId,
@@ -62,6 +68,12 @@ func NewUserPatentFocus(userId, patentId, createdBy, updatedBy int, PNM string, 
 			CreateBy: createdBy,
 			UpdateBy: updatedBy,
 		},
+	}
+}
+
+func NewEmptyFocus() *UserPatentObject {
+	return &UserPatentObject{
+		Type: FocusType,
 	}
 }
 
