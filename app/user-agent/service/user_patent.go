@@ -43,6 +43,22 @@ func (e *UserPatent) GetClaimLists(c *dto.UserPatentObject, list *[]models.UserP
 	return nil
 }
 
+// GetClaimCount 通过专利列表的ID数组获得认领专利数量
+func (e *UserPatent) GetClaimCount(c *dto.UserPatentObject, count *int64) error {
+	var err error
+	var data models.UserPatent
+	err = e.Orm.Model(&data).
+		Where("Type = ? AND User_Id = ?", dto.ClaimType, c.UserId).
+		Count(count).Error
+
+	if err != nil {
+		e.Log.Errorf("db error:%s", err)
+		return err
+	}
+
+	return nil
+}
+
 // GetFocusLists 通过专利列表的ID数组获得关注专利列表
 func (e *UserPatent) GetFocusLists(c *dto.UserPatentObject, list *[]models.UserPatent, count *int64) error {
 	var err error
@@ -50,6 +66,20 @@ func (e *UserPatent) GetFocusLists(c *dto.UserPatentObject, list *[]models.UserP
 	err = e.Orm.Model(&data).
 		Where("Type = ? AND User_Id = ?", dto.FocusType, c.UserId).
 		Find(list).Limit(-1).Offset(-1).
+		Count(count).Error
+	if err != nil {
+		e.Log.Errorf("db error:%s", err)
+		return err
+	}
+	return nil
+}
+
+// GetFocusCount 通过专利列表的ID数组获得关注专利数量
+func (e *UserPatent) GetFocusCount(c *dto.UserPatentObject, count *int64) error {
+	var err error
+	var data models.UserPatent
+	err = e.Orm.Model(&data).
+		Where("Type = ? AND User_Id = ?", dto.FocusType, c.UserId).
 		Count(count).Error
 	if err != nil {
 		e.Log.Errorf("db error:%s", err)

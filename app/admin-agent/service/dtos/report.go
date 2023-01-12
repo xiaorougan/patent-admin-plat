@@ -177,16 +177,6 @@ type PatentById struct {
 	common.ControlBy
 }
 
-type PatentsIds struct {
-	PatentId  int   `json:"patent_Id"`
-	PatentIds []int `json:"patent_Ids"`
-}
-
-func (s *PatentsIds) GetPatentId() []int {
-	s.PatentIds = append(s.PatentIds, s.PatentId)
-	return s.PatentIds
-}
-
 type ReportIds struct {
 	ReportId  int   `json:"report_Id"`
 	ReportIds []int `json:"report_Ids"`

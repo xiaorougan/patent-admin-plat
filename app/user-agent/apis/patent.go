@@ -221,7 +221,6 @@ func (e Patent) GetUserPatentsPages(c *gin.Context) {
 	s := service.UserPatent{}
 	s1 := service.Patent{}
 	req := dto.UserPatentObject{}
-	req1 := dto.PatentsIds{}
 
 	req.UserId = user.GetUserId(c)
 
@@ -230,40 +229,38 @@ func (e Patent) GetUserPatentsPages(c *gin.Context) {
 		Bind(&req).
 		MakeService(&s.Service).
 		Errors
-
 	if err != nil {
 		e.Logger.Error(err)
 		e.Error(500, err, err.Error())
 		return
 	}
-	//数据权限检查
-	//p := actions.GetPermissionFromContext(c)
+
 	list := make([]models.UserPatent, 0)
 
 	var count int64
 
 	err = s.GetUserPatentIds(&req, &list, &count)
-
 	if err != nil {
-		e.Error(500, err, "查询失败")
+		e.Logger.Error(err)
+		e.Error(500, err, err.Error())
 		return
 	}
 
 	var count2 int64
 	err = e.MakeContext(c).
 		MakeOrm().
-		Bind(&req1).
 		MakeService(&s.Service).
 		Errors
 
-	req1.PatentIds = make([]int, len(list))
+	ids := make([]int, len(list))
 	for i := 0; i < len(list); i++ {
-		req1.PatentIds[i] = list[i].PatentId
+		ids[i] = list[i].PatentId
 	}
 
-	res, err := s1.GetPageByIds(&req1, &count2)
+	res, err := s1.GetPageByIds(ids, &count2)
 	if err != nil {
-		e.Error(500, err, "查询失败")
+		e.Logger.Error(err)
+		e.Error(500, err, err.Error())
 		return
 	}
 
@@ -419,7 +416,6 @@ func (e Patent) GetFocusPages(c *gin.Context) {
 	s1 := service.Patent{}
 	req := dto.UserPatentObject{}
 	req.UserId = user.GetUserId(c)
-	req1 := dto.PatentsIds{}
 
 	err := e.MakeContext(c).
 		MakeOrm().
@@ -445,15 +441,21 @@ func (e Patent) GetFocusPages(c *gin.Context) {
 	var count2 int64
 	err = e.MakeContext(c).
 		MakeOrm().
-		Bind(&req1).
 		MakeService(&s1.Service).
 		Errors
-	req1.PatentIds = make([]int, len(list))
-	for i := 0; i < len(list); i++ {
-		req1.PatentIds[i] = list[i].PatentId
-	}
-	res, err = s1.GetPageByIds(&req1, &count2)
 	if err != nil {
+		e.Logger.Error(err)
+		e.Error(500, err, err.Error())
+		return
+	}
+
+	ids := make([]int, len(list))
+	for i := 0; i < len(list); i++ {
+		ids[i] = list[i].PatentId
+	}
+	res, err = s1.GetPageByIds(ids, &count2)
+	if err != nil {
+		e.Logger.Error(err)
 		e.Error(500, err, err.Error())
 		return
 	}
@@ -477,7 +479,6 @@ func (e Patent) GetClaimPages(c *gin.Context) {
 	s := service.UserPatent{}
 	s1 := service.Patent{}
 	req := dto.UserPatentObject{} //被绑定的数据
-	req1 := dto.PatentsIds{}
 
 	req.UserId = user.GetUserId(c)
 
@@ -506,7 +507,6 @@ func (e Patent) GetClaimPages(c *gin.Context) {
 
 	err = e.MakeContext(c).
 		MakeOrm().
-		Bind(&req1).
 		MakeService(&s1.Service).
 		Errors
 	if err != nil {
@@ -515,15 +515,15 @@ func (e Patent) GetClaimPages(c *gin.Context) {
 		return
 	}
 
-	req1.PatentIds = make([]int, len(list))
+	ids := make([]int, len(list))
 
 	for i := 0; i < len(list); i++ {
-		req1.PatentIds[i] = list[i].PatentId
+		ids[i] = list[i].PatentId
 	}
 
-	res, err := s1.GetPageByIds(&req1, &count2)
-
+	res, err := s1.GetPageByIds(ids, &count2)
 	if err != nil {
+		e.Logger.Error(err)
 		e.Error(500, err, err.Error())
 		return
 	}
@@ -848,7 +848,6 @@ func (e Patent) GetPatent(c *gin.Context) {
 	s := service.PatentTag{}
 	s1 := service.Patent{}
 	req := dto.PatentTagGetPageReq{}
-	req1 := dto.PatentsIds{}
 
 	err := e.MakeContext(c).
 		MakeOrm().
@@ -863,7 +862,6 @@ func (e Patent) GetPatent(c *gin.Context) {
 	}
 
 	req.TagId, err = strconv.Atoi(c.Param("tag_id"))
-
 	if err != nil {
 		e.Logger.Error(err)
 		e.Error(500, err, err.Error())
@@ -877,9 +875,9 @@ func (e Patent) GetPatent(c *gin.Context) {
 	var count int64
 
 	err = s.GetPatentIdByTagId(&req, &list, &count)
-
 	if err != nil {
-		e.Error(500, err, "查询失败")
+		e.Logger.Error(err)
+		e.Error(500, err, err.Error())
 		return
 	}
 
@@ -887,19 +885,18 @@ func (e Patent) GetPatent(c *gin.Context) {
 
 	err = e.MakeContext(c).
 		MakeOrm().
-		Bind(&req1).
 		MakeService(&s.Service).
 		Errors
 
-	req1.PatentIds = make([]int, len(list))
-
+	ids := make([]int, len(list))
 	for i := 0; i < len(list); i++ {
-		req1.PatentIds[i] = list[i].PatentId
+		ids[i] = list[i].PatentId
 	}
 
-	res, err := s1.GetPageByIds(&req1, &count2)
+	res, err := s1.GetPageByIds(ids, &count2)
 	if err != nil {
-		e.Error(500, err, "查询失败")
+		e.Logger.Error(err)
+		e.Error(500, err, err.Error())
 		return
 	}
 	e.OK(res, "查询成功")
@@ -985,7 +982,6 @@ func (e Patent) GetTags(c *gin.Context) {
 // @Security Bearer
 func (e Patent) GetRelationGraphByFocus(c *gin.Context) {
 	sp := service.Patent{}
-	reqp := dto.PatentsIds{}
 	sup := service.UserPatent{}
 	upDto := dto.UserPatentObject{}
 	InventorGraph := models.Graph{}
@@ -1003,15 +999,21 @@ func (e Patent) GetRelationGraphByFocus(c *gin.Context) {
 	}
 	upDto.UserId = user.GetUserId(c)
 	err = sup.GetFocusLists(&upDto, &upList, &count)
-	reqp.PatentIds = make([]int, len(upList))
+	if err != nil {
+		e.Logger.Error(err)
+		e.Error(500, err, err.Error())
+		return
+	}
+
+	ids := make([]int, len(upList))
 	for i := 0; i < len(upList); i++ {
-		reqp.PatentIds[i] = upList[i].PatentId
+		ids[i] = upList[i].PatentId
 	}
 	err = e.MakeContext(c).
 		MakeOrm().
 		MakeService(&sp.Service).
 		Errors
-	listp, err := sp.GetPageByIds(&reqp, &count)
+	listp, err := sp.GetPageByIds(ids, &count)
 	if err != nil {
 		e.Logger.Error(err)
 		return
@@ -1037,7 +1039,6 @@ func (e Patent) GetRelationGraphByFocus(c *gin.Context) {
 // @Security Bearer
 func (e Patent) GetTechGraphByFocus(c *gin.Context) {
 	sp := service.Patent{}
-	reqp := dto.PatentsIds{}
 	sup := service.UserPatent{}
 	upDto := dto.UserPatentObject{}
 	InventorGraph := models.Graph{}
@@ -1055,15 +1056,21 @@ func (e Patent) GetTechGraphByFocus(c *gin.Context) {
 	}
 	upDto.UserId = user.GetUserId(c)
 	err = sup.GetFocusLists(&upDto, &upList, &count)
-	reqp.PatentIds = make([]int, len(upList))
+	if err != nil {
+		e.Logger.Error(err)
+		e.Error(500, err, err.Error())
+		return
+	}
+
+	ids := make([]int, len(upList))
 	for i := 0; i < len(upList); i++ {
-		reqp.PatentIds[i] = upList[i].PatentId
+		ids[i] = upList[i].PatentId
 	}
 	err = e.MakeContext(c).
 		MakeOrm().
 		MakeService(&sp.Service).
 		Errors
-	listp, err := sp.GetPageByIds(&reqp, &count)
+	listp, err := sp.GetPageByIds(ids, &count)
 	if err != nil {
 		e.Logger.Error(err)
 		return

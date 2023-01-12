@@ -43,6 +43,19 @@ func (e *Report) UserGetRepoById(id int, model *model.Report) error {
 	return nil
 }
 
+// GetCountByUserID 获取Report对象
+func (e *Report) GetCountByUserID(uid int, count *int64) error {
+	//引用传递、函数名、形参、返回值
+	var err error
+	var data model.ReportRelation
+	err = e.Orm.Model(&data).Where("user_id = ?", uid).Count(count).Error
+	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+		e.Log.Errorf("db error:%s", err)
+		return err
+	}
+	return nil
+}
+
 // InsertReport 添加Report对象
 func (e *Report) InsertReport(c *dtos.ReportGetPageReq, typer string) (error, *model.Report) {
 

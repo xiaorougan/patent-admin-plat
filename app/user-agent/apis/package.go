@@ -81,7 +81,7 @@ func (e Package) ListByCurrentUser(c *gin.Context) {
 
 	err = s.ListByUserId(&req, &list)
 	if err != nil {
-		e.Error(500, err, "查询失败")
+		e.Error(500, err, err.Error())
 		return
 	}
 
@@ -254,7 +254,6 @@ func (e Package) GetPackagePatents(c *gin.Context) {
 	s := service.PatentPackage{}
 	s1 := service.Patent{}
 	req := dto.PackagePageGetReq{}
-	req1 := dto.PatentsIds{}
 
 	err := e.MakeContext(c).
 		MakeOrm().
@@ -293,17 +292,20 @@ func (e Package) GetPackagePatents(c *gin.Context) {
 
 	err = e.MakeContext(c).
 		MakeOrm().
-		Bind(&req1).
 		MakeService(&s1.Service).
 		Errors
-
-	req1.PatentIds = make([]int, len(list))
-
-	for i := 0; i < len(list); i++ {
-		req1.PatentIds[i] = list[i].PatentId
+	if err != nil {
+		e.Logger.Error(err)
+		e.Error(500, err, err.Error())
+		return
 	}
 
-	res, err := s1.GetPageByIds(&req1, &count2)
+	ids := make([]int, 0, len(list))
+	for i := 0; i < len(list); i++ {
+		ids[i] = list[i].PatentId
+	}
+
+	res, err := s1.GetPageByIds(ids, &count2)
 	if err != nil {
 		e.Error(500, err, "查询失败")
 		return
@@ -528,7 +530,6 @@ func (e Package) UpdatePackagePatentDesc(c *gin.Context) {
 // @Security Bearer
 func (e Package) GetRelationGraphByPackage(c *gin.Context) {
 	sp := service.Patent{}
-	reqp := dto.PatentsIds{}
 	spp := service.PatentPackage{}
 	reqpp := dto.PackagePageGetReq{}
 	InventorGraph := models.Graph{}
@@ -552,16 +553,16 @@ func (e Package) GetRelationGraphByPackage(c *gin.Context) {
 		e.Error(500, err, err.Error())
 		return
 	}
-	reqp.PatentIds = make([]int, len(listpp))
+	ids := make([]int, len(listpp))
 	for i := 0; i < len(listpp); i++ {
-		reqp.PatentIds[i] = listpp[i].PatentId
+		ids[i] = listpp[i].PatentId
 	}
 	err = e.MakeContext(c).
 		MakeOrm().
 		MakeService(&sp.Service).
 		Errors
 
-	listp, err := sp.GetPageByIds(&reqp, &count)
+	listp, err := sp.GetPageByIds(ids, &count)
 	if err != nil {
 		e.Logger.Error(err)
 		e.Error(500, err, err.Error())
@@ -589,7 +590,6 @@ func (e Package) GetRelationGraphByPackage(c *gin.Context) {
 // @Security Bearer
 func (e Package) GetTechGraphByPackage(c *gin.Context) {
 	sp := service.Patent{}
-	reqp := dto.PatentsIds{}
 	spp := service.PatentPackage{}
 	reqpp := dto.PackagePageGetReq{}
 	InventorGraph := models.Graph{}
@@ -608,16 +608,16 @@ func (e Package) GetTechGraphByPackage(c *gin.Context) {
 	listpp := make([]models.PatentPackage, 0)
 	var count int64
 	err = spp.GetPatentIdByPackageId(&reqpp, &listpp, &count)
-	reqp.PatentIds = make([]int, len(listpp))
+	ids := make([]int, len(listpp))
 	for i := 0; i < len(listpp); i++ {
-		reqp.PatentIds[i] = listpp[i].PatentId
+		ids[i] = listpp[i].PatentId
 	}
 	err = e.MakeContext(c).
 		MakeOrm().
 		MakeService(&sp.Service).
 		Errors
 
-	listp, err := sp.GetPageByIds(&reqp, &count)
+	listp, err := sp.GetPageByIds(ids, &count)
 	if err != nil {
 		e.Logger.Error(err)
 		return

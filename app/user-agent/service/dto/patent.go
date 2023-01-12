@@ -6,6 +6,8 @@ import (
 	common "go-admin/common/models"
 )
 
+const PatentPriceBase = 8000
+
 type PatentOrder struct {
 	CreatedAtOrder string `search:"type:order;column:created_at;table:patent" form:"createdAtOrder"`
 }
