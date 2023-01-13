@@ -263,8 +263,8 @@ func (e *Patent) GetGraphByPatents(simplifiedNodes []models.SimplifiedNode, Rela
 		PreNodeList = append(PreNodeList, models.PreNode{NodeId: inventor.Id, NodeCategory: i})
 	}
 	//build top10% to top10% relationship
-	MaxNumberOfLinks := 20 //the maximum find link
-	MaxExpansion := 3      //every Node can build the line
+	MaxNumberOfLinks := 15 //the maximum find link
+	MaxExpansion := 4      //every Node can extend the number of nodes
 	NowLink := FindRelationFrequencyAndSort(Relations, simplifiedNodes[0:StrongRelationInventors], simplifiedNodes[0:StrongRelationInventors], MaxNumberOfLinks, MaxExpansion, MaxSimplifiedNodes)
 	PreLinkList = append(PreLinkList, NowLink...)
 	//build top10% to others relationship
@@ -286,12 +286,12 @@ func (e *Patent) GetGraphByPatents(simplifiedNodes []models.SimplifiedNode, Rela
 		SourceNode = append(SourceNode, models.SimplifiedNode{Id: node.NodeId})
 		TargetNode = append(SourceNode, models.SimplifiedNode{Id: node.NodeId})
 	}
-	MaxNumberOfLinks = 20
-	MaxExpansion = 2
+	MaxNumberOfLinks = 100
+	MaxExpansion = 3
 	NowLink = FindRelationFrequencyAndSort(Relations, SourceNode, TargetNode, MaxNumberOfLinks, MaxExpansion, MaxSimplifiedNodes)
 	PreLinkList = append(PreLinkList, NowLink...)
 	//deal the struct PreLink and PreNode
-	MaxSizeofNode := 30
+	MaxSizeofNode := 50
 	for _, node := range PreNodeList {
 		NodeList = append(NodeList, models.Node{
 			NodeId:            strconv.FormatInt(int64(node.NodeId), 10),
