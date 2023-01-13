@@ -1,6 +1,7 @@
 package service
 
 import (
+	"bufio"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -11,6 +12,8 @@ import (
 	"go-admin/app/user-agent/models"
 	"go-admin/app/user-agent/service/dto"
 	"gorm.io/gorm"
+	"io"
+	"os"
 	"sort"
 	"strconv"
 	"strings"
@@ -260,8 +263,8 @@ func (e *Patent) GetGraphByPatents(simplifiedNodes []models.SimplifiedNode, Rela
 		PreNodeList = append(PreNodeList, models.PreNode{NodeId: inventor.Id, NodeCategory: i})
 	}
 	//build top10% to top10% relationship
-	MaxNumberOfLinks := 15 //the maximum find link
-	MaxExpansion := 4      //every Node can extend the number of nodes
+	MaxNumberOfLinks := 20 //the maximum find link
+	MaxExpansion := 3      //every Node can build the line
 	NowLink := FindRelationFrequencyAndSort(Relations, simplifiedNodes[0:StrongRelationInventors], simplifiedNodes[0:StrongRelationInventors], MaxNumberOfLinks, MaxExpansion, MaxSimplifiedNodes)
 	PreLinkList = append(PreLinkList, NowLink...)
 	//build top10% to others relationship
@@ -283,12 +286,12 @@ func (e *Patent) GetGraphByPatents(simplifiedNodes []models.SimplifiedNode, Rela
 		SourceNode = append(SourceNode, models.SimplifiedNode{Id: node.NodeId})
 		TargetNode = append(SourceNode, models.SimplifiedNode{Id: node.NodeId})
 	}
-	MaxNumberOfLinks = 100
-	MaxExpansion = 3
+	MaxNumberOfLinks = 20
+	MaxExpansion = 2
 	NowLink = FindRelationFrequencyAndSort(Relations, SourceNode, TargetNode, MaxNumberOfLinks, MaxExpansion, MaxSimplifiedNodes)
 	PreLinkList = append(PreLinkList, NowLink...)
 	//deal the struct PreLink and PreNode
-	MaxSizeofNode := 50
+	MaxSizeofNode := 30
 	for _, node := range PreNodeList {
 		NodeList = append(NodeList, models.Node{
 			NodeId:            strconv.FormatInt(int64(node.NodeId), 10),
@@ -442,11 +445,39 @@ func (e *Patent) FindInventorsAndRelationsFromPatents(listPatents []models.Paten
 	return ListSimplifiedNodes, ListRelations, nil
 }
 
+// get keywords from file
+func lineByLine(file string) (map[string]bool, error) {
+	var err error
+	f, err := os.Open(file)
+	if err != nil {
+		if err != nil {
+
+		}
+	}
+	defer f.Close()
+	result := make(map[string]bool, 0)
+	r := bufio.NewReader(f)
+	for {
+		line, err := r.ReadString('\n')
+		if err == io.EOF {
+			break
+		} else if err != nil {
+			fmt.Printf("error reading file %s", err)
+			break
+		}
+		line = line[0 : len(line)-2]
+		result[line] = true
+	}
+	return result, err
+}
+
 // FindKeywordsAndRelationsFromPatents --------------------------------------------------------------------------
 // 通过patents数组查找patents数组中的关键字以及专利和关键字的关系
 func (e *Patent) FindKeywordsAndRelationsFromPatents(listPatents []models.Patent) ([]models.SimplifiedNode, []int, error) {
 
 	ListKeyWords := make([]models.KeyWord, 0)
+	ListFilteredKeyWords := make([]models.KeyWord, 0)
+	fliterword, err := lineByLine("app/user-agent/service/dict/filterkeyword.txt")
 	//find every patents' SimplifiedNode and count
 	TiOfPatentsList := make([]string, 0)
 	//keywordsList :=make([][]string,len(listPatents))
@@ -455,7 +486,7 @@ func (e *Patent) FindKeywordsAndRelationsFromPatents(listPatents []models.Patent
 		if err := json.Unmarshal([]byte(p.PatentProperties), &patentDetail); err != nil {
 			return nil, nil, err
 		}
-		TiOfPatentsList = append(TiOfPatentsList, patentDetail.Ti+patentDetail.Abst)
+		TiOfPatentsList = append(TiOfPatentsList, patentDetail.Ti+patentDetail.Cl)
 	}
 	keywordsList := FindKeyWords(TiOfPatentsList)
 	for z := 0; z < len(listPatents); z++ {
@@ -481,30 +512,35 @@ func (e *Patent) FindKeywordsAndRelationsFromPatents(listPatents []models.Patent
 			}
 		}
 	}
-	//sort Inventors
+	//sort Inventors and filter keywords
 	sort.Slice(ListKeyWords, func(i, j int) bool {
 		if ListKeyWords[i].TheNumberOfPatents > ListKeyWords[j].TheNumberOfPatents {
 			return true
 		}
 		return false
 	})
+	for _, i := range ListKeyWords {
+		if !fliterword[i.Name] {
+			ListFilteredKeyWords = append(ListFilteredKeyWords, i)
+		}
+	}
 
 	//write the id to Inventors
-	for i := 0; i < len(ListKeyWords); i++ {
-		ListKeyWords[i].Id = i
+	for i := 0; i < len(ListFilteredKeyWords); i++ {
+		ListFilteredKeyWords[i].Id = i
 	}
 	//create Relations
-	NowKeyWordsNumbers := MinResult(MaxSimplifiedNodes, len(ListKeyWords))
+	NowKeyWordsNumbers := MinResult(MaxSimplifiedNodes, len(ListFilteredKeyWords))
 	ListRelations := make([]int, MaxSimplifiedNodes*MaxSimplifiedNodes)
 	for i := 0; i < NowKeyWordsNumbers; i++ {
 		for j := i; j < NowKeyWordsNumbers; j++ {
 			var count int
 			source := make(map[int]bool)
-			for _, OneOfPatentId := range ListKeyWords[i].PatentsId {
+			for _, OneOfPatentId := range ListFilteredKeyWords[i].PatentsId {
 				source[OneOfPatentId] = true
 
 			}
-			for _, OneOfPatentId := range ListKeyWords[j].PatentsId {
+			for _, OneOfPatentId := range ListFilteredKeyWords[j].PatentsId {
 				if _, ok := source[OneOfPatentId]; ok {
 					count++
 				}
@@ -516,11 +552,11 @@ func (e *Patent) FindKeywordsAndRelationsFromPatents(listPatents []models.Patent
 
 	//change preInventors to Inventors(delete preInventor->patents)
 	ListSimplifiedNodes := make([]models.SimplifiedNode, 0)
-	for _, i := range ListKeyWords {
-		NowInventor := models.SimplifiedNode{Id: i.Id, Name: i.Name, TheNumberOfPatents: i.TheNumberOfPatents}
-		ListSimplifiedNodes = append(ListSimplifiedNodes, NowInventor)
+	for _, i := range ListFilteredKeyWords {
+		NowSimplifiedNode := models.SimplifiedNode{Id: i.Id, Name: i.Name, TheNumberOfPatents: i.TheNumberOfPatents}
+		ListSimplifiedNodes = append(ListSimplifiedNodes, NowSimplifiedNode)
 	}
-	return ListSimplifiedNodes, ListRelations, nil
+	return ListSimplifiedNodes, ListRelations, err
 }
 
 // FindKeyWords find the KeyWords from Sentence
@@ -532,7 +568,7 @@ func FindKeyWords(Sentences []string) [][]string {
 		WordResult := make([]string, 0)
 		for _, word := range TagReturn {
 			nowWord := strings.Split(word, "/")
-			if len(nowWord[0]) > 6 && nowWord[0] != uselessWords && nowWord[1][0] == 'n' {
+			if len(nowWord[0]) > 3 && nowWord[0] != uselessWords && nowWord[1][0] == 'n' {
 				WordResult = append(WordResult, nowWord[0])
 			}
 		}
