@@ -10,6 +10,7 @@ import (
 	"go-admin/app/admin-agent/service/dtos"
 	"go-admin/app/user-agent/models"
 	"go-admin/app/user-agent/service/dto"
+	cDto "go-admin/common/dto"
 	"gorm.io/gorm"
 	"sort"
 	"strconv"
@@ -40,8 +41,8 @@ func (e *Patent) GetPage(c *dto.PatentReq, list *[]models.Patent, count *int64) 
 	return nil
 }
 
-// GetPageByIds 通过Id数组获取Patent对象列表
-func (e *Patent) GetPageByIds(ids []int, count *int64) ([]models.Patent, error) {
+// GetPatentsByIds 通过Id数组获取Patent对象列表
+func (e *Patent) GetPatentsByIds(ids []int, count *int64) ([]models.Patent, error) {
 	if len(ids) == 0 {
 		return []models.Patent{}, nil
 	}
@@ -51,6 +52,38 @@ func (e *Patent) GetPageByIds(ids []int, count *int64) ([]models.Patent, error) 
 
 	var patentData models.Patent
 	err = e.Orm.Model(&patentData).
+		Find(&patents, ids).Limit(-1).Offset(-1).
+		Count(count).Error
+	if err != nil {
+		e.Log.Errorf("db error:%s", err)
+		return nil, err
+	}
+
+	for i, pdData := range patents {
+		pd := dto.PatentDetail{}
+		err = json.Unmarshal([]byte(pdData.PatentProperties), &pd)
+		if err != nil {
+			return nil, err
+		}
+		patents[i].Price = pd.Idx * dto.PatentPriceBase
+	}
+
+	return patents, nil
+}
+
+func (e *Patent) GetPatentPagesByIds(ids []int, req dto.PatentPagesReq, count *int64) ([]models.Patent, error) {
+	if len(ids) == 0 {
+		return []models.Patent{}, nil
+	}
+
+	var err error
+	patents := make([]models.Patent, 0)
+
+	var patentData models.Patent
+	err = e.Orm.Model(&patentData).
+		Scopes(
+			cDto.Paginate(req.GetPageSize(), req.GetPageIndex()),
+		).
 		Find(&patents, ids).Limit(-1).Offset(-1).
 		Count(count).Error
 	if err != nil {

@@ -39,30 +39,29 @@ func (e Dashboard) GetDashboard(c *gin.Context) {
 		return
 	}
 
-	req := dto.NewEmptyClaim()
-	req.UserId = user.GetUserId(c)
+	userID := user.GetUserId(c)
 
 	var focusCount int64
-	if err = ups.GetFocusCount(req, &focusCount); err != nil {
+	if err = ups.GetFocusCount(userID, &focusCount); err != nil {
 		e.Logger.Error(err)
 		e.Error(500, err, err.Error())
 		return
 	}
 
 	claimList := make([]models.UserPatent, 0)
-	var claimCount int64
-	if err = ups.GetClaimLists(req, &claimList, &claimCount); err != nil {
+	if err = ups.GetClaimLists(userID, &claimList); err != nil {
 		e.Logger.Error(err)
 		e.Error(500, err, err.Error())
 		return
 	}
+	claimCount := len(claimList)
 
 	ids := make([]int, 0, len(claimList))
 	for _, claim := range claimList {
 		ids = append(ids, claim.PatentId)
 	}
 	var patentCount int64
-	patents, err := ps.GetPageByIds(ids, &patentCount)
+	patents, err := ps.GetPatentsByIds(ids, &patentCount)
 	if err != nil {
 		e.Logger.Error(err)
 		e.Error(500, err, err.Error())

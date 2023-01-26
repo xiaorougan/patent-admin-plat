@@ -306,7 +306,7 @@ func (e Package) GetPackagePatents(c *gin.Context) {
 		ids[i] = list[i].PatentId
 	}
 
-	res, err := s1.GetPageByIds(ids, &count2)
+	res, err := s1.GetPatentsByIds(ids, &count2)
 	if err != nil {
 		e.Error(500, err, err.Error())
 		return
@@ -563,7 +563,7 @@ func (e Package) GetRelationGraphByPackage(c *gin.Context) {
 		MakeService(&sp.Service).
 		Errors
 
-	listp, err := sp.GetPageByIds(ids, &count)
+	listp, err := sp.GetPatentsByIds(ids, &count)
 	if err != nil {
 		e.Logger.Error(err)
 		e.Error(500, err, err.Error())
@@ -618,7 +618,7 @@ func (e Package) GetTechGraphByPackage(c *gin.Context) {
 		MakeService(&sp.Service).
 		Errors
 
-	listp, err := sp.GetPageByIds(ids, &count)
+	listp, err := sp.GetPatentsByIds(ids, &count)
 	if err != nil {
 		e.Logger.Error(err)
 		return

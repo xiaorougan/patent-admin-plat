@@ -3,6 +3,7 @@ package dto
 import (
 	"encoding/json"
 	"go-admin/app/user-agent/models"
+	cDto "go-admin/common/dto"
 	common "go-admin/common/models"
 )
 
@@ -80,4 +81,8 @@ func (r *PatentDescReq) GeneratePatentPackage(model *models.PatentPackage) {
 	model.PNM = r.PNM
 	model.PackageId = r.PackageID
 	model.Desc = r.Desc
+}
+
+type PatentPagesReq struct {
+	cDto.Pagination
 }
