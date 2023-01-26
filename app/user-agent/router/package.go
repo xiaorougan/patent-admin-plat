@@ -17,6 +17,7 @@ func registerPackageRouter(v1 *gin.RouterGroup, authMiddleware *jwt.GinJWTMiddle
 	r := v1.Group("/package").Use(authMiddleware.MiddlewareFunc()).Use(middleware.AuthCheckRole())
 	{
 		r.GET("", api.ListByCurrentUser)
+		r.GET("/search", api.Find)
 		r.GET("/:id", api.Get)
 		r.POST("", api.Insert)
 		r.PUT("/:id", api.Update)

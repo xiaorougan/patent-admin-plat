@@ -2,6 +2,7 @@ package service
 
 import (
 	"errors"
+	"fmt"
 	log "github.com/go-admin-team/go-admin-core/logger"
 	"github.com/go-admin-team/go-admin-core/sdk/service"
 	"go-admin/app/user-agent/models"
@@ -39,6 +40,23 @@ func (e *Package) ListByUserId(c *dto.PackageListReq, list *[]models.Package) er
 	// todo: check
 	err = e.Orm.Debug().
 		Where("create_by = ?", c.UserId).
+		Find(list).Limit(-1).Offset(-1).
+		Error
+
+	if err != nil {
+		e.Log.Errorf("db error: %s", err)
+		return err
+	}
+
+	return nil
+}
+
+func (e *Package) FindForCurrentUser(c *dto.PackageFindReq, list *[]models.Package) error {
+	var err error
+	//var data models.Package
+	// todo: check
+	err = e.Orm.Debug().
+		Where("create_by = ? AND package_name LIKE ?", c.UserId, fmt.Sprintf("%%%s%%", c.Query)).
 		Find(list).Limit(-1).Offset(-1).
 		Error
 

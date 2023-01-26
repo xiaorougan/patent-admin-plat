@@ -28,7 +28,12 @@ func (m *PackageGetPageReq) GetNeedSearch() interface{} {
 }
 
 type PackageListReq struct {
-	UserId int `form:"desc" search:"type:order;column:created_at;table:package"`
+	UserId int `json:"-" form:"desc" search:"type:order;column:created_at;table:package"`
+}
+
+type PackageFindReq struct {
+	UserId int    `json:"-" form:"desc" search:"type:order;column:created_at;table:package"`
+	Query  string `json:"query"`
 }
 
 type PackageInsertReq struct {

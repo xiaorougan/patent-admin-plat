@@ -103,30 +103,37 @@ func (e *Patent) GetPatentPagesByIds(ids []int, req dto.PatentPagesReq, count *i
 	return patents, nil
 }
 
-// GetInventorPageByIds 通过Id数组获取Patent对象列表
-func (e *Patent) GetInventorPageByIds(d *dto.PatentsIds, list *[]models.Patent, count *int64) error {
-	var err error
-	var ids []int = d.GetPatentId()
-	for i := 0; i < len(ids); i++ {
-		if ids[i] != 0 {
-			var data1 models.Patent
-			err = e.Orm.Model(&data1).
-				Where("Patent_Id = ? ", ids[i]).
-				First(&data1).Limit(-1).Offset(-1).
-				Count(count).Error
-			*list = append(*list, data1)
-			if err != nil {
-				e.Log.Errorf("db error:%s", err)
-				return err
-			}
-		}
+func (e *Patent) FindPatentPages(ids []int, req dto.FindPatentPagesReq, count *int64) ([]models.Patent, error) {
+	if len(ids) == 0 {
+		return []models.Patent{}, nil
 	}
 
+	var err error
+	patents := make([]models.Patent, 0)
+
+	var patentData models.Patent
+	err = e.Orm.Model(&patentData).
+		Scopes(
+			cDto.Paginate(req.GetPageSize(), req.GetPageIndex()),
+		).
+		Where("patent_properties LIKE ?", fmt.Sprintf("%%%s%%", req.Query)).
+		Find(&patents, ids).Limit(-1).Offset(-1).
+		Count(count).Error
 	if err != nil {
 		e.Log.Errorf("db error:%s", err)
-		return err
+		return nil, err
 	}
-	return nil
+
+	for i, pdData := range patents {
+		pd := dto.PatentDetail{}
+		err = json.Unmarshal([]byte(pdData.PatentProperties), &pd)
+		if err != nil {
+			return nil, err
+		}
+		patents[i].Price = pd.Idx * dto.PatentPriceBase
+	}
+
+	return patents, nil
 }
 
 // Get 获取Patent对象

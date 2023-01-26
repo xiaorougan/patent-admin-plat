@@ -36,5 +36,6 @@ func registerAuthedSearchRouter(v1 *gin.RouterGroup, authMiddleware *jwt.GinJWTM
 		r.PUT("/queries/:qid", api.UpdateStoredQuery)
 
 		r.POST("/full", api.SearchFullText)
+		r.GET("/queries/search", api.FindStoredQueryPages)
 	}
 }

@@ -86,3 +86,8 @@ func (r *PatentDescReq) GeneratePatentPackage(model *models.PatentPackage) {
 type PatentPagesReq struct {
 	cDto.Pagination
 }
+
+type FindPatentPagesReq struct {
+	cDto.Pagination
+	Query string `json:"query"`
+}

@@ -467,6 +467,70 @@ func (e Patent) GetFocusPages(c *gin.Context) {
 	e.PageOK(res, int(count), req.PageSize, req.PageIndex, "查询成功")
 }
 
+// FindFocusPages
+// @Summary 搜索关注列表
+// @Description
+// @Tags 专利表
+// @Accept  application/json
+// @Product application/json
+// @Router /api/v1/user-agent/patent/focus/search [get]
+// @Param data body dto.FindPatentPagesReq true "搜索参数"
+// @Security Bearer
+func (e Patent) FindFocusPages(c *gin.Context) {
+	ups := service.UserPatent{}
+	err := e.MakeContext(c).
+		MakeOrm().
+		MakeService(&ups.Service).
+		Errors
+	if err != nil {
+		e.Logger.Error(err)
+		e.Error(500, err, err.Error())
+		return
+	}
+
+	//数据权限检查
+	//p := actions.GetPermissionFromContext(c)
+	list := make([]models.UserPatent, 0)
+	userID := user.GetUserId(c)
+	err = ups.GetFocusLists(userID, &list)
+	if err != nil {
+		e.Logger.Error(err)
+		e.Error(500, err, err.Error())
+		return
+	}
+
+	req := dto.FindPatentPagesReq{}
+	ps := service.Patent{}
+	err = e.MakeContext(c).
+		MakeOrm().
+		Bind(&req, binding.JSON).
+		MakeService(&ps.Service).
+		Errors
+	if err != nil {
+		e.Logger.Error(err)
+		e.Error(500, err, err.Error())
+		return
+	}
+
+	ids := make([]int, len(list))
+	for i := 0; i < len(list); i++ {
+		ids[i] = list[i].PatentId
+	}
+	var count int64
+	res, err := ps.FindPatentPages(ids, req, &count)
+	if err != nil {
+		e.Logger.Error(err)
+		e.Error(500, err, err.Error())
+		return
+	}
+
+	for i := range res {
+		res[i].Desc = list[i].Desc
+	}
+
+	e.PageOK(res, int(count), req.PageSize, req.PageIndex, "查询成功")
+}
+
 // GetClaimPages
 // @Summary 获取认领列表
 // @Description
@@ -518,6 +582,71 @@ func (e Patent) GetClaimPages(c *gin.Context) {
 
 	var count int64
 	res, err := ps.GetPatentPagesByIds(ids, req, &count)
+	if err != nil {
+		e.Logger.Error(err)
+		e.Error(500, err, err.Error())
+		return
+	}
+
+	for i := range res {
+		res[i].Desc = list[i].Desc
+	}
+
+	e.PageOK(res, int(count), req.PageIndex, req.PageSize, "查询成功")
+}
+
+// FindClaimPages
+// @Summary 搜索认领专利
+// @Description
+// @Tags 专利表
+// @Accept  application/json
+// @Product application/json
+// @Router /api/v1/user-agent/patent/claim/search [get]
+// @Param data body dto.FindPatentPagesReq true "搜索参数"
+// @Security Bearer
+func (e Patent) FindClaimPages(c *gin.Context) {
+	s := service.UserPatent{}
+
+	userID := user.GetUserId(c)
+	err := e.MakeContext(c).
+		MakeOrm().
+		MakeService(&s.Service).
+		Errors
+	if err != nil {
+		e.Logger.Error(err)
+		e.Error(500, err, err.Error())
+		return
+	}
+
+	list := make([]models.UserPatent, 0)
+	err = s.GetClaimLists(userID, &list)
+	if err != nil {
+		e.Logger.Error(err)
+		e.Error(500, err, err.Error())
+		return
+	}
+
+	ps := service.Patent{}
+	req := dto.FindPatentPagesReq{}
+	err = e.MakeContext(c).
+		MakeOrm().
+		Bind(&req, binding.JSON).
+		MakeService(&ps.Service).
+		Errors
+	if err != nil {
+		e.Logger.Error(err)
+		e.Error(500, err, err.Error())
+		return
+	}
+
+	ids := make([]int, len(list))
+
+	for i := 0; i < len(list); i++ {
+		ids[i] = list[i].PatentId
+	}
+
+	var count int64
+	res, err := ps.FindPatentPages(ids, req, &count)
 	if err != nil {
 		e.Logger.Error(err)
 		e.Error(500, err, err.Error())

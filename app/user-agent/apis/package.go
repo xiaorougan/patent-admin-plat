@@ -88,6 +88,43 @@ func (e Package) ListByCurrentUser(c *gin.Context) {
 	e.OK(list, "查询成功")
 }
 
+// Find
+// @Summary 搜索当前用户专利包列表
+// @Description 获取JSON
+// @Tags 专利包
+// @Accept  application/json
+// @Product application/json
+// @Router /api/v1/user-agent/package/search [get]
+// @Param data body dto.FindPatentPagesReq true "搜索参数"
+// @Security Bearer
+func (e Package) Find(c *gin.Context) {
+	s := service.Package{}
+	req := dto.PackageFindReq{}
+	err := e.MakeContext(c).
+		MakeOrm().
+		Bind(&req).
+		MakeService(&s.Service).
+		Errors
+	if err != nil {
+		e.Logger.Error(err)
+		e.Error(500, err, err.Error())
+		return
+	}
+
+	req.UserId = user.GetUserId(c)
+
+	list := make([]models.Package, 0)
+
+	err = s.FindForCurrentUser(&req, &list)
+	if err != nil {
+		e.Logger.Error(err)
+		e.Error(500, err, err.Error())
+		return
+	}
+
+	e.OK(list, "查询成功")
+}
+
 // Get
 // @Summary 获取专利包
 // @Description 获取JSON

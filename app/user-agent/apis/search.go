@@ -271,6 +271,45 @@ func (e Search) GetStoredQueryPages(c *gin.Context) {
 	e.PageOK(list, int(count), req.GetPageIndex(), req.GetPageSize(), "查询成功")
 }
 
+// FindStoredQueryPages
+// @Summary 搜索暂存的检索表达式（分页）
+// @Description 搜索暂存的检索表达式（分页）
+// @Tags 专利检索
+// @Param data body dto.StoredQueryFindReq true "搜索参数"
+// @Success 200
+// @Router /api/v1/user-agent/auth-search/queries/search [get]
+// @Security Bearer
+func (e Search) FindStoredQueryPages(c *gin.Context) {
+	s := service.Search{}
+	req := dto.StoredQueryFindReq{}
+
+	err := e.MakeContext(c).
+		MakeOrm().
+		Bind(&req, binding.JSON).
+		MakeService(&s.Service).
+		Errors
+	if err != nil {
+		e.Logger.Error(err)
+		e.Error(500, err, err.Error())
+		return
+	}
+
+	if len(c.GetHeader("Authorization")) != 0 {
+		req.UserId = user.GetUserId(c)
+	}
+
+	list := make([]models.StoredQuery, 0)
+	var count int64
+	err = s.FindQueryPages(&req, &list, &count)
+	if err != nil {
+		e.Logger.Error(err)
+		e.Error(500, err, err.Error())
+		return
+	}
+
+	e.PageOK(list, int(count), req.GetPageIndex(), req.GetPageSize(), "查询成功")
+}
+
 // RemoveStoredQuery
 // @Summary 删除检索表达式
 // @Description 为当前用户删除检索表达式

@@ -28,6 +28,14 @@ type StoredQueryReq struct {
 	UserId int `json:"-"`
 }
 
+type StoredQueryFindReq struct {
+	dto.Pagination
+
+	Query string `json:"query"`
+
+	UserId int `json:"-"`
+}
+
 func (r *StoredQueryReq) Generate(m *models.StoredQuery) {
 	if r.QueryID != 0 {
 		m.QueryID = r.QueryID
