@@ -53,16 +53,9 @@ func CustomError(c *gin.Context) {
 					"msg":  errStr.Error(),
 				})
 			default:
-				printStack()
 				panic(err)
 			}
 		}
 	}()
 	c.Next()
-}
-
-func printStack() {
-	var buf [4096]byte
-	n := runtime.Stack(buf[:], false)
-	fmt.Printf("==> %s\n", string(buf[:n]))
 }
