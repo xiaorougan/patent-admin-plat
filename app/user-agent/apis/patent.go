@@ -411,6 +411,8 @@ func (e Patent) internalInsertIfAbsent(c *gin.Context) (int, string, string, err
 // @Accept  application/json
 // @Product application/json
 // @Router /api/v1/user-agent/patent/focus [get]
+// @Param pageIndex query int true "pageIndex"
+// @Param pageSize query int true "pageSize"
 // @Security Bearer
 func (e Patent) GetFocusPages(c *gin.Context) {
 	ups := service.UserPatent{}
@@ -435,11 +437,9 @@ func (e Patent) GetFocusPages(c *gin.Context) {
 		return
 	}
 
-	req := dto.PatentPagesReq{}
 	ps := service.Patent{}
 	err = e.MakeContext(c).
 		MakeOrm().
-		Bind(&req, binding.JSON).
 		MakeService(&ps.Service).
 		Errors
 	if err != nil {
@@ -447,6 +447,12 @@ func (e Patent) GetFocusPages(c *gin.Context) {
 		e.Error(500, err, err.Error())
 		return
 	}
+
+	pageIndex, _ := strconv.Atoi(c.Param("pageIndex"))
+	pageSize, _ := strconv.Atoi(c.Param("pageSize"))
+	req := dto.PatentPagesReq{}
+	req.PageIndex = pageIndex
+	req.PageSize = pageSize
 
 	ids := make([]int, len(list))
 	for i := 0; i < len(list); i++ {
@@ -474,7 +480,9 @@ func (e Patent) GetFocusPages(c *gin.Context) {
 // @Accept  application/json
 // @Product application/json
 // @Router /api/v1/user-agent/patent/focus/search [get]
-// @Param data body dto.FindPatentPagesReq true "搜索参数"
+// @Param pageIndex query int true "pageIndex"
+// @Param pageSize query int true "pageSize"
+// @Param query query string true "query"
 // @Security Bearer
 func (e Patent) FindFocusPages(c *gin.Context) {
 	ups := service.UserPatent{}
@@ -499,11 +507,9 @@ func (e Patent) FindFocusPages(c *gin.Context) {
 		return
 	}
 
-	req := dto.FindPatentPagesReq{}
 	ps := service.Patent{}
 	err = e.MakeContext(c).
 		MakeOrm().
-		Bind(&req, binding.JSON).
 		MakeService(&ps.Service).
 		Errors
 	if err != nil {
@@ -511,6 +517,14 @@ func (e Patent) FindFocusPages(c *gin.Context) {
 		e.Error(500, err, err.Error())
 		return
 	}
+
+	pageIndex, _ := strconv.Atoi(c.Param("pageIndex"))
+	pageSize, _ := strconv.Atoi(c.Param("pageSize"))
+	query := c.Param("query")
+	req := dto.FindPatentPagesReq{}
+	req.PageIndex = pageIndex
+	req.PageSize = pageSize
+	req.Query = query
 
 	ids := make([]int, len(list))
 	for i := 0; i < len(list); i++ {
@@ -538,6 +552,8 @@ func (e Patent) FindFocusPages(c *gin.Context) {
 // @Accept  application/json
 // @Product application/json
 // @Router /api/v1/user-agent/patent/claim [get]
+// @Param pageIndex query int true "pageIndex"
+// @Param pageSize query int true "pageSize"
 // @Security Bearer
 func (e Patent) GetClaimPages(c *gin.Context) {
 	s := service.UserPatent{}
@@ -562,10 +578,8 @@ func (e Patent) GetClaimPages(c *gin.Context) {
 	}
 
 	ps := service.Patent{}
-	req := dto.PatentPagesReq{}
 	err = e.MakeContext(c).
 		MakeOrm().
-		Bind(&req, binding.JSON).
 		MakeService(&ps.Service).
 		Errors
 	if err != nil {
@@ -573,6 +587,12 @@ func (e Patent) GetClaimPages(c *gin.Context) {
 		e.Error(500, err, err.Error())
 		return
 	}
+
+	pageIndex, _ := strconv.Atoi(c.Param("pageIndex"))
+	pageSize, _ := strconv.Atoi(c.Param("pageSize"))
+	req := dto.PatentPagesReq{}
+	req.PageIndex = pageIndex
+	req.PageSize = pageSize
 
 	ids := make([]int, len(list))
 
@@ -602,7 +622,9 @@ func (e Patent) GetClaimPages(c *gin.Context) {
 // @Accept  application/json
 // @Product application/json
 // @Router /api/v1/user-agent/patent/claim/search [get]
-// @Param data body dto.FindPatentPagesReq true "搜索参数"
+// @Param pageIndex query int true "pageIndex"
+// @Param pageSize query int true "pageSize"
+// @Param query query string true "query"
 // @Security Bearer
 func (e Patent) FindClaimPages(c *gin.Context) {
 	s := service.UserPatent{}
@@ -627,10 +649,8 @@ func (e Patent) FindClaimPages(c *gin.Context) {
 	}
 
 	ps := service.Patent{}
-	req := dto.FindPatentPagesReq{}
 	err = e.MakeContext(c).
 		MakeOrm().
-		Bind(&req, binding.JSON).
 		MakeService(&ps.Service).
 		Errors
 	if err != nil {
@@ -638,6 +658,14 @@ func (e Patent) FindClaimPages(c *gin.Context) {
 		e.Error(500, err, err.Error())
 		return
 	}
+
+	pageIndex, _ := strconv.Atoi(c.Param("pageIndex"))
+	pageSize, _ := strconv.Atoi(c.Param("pageSize"))
+	query := c.Param("query")
+	req := dto.FindPatentPagesReq{}
+	req.PageIndex = pageIndex
+	req.PageSize = pageSize
+	req.Query = query
 
 	ids := make([]int, len(list))
 
