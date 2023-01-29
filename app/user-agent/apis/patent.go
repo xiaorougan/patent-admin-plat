@@ -448,8 +448,8 @@ func (e Patent) GetFocusPages(c *gin.Context) {
 		return
 	}
 
-	pageIndex, _ := strconv.Atoi(c.Param("pageIndex"))
-	pageSize, _ := strconv.Atoi(c.Param("pageSize"))
+	pageIndex, _ := strconv.Atoi(c.Query("pageIndex"))
+	pageSize, _ := strconv.Atoi(c.Query("pageSize"))
 	req := dto.PatentPagesReq{}
 	req.PageIndex = pageIndex
 	req.PageSize = pageSize
@@ -518,9 +518,9 @@ func (e Patent) FindFocusPages(c *gin.Context) {
 		return
 	}
 
-	pageIndex, _ := strconv.Atoi(c.Param("pageIndex"))
-	pageSize, _ := strconv.Atoi(c.Param("pageSize"))
-	query := c.Param("query")
+	pageIndex, _ := strconv.Atoi(c.Query("pageIndex"))
+	pageSize, _ := strconv.Atoi(c.Query("pageSize"))
+	query := c.Query("query")
 	req := dto.FindPatentPagesReq{}
 	req.PageIndex = pageIndex
 	req.PageSize = pageSize
@@ -588,8 +588,8 @@ func (e Patent) GetClaimPages(c *gin.Context) {
 		return
 	}
 
-	pageIndex, _ := strconv.Atoi(c.Param("pageIndex"))
-	pageSize, _ := strconv.Atoi(c.Param("pageSize"))
+	pageIndex, _ := strconv.Atoi(c.Query("pageIndex"))
+	pageSize, _ := strconv.Atoi(c.Query("pageSize"))
 	req := dto.PatentPagesReq{}
 	req.PageIndex = pageIndex
 	req.PageSize = pageSize
@@ -659,9 +659,9 @@ func (e Patent) FindClaimPages(c *gin.Context) {
 		return
 	}
 
-	pageIndex, _ := strconv.Atoi(c.Param("pageIndex"))
-	pageSize, _ := strconv.Atoi(c.Param("pageSize"))
-	query := c.Param("query")
+	pageIndex, _ := strconv.Atoi(c.Query("pageIndex"))
+	pageSize, _ := strconv.Atoi(c.Query("pageSize"))
+	query := c.Query("query")
 	req := dto.FindPatentPagesReq{}
 	req.PageIndex = pageIndex
 	req.PageSize = pageSize

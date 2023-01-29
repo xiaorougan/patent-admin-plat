@@ -250,8 +250,8 @@ func (e Search) GetStoredQueryPages(c *gin.Context) {
 		return
 	}
 
-	pageIndex, _ := strconv.Atoi(c.Param("pageIndex"))
-	pageSize, _ := strconv.Atoi(c.Param("pageSize"))
+	pageIndex, _ := strconv.Atoi(c.Query("pageIndex"))
+	pageSize, _ := strconv.Atoi(c.Query("pageSize"))
 	req := dto.StoredQueryReq{}
 	req.PageIndex = pageIndex
 	req.PageSize = pageSize
@@ -301,9 +301,9 @@ func (e Search) FindStoredQueryPages(c *gin.Context) {
 		return
 	}
 
-	pageIndex, _ := strconv.Atoi(c.Param("pageIndex"))
-	pageSize, _ := strconv.Atoi(c.Param("pageSize"))
-	query := c.Param("query")
+	pageIndex, _ := strconv.Atoi(c.Query("pageIndex"))
+	pageSize, _ := strconv.Atoi(c.Query("pageSize"))
+	query := c.Query("query")
 	req := dto.StoredQueryFindReq{}
 	req.PageIndex = pageIndex
 	req.PageSize = pageSize
