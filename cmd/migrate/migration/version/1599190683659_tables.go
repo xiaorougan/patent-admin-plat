@@ -40,6 +40,7 @@ func _1599190683659Tables(db *gorm.DB, version string) error {
 			new(model.ReportRelation),
 			new(model.Dept),
 			new(model.DeptRelation),
+			new(model.Ticket),
 		)
 		if err != nil {
 			return err
