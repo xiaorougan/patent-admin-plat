@@ -20,6 +20,6 @@ func registerTicketRouter(v1 *gin.RouterGroup, authMiddleware *jwt.GinJWTMiddlew
 		r.GET("", api.GetTicketPages)
 		r.POST("", api.CreateTicket)
 		r.PUT("/:id", api.UpdateTicket)
-		r.DELETE("/:id", api.CloseTicket)
+		r.PUT("/:id/close", api.CloseTicket)
 	}
 }

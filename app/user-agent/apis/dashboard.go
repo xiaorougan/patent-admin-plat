@@ -41,8 +41,28 @@ func (e Dashboard) GetDashboard(c *gin.Context) {
 
 	userID := user.GetUserId(c)
 
-	var focusCount int64
-	if err = ups.GetFocusCount(userID, &focusCount); err != nil {
+	focusList := make([]models.UserPatent, 0)
+	if err = ups.GetFocusLists(userID, &focusList); err != nil {
+		e.Logger.Error(err)
+		e.Error(500, err, err.Error())
+		return
+	}
+	focusCount := len(focusList)
+
+	// get competitors
+	focusIds := make([]int, len(focusList))
+	for _, fp := range focusList {
+		focusIds = append(focusIds, fp.Id)
+	}
+	var _c int64
+	focusPatents, err := ps.GetPatentsByIds(focusIds, &_c)
+	if err != nil {
+		e.Logger.Error(err)
+		e.Error(500, err, err.Error())
+		return
+	}
+	competitorNodes, _, err := ps.FindInventorsAndRelationsFromPatents(focusPatents)
+	if err != nil {
 		e.Logger.Error(err)
 		e.Error(500, err, err.Error())
 		return
@@ -55,6 +75,25 @@ func (e Dashboard) GetDashboard(c *gin.Context) {
 		return
 	}
 	claimCount := len(claimList)
+
+	// get collaborators
+	claimIds := make([]int, len(claimList))
+	for _, cp := range claimList {
+		claimIds = append(claimIds, cp.PatentId)
+	}
+	var count int64
+	claimPatents, err := ps.GetPatentsByIds(claimIds, &count)
+	if err != nil {
+		e.Logger.Error(err)
+		e.Error(500, err, err.Error())
+		return
+	}
+	collaboratorNodes, _, err := ps.FindInventorsAndRelationsFromPatents(claimPatents)
+	if err != nil {
+		e.Logger.Error(err)
+		e.Error(500, err, err.Error())
+		return
+	}
 
 	ids := make([]int, 0, len(claimList))
 	for _, claim := range claimList {
@@ -120,7 +159,20 @@ func (e Dashboard) GetDashboard(c *gin.Context) {
 		PatentRecommendation: nil,
 		ReportCount:          int(reportCount),
 		PatentTotalPrice:     totalPrice,
+		Collaborators:        covertNodesToResearchers(collaboratorNodes),
+		Competitors:          covertNodesToResearchers(competitorNodes),
 	}
 
 	e.OK(res, "查询成功")
+}
+
+func covertNodesToResearchers(nodes []models.SimplifiedNode) []*dto.Researcher {
+	res := make([]*dto.Researcher, 0, len(nodes))
+	for _, n := range nodes {
+		res = append(res, &dto.Researcher{
+			Name:  n.Name,
+			Times: n.TheNumberOfPatents,
+		})
+	}
+	return res
 }

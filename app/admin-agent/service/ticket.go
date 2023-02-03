@@ -24,6 +24,7 @@ func (e *Ticket) GetTicketPages(req *dtos.TicketPagesReq, list *[]model.Ticket, 
 	err = e.Orm.Model(&data).
 		Scopes(cDto.Paginate(req.GetPageSize(), req.GetPageIndex())).
 		Where(&data).
+		Where("name LIKE ?", fmt.Sprintf("%%%s%%", req.Query)).
 		Find(list).Limit(-1).Offset(-1).
 		Count(count).Error
 	if err != nil {

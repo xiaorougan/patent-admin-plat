@@ -106,6 +106,7 @@ func (e *Report) GetReportPagesByTickets(req *dtos.ReportPagesReq, tickets []mod
 	err = e.Orm.Model(&data).
 		Scopes(cDto.Paginate(req.GetPageSize(), req.GetPageIndex())).
 		Where(&data).
+		Where("report_name LIKE ?", fmt.Sprintf("%%%s%%", req.Query)).
 		Find(&reports, reportIDs).Limit(-1).Offset(-1).
 		Count(count).Error
 	if err != nil {

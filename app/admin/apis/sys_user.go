@@ -471,11 +471,7 @@ func (e SysUser) GetInfo(c *gin.Context) {
 		e.Error(http.StatusUnauthorized, err, "登录失败")
 		return
 	}
-	dept, err := d.GetDeptByUserID(user.GetUserId(c))
-	if err != nil {
-		e.Error(http.StatusUnauthorized, err, "登录失败")
-		return
-	}
+	dept, _ := d.GetDeptByUserID(user.GetUserId(c))
 	mp["avatar"] = "https://wpimg.wallstcn.com/f778738c-e4f8-4870-b634-56703b4acafe.gif"
 	if sysUser.Avatar != "" {
 		mp["avatar"] = sysUser.Avatar

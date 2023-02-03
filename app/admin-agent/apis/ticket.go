@@ -24,6 +24,7 @@ type Ticket struct {
 // @Param pageIndex query int true "pageIndex"
 // @Param pageSize query int true "pageSize"
 // @Param type query string true "type"
+// @Param query query string true "type"
 // @Param status query string true "status"
 // @Param reportType query string false "reportType"
 // @Security Bearer
@@ -48,6 +49,7 @@ func (e Ticket) GetAllTicketPages(c *gin.Context) {
 	req.PageSize = pageSize
 	req.Type = t
 	req.Status = status
+	req.Query = c.Query("query")
 
 	list := make([]model.Ticket, 0)
 	var count int64
@@ -70,8 +72,9 @@ func (e Ticket) GetAllTicketPages(c *gin.Context) {
 			return
 		}
 
+		var _c int64
 		rt := c.Query("reportType")
-		list, err = rs.GetReportTicketListByTickets(rt, list, &count)
+		list, err = rs.GetReportTicketListByTickets(rt, list, &_c)
 		if err != nil {
 			e.Logger.Error(err)
 			e.Error(500, err, err.Error())

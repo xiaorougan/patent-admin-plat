@@ -22,12 +22,14 @@ type TicketPagesReq struct {
 	Type   string `json:"type"`
 	Status string `json:"status"`
 	UserID int    `json:"userID"`
+	Query  string `json:"query"`
 }
 
 type TicketListReq struct {
 	Type   string `json:"type"`
 	Status string `json:"status"`
 	UserID int    `json:"userID"`
+	Query  string `json:"query"`
 }
 
 type TicketRelObj interface {

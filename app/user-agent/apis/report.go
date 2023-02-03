@@ -25,6 +25,7 @@ type Report struct {
 // @Param pageIndex query int true "pageIndex"
 // @Param pageSize query int true "pageSize"
 // @Param reportType query string true "reportType"
+// @Param query query string true "query"
 // @Security Bearer
 func (e Report) GetReportPages(c *gin.Context) {
 	s := service.Ticket{}
@@ -69,6 +70,7 @@ func (e Report) GetReportPages(c *gin.Context) {
 	rtr.PageSize = pageSize
 	rtr.Type = rt
 	rtr.UserID = user.GetUserId(c)
+	rtr.Query = c.Query("query")
 
 	res, err := rs.GetReportPagesByTickets(&rtr, list, &count)
 	if err != nil {

@@ -53,6 +53,7 @@ type ReportPagesReq struct {
 	cDto.Pagination
 	Type   string `json:"type"`
 	UserID int    `json:"userID"`
+	Query  string `json:"query"`
 }
 
 func (s *ReportPagesReq) GetConditions() string {
