@@ -7,7 +7,6 @@ import (
 	"github.com/go-admin-team/go-admin-core/sdk/service"
 	"github.com/prometheus/common/log"
 	"github.com/yanyiwu/gojieba"
-	"go-admin/app/admin-agent/service/dtos"
 	"go-admin/app/user-agent/models"
 	"go-admin/app/user-agent/service/dto"
 	cDto "go-admin/common/dto"
@@ -158,23 +157,6 @@ func (e *Patent) GeByPNM(d *dto.PatentBriefInfo, model *models.Patent) error {
 	//引用传递、函数名、形参、返回值
 	var err error
 	db := e.Orm.First(model, d.PNM)
-	err = db.Error
-	if err != nil && errors.Is(err, gorm.ErrRecordNotFound) {
-		err = errors.New("查看专利不存在或无权查看")
-		e.Log.Errorf("db error:%s", err)
-		return err
-	}
-	if db.Error != nil {
-		e.Log.Errorf("db error:%s", err)
-		return err
-	}
-	return nil
-}
-
-// GeById 获取Patent对象
-func (e *Patent) GeById(d *dtos.ReportRelaReq, model *models.Patent) error {
-	var err error
-	db := e.Orm.Where("patent_id = ?", d.PatentId).First(model)
 	err = db.Error
 	if err != nil && errors.Is(err, gorm.ErrRecordNotFound) {
 		err = errors.New("查看专利不存在或无权查看")

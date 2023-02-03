@@ -38,8 +38,8 @@ func _1599190683659Tables(db *gorm.DB, version string) error {
 			new(modelsUser.TraceLog),
 			new(model.Report),
 			new(model.ReportRelation),
-			new(model.Dept),
-			new(model.DeptRelation),
+			new(models.SysDept),
+			new(models.DeptRelation),
 			new(model.Ticket),
 		)
 		if err != nil {

@@ -11,32 +11,21 @@ import (
 	"time"
 )
 
-const (
-	ticketStatusOpen  = "open"
-	ticketStatusClose = "closed"
-)
-
 type Ticket struct {
 	service.Service
 }
 
 func (e *Ticket) GetTicketPages(req *dtos.TicketPagesReq, list *[]model.Ticket, count *int64) error {
-	cond := req.GenConditions()
 	var err error
 	var data model.Ticket
-	if len(cond) != 0 {
-		err = e.Orm.Model(&data).
-			Scopes(cDto.Paginate(req.GetPageSize(), req.GetPageIndex())).
-			Where(cond).
-			Find(list).Limit(-1).Offset(-1).
-			Count(count).Error
-	} else {
-		err = e.Orm.Model(&data).
-			Scopes(cDto.Paginate(req.GetPageSize(), req.GetPageIndex())).
-			Find(list).Limit(-1).Offset(-1).
-			Count(count).Error
-	}
-
+	data.Type = req.Type
+	data.Status = req.Status
+	data.CreateBy = req.UserID
+	err = e.Orm.Model(&data).
+		Scopes(cDto.Paginate(req.GetPageSize(), req.GetPageIndex())).
+		Where(&data).
+		Find(list).Limit(-1).Offset(-1).
+		Count(count).Error
 	if err != nil {
 		e.Log.Errorf("db error:%s", err)
 		return err
@@ -44,13 +33,30 @@ func (e *Ticket) GetTicketPages(req *dtos.TicketPagesReq, list *[]model.Ticket, 
 	return nil
 }
 
-func (e *Ticket) Create(req *dtos.TicketReq) error {
+func (e *Ticket) GetTicketList(req *dtos.TicketListReq, list *[]model.Ticket, count *int64) error {
+	var err error
+	var data model.Ticket
+	data.Type = req.Type
+	data.Status = req.Status
+	data.CreateBy = req.UserID
+	err = e.Orm.Model(&data).
+		Where(&data).
+		Find(list).Limit(-1).Offset(-1).
+		Count(count).Error
+	if err != nil {
+		e.Log.Errorf("db error:%s", err)
+		return err
+	}
+	return nil
+}
+
+func (e *Ticket) Create(req *dtos.TicketDBReq) (*model.Ticket, error) {
 	var user aModels.SysUser
 	err := e.Orm.Model(&user).Debug().
 		First(&user, req.UserID).Error
 	if err != nil {
 		e.Log.Errorf("db error: %s", err)
-		return err
+		return nil, err
 	}
 
 	var t model.Ticket
@@ -66,18 +72,18 @@ func (e *Ticket) Create(req *dtos.TicketReq) error {
 	}
 	t.OptLogs = ols.String()
 
-	t.Status = ticketStatusOpen
+	t.Status = dtos.TicketStatusOpen
 
 	err = e.Orm.Create(&t).Error
 	if err != nil {
 		e.Log.Errorf("db error: %s", err)
-		return err
+		return nil, err
 	}
 
-	return nil
+	return &t, nil
 }
 
-func (e *Ticket) Update(id int, req *dtos.TicketReq) error {
+func (e *Ticket) Update(id int, req *dtos.TicketDBReq) error {
 	var user aModels.SysUser
 	err := e.Orm.Model(&user).Debug().
 		First(&user, req.UserID).Error
@@ -118,7 +124,7 @@ func (e *Ticket) Update(id int, req *dtos.TicketReq) error {
 	return nil
 }
 
-func (e *Ticket) Close(id int, req *dtos.TicketReq) error {
+func (e *Ticket) Close(id int, req *dtos.TicketDBReq) error {
 	var user aModels.SysUser
 	err := e.Orm.Model(&user).Debug().
 		First(&user, req.UserID).Error
@@ -158,7 +164,58 @@ func (e *Ticket) Close(id int, req *dtos.TicketReq) error {
 	}
 	t.OptLogs = ols.String()
 
-	t.Type = ticketStatusClose
+	t.Status = dtos.TicketStatusClosed
+
+	update := e.Orm.Model(&t).Where("id = ?", &t.ID).Updates(&t)
+	if err = update.Error; err != nil {
+		e.Log.Errorf("db error: %s", err)
+		return err
+	}
+
+	return nil
+}
+
+func (e *Ticket) Finish(id int, req *dtos.TicketDBReq) error {
+	var user aModels.SysUser
+	err := e.Orm.Model(&user).Debug().
+		First(&user, req.UserID).Error
+	if err != nil {
+		e.Log.Errorf("db error: %s", err)
+		return err
+	}
+
+	var t model.Ticket
+	db := e.Orm.First(&t, id)
+	if err = db.Error; err != nil {
+		e.Log.Errorf("Service CloseTicket error: %s", err)
+		return err
+	}
+
+	req.Generate(&t)
+	t.UpdateBy = req.UserID
+
+	// update logs
+	ols, err := unmarshalOptLogs([]byte(t.OptLogs))
+	if err != nil {
+		e.Log.Errorf("db error: %s", err)
+		return err
+	}
+	if len(user.NickName) != 0 {
+		if len(req.OptMsg) != 0 {
+			ols.addCloseOptLog(user.NickName, req.OptMsg)
+		} else {
+			ols.addCompleteOptLog(user.NickName)
+		}
+	} else {
+		if len(req.OptMsg) != 0 {
+			ols.addCloseOptLog(user.NickName, req.OptMsg)
+		} else {
+			ols.addCompleteOptLog(user.Username)
+		}
+	}
+	t.OptLogs = ols.String()
+
+	t.Status = dtos.TicketStatusFinished
 
 	update := e.Orm.Model(&t).Where("id = ?", &t.ID).Updates(&t)
 	if err = update.Error; err != nil {
