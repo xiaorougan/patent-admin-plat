@@ -21,7 +21,6 @@ type PackageBack struct {
 type PackagePageGetReq struct {
 	dto.Pagination `search:"-"`
 	PackageBack
-	PatentTagOrder
 	common.ControlBy
 	CreatedAt time.Time `json:"CreatedAt" gorm:"comment:创建时间"`
 	UpdatedAt time.Time `json:"UpdatedAt" gorm:"comment:最后更新时间"`

@@ -16,17 +16,6 @@ const (
 	FilesDelete = "del"
 )
 
-type PackageGetPageReq struct {
-	dto.Pagination `search:"-"`
-	PackageId      int    `form:"packageId" search:"type:exact;column:package_id;table:package" comment:"专利包ID"`
-	PackageName    string `form:"packageName" search:"type:contains;column:package_name;table:package" comment:"专利包名"`
-	Desc           string `form:"desc" search:"type:contains;column:desc;table:package" comment:"描述"`
-}
-
-func (m *PackageGetPageReq) GetNeedSearch() interface{} {
-	return *m
-}
-
 type PackageListReq struct {
 	UserId int `json:"-" form:"desc" search:"type:order;column:created_at;table:package"`
 }

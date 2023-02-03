@@ -14,26 +14,6 @@ type Package struct {
 	service.Service
 }
 
-//// GetPage 获取Package列表
-//func (e *Package) GetPage(c *dtos.PackageGetPageReq, list *[]models.Package, count *int64) error {
-//	var err error
-//	//var data models.Package
-//	// todo: check
-//	err = e.Orm.Debug().
-//		Scopes(
-//			cDto.MakeCondition(c.GetNeedSearch()),
-//			cDto.Paginate(c.GetPageSize(), c.GetPageIndex()),
-//			//actions.Permission(data.TableName(), p),
-//		).
-//		Find(list).Limit(-1).Offset(-1).
-//		Count(count).Error
-//	if err != nil {
-//		e.Log.Errorf("db error: %s", err)
-//		return err
-//	}
-//	return nil
-//}
-
 func (e *Package) ListByUserId(c *dto.PackageListReq, list *[]models.Package) error {
 	var err error
 	//var data models.Package

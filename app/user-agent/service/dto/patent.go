@@ -9,10 +9,6 @@ import (
 
 const PatentPriceBase = 8000
 
-type PatentOrder struct {
-	CreatedAtOrder string `search:"type:order;column:created_at;table:patent" form:"createdAtOrder"`
-}
-
 type PatentReq struct {
 	PatentId int    `json:"patentId" gorm:"size:128;comment:专利ID"`
 	TI       string `json:"TI" gorm:"size:128;comment:专利名"`
