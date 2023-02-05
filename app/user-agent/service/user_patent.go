@@ -27,13 +27,13 @@ func (e *UserPatent) GetUserPatentIds(c *dto.UserPatentObject, list *[]models.Us
 }
 
 // GetClaimLists 通过专利列表的ID数组获得认领专利列表
-func (e *UserPatent) GetClaimLists(c *dto.UserPatentObject, list *[]models.UserPatent, count *int64) error {
+func (e *UserPatent) GetClaimLists(id int, list *[]models.UserPatent) error {
 	var err error
 	var data models.UserPatent
 	err = e.Orm.Model(&data).
-		Where("Type = ? AND User_Id = ?", dto.ClaimType, c.UserId).
+		Where("Type = ? AND User_Id = ?", dto.ClaimType, id).
 		Find(list).Limit(-1).Offset(-1).
-		Count(count).Error
+		Error
 
 	if err != nil {
 		e.Log.Errorf("db error:%s", err)
@@ -44,11 +44,11 @@ func (e *UserPatent) GetClaimLists(c *dto.UserPatentObject, list *[]models.UserP
 }
 
 // GetClaimCount 通过专利列表的ID数组获得认领专利数量
-func (e *UserPatent) GetClaimCount(c *dto.UserPatentObject, count *int64) error {
+func (e *UserPatent) GetClaimCount(id int, count *int64) error {
 	var err error
 	var data models.UserPatent
 	err = e.Orm.Model(&data).
-		Where("Type = ? AND User_Id = ?", dto.ClaimType, c.UserId).
+		Where("Type = ? AND User_Id = ?", dto.ClaimType, id).
 		Count(count).Error
 
 	if err != nil {
@@ -60,13 +60,13 @@ func (e *UserPatent) GetClaimCount(c *dto.UserPatentObject, count *int64) error 
 }
 
 // GetFocusLists 通过专利列表的ID数组获得关注专利列表
-func (e *UserPatent) GetFocusLists(c *dto.UserPatentObject, list *[]models.UserPatent, count *int64) error {
+func (e *UserPatent) GetFocusLists(id int, list *[]models.UserPatent) error {
 	var err error
 	var data models.UserPatent
 	err = e.Orm.Model(&data).
-		Where("Type = ? AND User_Id = ?", dto.FocusType, c.UserId).
+		Where("Type = ? AND User_Id = ?", dto.FocusType, id).
 		Find(list).Limit(-1).Offset(-1).
-		Count(count).Error
+		Error
 	if err != nil {
 		e.Log.Errorf("db error:%s", err)
 		return err
@@ -75,11 +75,11 @@ func (e *UserPatent) GetFocusLists(c *dto.UserPatentObject, list *[]models.UserP
 }
 
 // GetFocusCount 通过专利列表的ID数组获得关注专利数量
-func (e *UserPatent) GetFocusCount(c *dto.UserPatentObject, count *int64) error {
+func (e *UserPatent) GetFocusCount(id int, count *int64) error {
 	var err error
 	var data models.UserPatent
 	err = e.Orm.Model(&data).
-		Where("Type = ? AND User_Id = ?", dto.FocusType, c.UserId).
+		Where("Type = ? AND User_Id = ?", dto.FocusType, id).
 		Count(count).Error
 	if err != nil {
 		e.Log.Errorf("db error:%s", err)

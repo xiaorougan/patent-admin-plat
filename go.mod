@@ -1,6 +1,6 @@
 module go-admin
 
-go 1.17
+go 1.19
 
 require (
 	github.com/alibaba/sentinel-golang v1.0.4
@@ -36,7 +36,7 @@ require (
 )
 
 require (
-	github.com/Gleiphir2769/s-cache v0.1.1
+	github.com/Gleiphir2769/s-cache v0.1.2
 	github.com/Knetic/govaluate v3.0.1-0.20171022003610-9aa49832a739+incompatible // indirect
 	github.com/KyleBanks/depth v1.2.1 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect

@@ -10,7 +10,7 @@ INSERT INTO `sys_user` (`user_id`, `username`, `password`, `nick_name`, `phone`,
 INSERT INTO `sys_user` (`user_id`, `username`, `password`, `nick_name`, `phone`, `role_id`, `salt`, `avatar`, `sex`, `email`, `remark`, `status`, `create_by`, `update_by`, `created_at`, `updated_at`, `deleted_at`) VALUES (4, 'user3', '$2a$10$/Glr4g9Svr6O0kvjsRJCXu3f0W8/dsP3XZyVNi1019ratWpSPMyw.', 'user3', '13818888888', 2, NULL, NULL, '1', '1@qq.com', NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO `sys_user` (`user_id`, `username`, `password`, `nick_name`, `phone`, `role_id`, `salt`, `avatar`, `sex`, `email`, `remark`, `status`, `create_by`, `update_by`, `created_at`, `updated_at`, `deleted_at`) VALUES (5, 'user4', '$2a$10$/Glr4g9Svr6O0kvjsRJCXu3f0W8/dsP3XZyVNi1019ratWpSPMyw.', 'user4', '13818888888', 2, NULL, NULL, '1', '1@qq.com', NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 
-INSERT INTO `dept` (`dept_id`, `dept_name`, `dept_properties`, `research_interest`, `created_at`, `updated_at`, `dept_status`, `create_by`, `update_by`) VALUES (1, '北邮网安六组', '北京邮电大学网络空间安全学院六组', '隐写分析，加密算法，NLP', '2022-10-18 18:49:24', NULL, '存在', NULL, NULL);
-INSERT INTO `dept` (`dept_id`, `dept_name`, `dept_properties`, `research_interest`, `created_at`, `updated_at`, `dept_status`, `create_by`, `update_by`) VALUES (2, '北邮网安七组', '北京邮电大学网络空间安全学院六组', '网络攻防', '2022-10-18 18:49:24', NULL, '存在', NULL, NULL);
+INSERT INTO `dept` (`dept_id`, `dept_name`, `dept_properties`, `created_at`, `updated_at`, `create_by`, `update_by`) VALUES (1, '北邮网安六组', '北京邮电大学网络空间安全学院六组', '2022-10-18 18:49:24', NULL, NULL, NULL);
+INSERT INTO `dept` (`dept_id`, `dept_name`, `dept_properties`, `created_at`, `updated_at`, `create_by`, `update_by`) VALUES (2, '北邮网安七组', '北京邮电大学网络空间安全学院六组', '2022-10-18 18:49:24', NULL, NULL, NULL);
 
 -- 数据完成 ;

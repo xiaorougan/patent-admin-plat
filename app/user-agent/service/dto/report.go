@@ -1,5 +1,7 @@
 package dto
 
+import "encoding/json"
+
 type NoveltyReportReq struct {
 	KeyWords  []string `json:"keyWords"`
 	Title     string   `json:"title"`
@@ -30,4 +32,16 @@ type NoveltyReportResp struct {
 	VeryRelativeNum string `json:"VERY_RELATIVE_NUM"`
 	SearchResult    string `json:"SEARCH_RESULT"`
 	Conclusion      string `json:"CONCLUSION"`
+}
+
+func (r *NoveltyReportResp) String() string {
+	bs, _ := json.Marshal(r)
+	return string(bs)
+}
+
+func (r *NoveltyReportResp) Map() map[string]interface{} {
+	bs, _ := json.Marshal(r)
+	res := make(map[string]interface{})
+	_ = json.Unmarshal(bs, &res)
+	return res
 }

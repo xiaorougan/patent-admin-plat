@@ -27,6 +27,21 @@ func (e *Search) GetQueryPage(c *dto.StoredQueryReq, list *[]models.StoredQuery,
 	return nil
 }
 
+func (e *Search) FindQueryPages(c *dto.StoredQueryFindReq, list *[]models.StoredQuery, count *int64) error {
+	var err error
+	var data models.StoredQuery
+	err = e.Orm.Model(&data).
+		Scopes(cDto.Paginate(c.GetPageSize(), c.GetPageIndex())).
+		Where("name LIKE ?", fmt.Sprintf("%%%s%%", c.Query)).
+		Find(list).Limit(-1).Offset(-1).
+		Count(count).Error
+	if err != nil {
+		e.Log.Errorf("db error:%s", err)
+		return err
+	}
+	return nil
+}
+
 func (e *Search) InsertQuery(c *dto.StoredQueryReq) error {
 	var err error
 	var data models.StoredQuery

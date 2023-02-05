@@ -23,6 +23,10 @@ type Dashboard struct {
 	ReportCount int `json:"reportCount"`
 	// 专利预估价
 	PatentTotalPrice int `json:"patentTotalPrice"`
+	// 合作者
+	Collaborators []*Researcher `json:"collaborators"`
+	// 竞争者
+	Competitors []*Researcher `json:"competitors"`
 }
 
 type PublicationDate struct {
@@ -69,4 +73,9 @@ type ReportInfo struct {
 	Novelty      int `json:"novelty"`
 	Infringement int `json:"infringement"`
 	Valuation    int `json:"valuation"`
+}
+
+type Researcher struct {
+	Name  string `json:"name"`
+	Times int    `json:"times"`
 }

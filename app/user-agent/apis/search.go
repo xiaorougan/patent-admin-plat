@@ -234,14 +234,14 @@ func (e Search) InsertStoredQuery(c *gin.Context) {
 // @Param data body dto.StoredQueryReq true "表达式"
 // @Success 200
 // @Router /api/v1/user-agent/auth-search/queries [get]
+// @Param pageIndex query int true "pageIndex"
+// @Param pageSize query int true "pageSize"
 // @Security Bearer
 func (e Search) GetStoredQueryPages(c *gin.Context) {
 	s := service.Search{}
-	req := dto.StoredQueryReq{}
 
 	err := e.MakeContext(c).
 		MakeOrm().
-		Bind(&req, binding.JSON).
 		MakeService(&s.Service).
 		Errors
 	if err != nil {
@@ -249,6 +249,12 @@ func (e Search) GetStoredQueryPages(c *gin.Context) {
 		e.Error(500, err, err.Error())
 		return
 	}
+
+	pageIndex, _ := strconv.Atoi(c.Query("pageIndex"))
+	pageSize, _ := strconv.Atoi(c.Query("pageSize"))
+	req := dto.StoredQueryReq{}
+	req.PageIndex = pageIndex
+	req.PageSize = pageSize
 
 	if len(req.DB) == 0 {
 		// todo: 设置默认数据库配置文件
@@ -262,6 +268,54 @@ func (e Search) GetStoredQueryPages(c *gin.Context) {
 	list := make([]models.StoredQuery, 0)
 	var count int64
 	err = s.GetQueryPage(&req, &list, &count)
+	if err != nil {
+		e.Logger.Error(err)
+		e.Error(500, err, err.Error())
+		return
+	}
+
+	e.PageOK(list, int(count), req.GetPageIndex(), req.GetPageSize(), "查询成功")
+}
+
+// FindStoredQueryPages
+// @Summary 搜索暂存的检索表达式（分页）
+// @Description 搜索暂存的检索表达式（分页）
+// @Tags 专利检索
+// @Param data body dto.StoredQueryFindReq true "搜索参数"
+// @Success 200
+// @Router /api/v1/user-agent/auth-search/queries/search [get]
+// @Param pageIndex query int true "pageIndex"
+// @Param pageSize query int true "pageSize"
+// @Param query query string true "query"
+// @Security Bearer
+func (e Search) FindStoredQueryPages(c *gin.Context) {
+	s := service.Search{}
+
+	err := e.MakeContext(c).
+		MakeOrm().
+		MakeService(&s.Service).
+		Errors
+	if err != nil {
+		e.Logger.Error(err)
+		e.Error(500, err, err.Error())
+		return
+	}
+
+	pageIndex, _ := strconv.Atoi(c.Query("pageIndex"))
+	pageSize, _ := strconv.Atoi(c.Query("pageSize"))
+	query := c.Query("query")
+	req := dto.StoredQueryFindReq{}
+	req.PageIndex = pageIndex
+	req.PageSize = pageSize
+	req.Query = query
+
+	if len(c.GetHeader("Authorization")) != 0 {
+		req.UserId = user.GetUserId(c)
+	}
+
+	list := make([]models.StoredQuery, 0)
+	var count int64
+	err = s.FindQueryPages(&req, &list, &count)
 	if err != nil {
 		e.Logger.Error(err)
 		e.Error(500, err, err.Error())

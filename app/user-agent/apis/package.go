@@ -19,42 +19,6 @@ type Package struct {
 	api.Api
 }
 
-//// GetPage
-//// @Summary 列表专利包信息数据
-//// @Description 获取JSON
-//// @Tags 专利包
-//// @Param packageName query string false "packageName"
-//// @Router /api/v1/package [get]
-//// @Security Bearer
-//func (e Package) GetPage(c *gin.Context) {
-//	s := service.Package{}
-//	req := dtos.PackageGetPageReq{}
-//	err := e.MakeContext(c).
-//		MakeOrm().
-//		Bind(&req).
-//		MakeService(&s.Service).
-//		Errors
-//	if err != nil {
-//		e.Logger.Error(err)
-//		e.Error(500, err, err.Error())
-//		return
-//	}
-//
-//	//数据权限检查
-//	//p := actions.GetPermissionFromContext(c)
-//
-//	list := make([]models.Package, 0)
-//	var count int64
-//
-//	err = s.GetPage(&req, &list, &count)
-//	if err != nil {
-//		e.Error(500, err, "查询失败")
-//		return
-//	}
-//
-//	e.PageOK(list, int(count), req.GetPageIndex(), req.GetPageSize(), "查询成功")
-//}
-
 // ListByCurrentUser
 // @Summary 获取当前用户专利包列表
 // @Description 获取JSON
@@ -81,6 +45,43 @@ func (e Package) ListByCurrentUser(c *gin.Context) {
 
 	err = s.ListByUserId(&req, &list)
 	if err != nil {
+		e.Error(500, err, err.Error())
+		return
+	}
+
+	e.OK(list, "查询成功")
+}
+
+// Find
+// @Summary 搜索当前用户专利包列表
+// @Description 获取JSON
+// @Tags 专利包
+// @Accept  application/json
+// @Product application/json
+// @Router /api/v1/user-agent/package/search [get]
+// @Param data body dto.FindPatentPagesReq true "搜索参数"
+// @Security Bearer
+func (e Package) Find(c *gin.Context) {
+	s := service.Package{}
+	req := dto.PackageFindReq{}
+	err := e.MakeContext(c).
+		MakeOrm().
+		Bind(&req).
+		MakeService(&s.Service).
+		Errors
+	if err != nil {
+		e.Logger.Error(err)
+		e.Error(500, err, err.Error())
+		return
+	}
+
+	req.UserId = user.GetUserId(c)
+
+	list := make([]models.Package, 0)
+
+	err = s.FindForCurrentUser(&req, &list)
+	if err != nil {
+		e.Logger.Error(err)
 		e.Error(500, err, err.Error())
 		return
 	}
@@ -306,7 +307,7 @@ func (e Package) GetPackagePatents(c *gin.Context) {
 		ids[i] = list[i].PatentId
 	}
 
-	res, err := s1.GetPageByIds(ids, &count2)
+	res, err := s1.GetPatentsByIds(ids, &count2)
 	if err != nil {
 		e.Error(500, err, err.Error())
 		return
@@ -563,7 +564,7 @@ func (e Package) GetRelationGraphByPackage(c *gin.Context) {
 		MakeService(&sp.Service).
 		Errors
 
-	listp, err := sp.GetPageByIds(ids, &count)
+	listp, err := sp.GetPatentsByIds(ids, &count)
 	if err != nil {
 		e.Logger.Error(err)
 		e.Error(500, err, err.Error())
@@ -618,7 +619,7 @@ func (e Package) GetTechGraphByPackage(c *gin.Context) {
 		MakeService(&sp.Service).
 		Errors
 
-	listp, err := sp.GetPageByIds(ids, &count)
+	listp, err := sp.GetPatentsByIds(ids, &count)
 	if err != nil {
 		e.Logger.Error(err)
 		return

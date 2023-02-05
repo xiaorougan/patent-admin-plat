@@ -3,14 +3,11 @@ package dto
 import (
 	"encoding/json"
 	"go-admin/app/user-agent/models"
+	cDto "go-admin/common/dto"
 	common "go-admin/common/models"
 )
 
 const PatentPriceBase = 8000
-
-type PatentOrder struct {
-	CreatedAtOrder string `search:"type:order;column:created_at;table:patent" form:"createdAtOrder"`
-}
 
 type PatentReq struct {
 	PatentId int    `json:"patentId" gorm:"size:128;comment:专利ID"`
@@ -80,4 +77,13 @@ func (r *PatentDescReq) GeneratePatentPackage(model *models.PatentPackage) {
 	model.PNM = r.PNM
 	model.PackageId = r.PackageID
 	model.Desc = r.Desc
+}
+
+type PatentPagesReq struct {
+	cDto.Pagination
+}
+
+type FindPatentPagesReq struct {
+	cDto.Pagination
+	Query string `json:"query"`
 }

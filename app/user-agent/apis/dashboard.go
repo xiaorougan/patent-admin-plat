@@ -39,19 +39,57 @@ func (e Dashboard) GetDashboard(c *gin.Context) {
 		return
 	}
 
-	req := dto.NewEmptyClaim()
-	req.UserId = user.GetUserId(c)
+	userID := user.GetUserId(c)
 
-	var focusCount int64
-	if err = ups.GetFocusCount(req, &focusCount); err != nil {
+	focusList := make([]models.UserPatent, 0)
+	if err = ups.GetFocusLists(userID, &focusList); err != nil {
+		e.Logger.Error(err)
+		e.Error(500, err, err.Error())
+		return
+	}
+	focusCount := len(focusList)
+
+	// get competitors
+	focusIds := make([]int, len(focusList))
+	for _, fp := range focusList {
+		focusIds = append(focusIds, fp.Id)
+	}
+	var _c int64
+	focusPatents, err := ps.GetPatentsByIds(focusIds, &_c)
+	if err != nil {
+		e.Logger.Error(err)
+		e.Error(500, err, err.Error())
+		return
+	}
+	competitorNodes, _, err := ps.FindInventorsAndRelationsFromPatents(focusPatents)
+	if err != nil {
 		e.Logger.Error(err)
 		e.Error(500, err, err.Error())
 		return
 	}
 
 	claimList := make([]models.UserPatent, 0)
-	var claimCount int64
-	if err = ups.GetClaimLists(req, &claimList, &claimCount); err != nil {
+	if err = ups.GetClaimLists(userID, &claimList); err != nil {
+		e.Logger.Error(err)
+		e.Error(500, err, err.Error())
+		return
+	}
+	claimCount := len(claimList)
+
+	// get collaborators
+	claimIds := make([]int, len(claimList))
+	for _, cp := range claimList {
+		claimIds = append(claimIds, cp.PatentId)
+	}
+	var count int64
+	claimPatents, err := ps.GetPatentsByIds(claimIds, &count)
+	if err != nil {
+		e.Logger.Error(err)
+		e.Error(500, err, err.Error())
+		return
+	}
+	collaboratorNodes, _, err := ps.FindInventorsAndRelationsFromPatents(claimPatents)
+	if err != nil {
 		e.Logger.Error(err)
 		e.Error(500, err, err.Error())
 		return
@@ -62,7 +100,7 @@ func (e Dashboard) GetDashboard(c *gin.Context) {
 		ids = append(ids, claim.PatentId)
 	}
 	var patentCount int64
-	patents, err := ps.GetPageByIds(ids, &patentCount)
+	patents, err := ps.GetPatentsByIds(ids, &patentCount)
 	if err != nil {
 		e.Logger.Error(err)
 		e.Error(500, err, err.Error())
@@ -121,7 +159,20 @@ func (e Dashboard) GetDashboard(c *gin.Context) {
 		PatentRecommendation: nil,
 		ReportCount:          int(reportCount),
 		PatentTotalPrice:     totalPrice,
+		Collaborators:        covertNodesToResearchers(collaboratorNodes),
+		Competitors:          covertNodesToResearchers(competitorNodes),
 	}
 
 	e.OK(res, "查询成功")
+}
+
+func covertNodesToResearchers(nodes []models.SimplifiedNode) []*dto.Researcher {
+	res := make([]*dto.Researcher, 0, len(nodes))
+	for _, n := range nodes {
+		res = append(res, &dto.Researcher{
+			Name:  n.Name,
+			Times: n.TheNumberOfPatents,
+		})
+	}
+	return res
 }
